@@ -6,6 +6,8 @@ A coding clinic is a timeboxed session where two or more participants will colla
 
 codx has come to help developers to connect with other developers and solve problmes together.
 
+![Prototype](./prototype_1.png)
+
 ## Features
 
 * Friendly "Slack-discourse" environment
