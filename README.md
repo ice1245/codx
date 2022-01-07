@@ -6,8 +6,6 @@ A coding clinic is a timeboxed session where two or more participants will colla
 
 codx has come to help developers to connect with other developers and solve problmes together.
 
-![Prototype](./prototype_1.png)
-
 ## Features
 
 * Friendly "Slack-discourse" environment
@@ -18,4 +16,8 @@ codx has come to help developers to connect with other developers and solve prob
 * Forums
 * Multiple communities
 
+## Mockups
 
+![image](https://user-images.githubusercontent.com/767180/148520333-c15fd9f9-c0f1-451f-987b-2d5ab6019760.png)
+
+![image](https://user-images.githubusercontent.com/767180/148520789-81e0367b-e343-42ed-b2c8-40dd551fbc16.png)
