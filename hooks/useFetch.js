@@ -1,6 +1,6 @@
 import axios from "axios";
 const useFetch = axios.create({
-  baseURL: "http://localhost:1337/",
+  baseURL: process.env.VUE_APP_API,
 });
 useFetch.interceptors.request.use(
   async (config) => {
