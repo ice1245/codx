@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import store from "../store";
+import { $storex } from "@/store";
 const routes = [
   {
     path: "/login",
@@ -18,8 +18,8 @@ const routes = [
   },
   {
     path: "/",
-    name: "Profile",
-    component: () => import("../views/Profile.vue"),
+    name: "Main",
+    component: () => import("../views/Main.vue"),
   },
 ];
 
@@ -28,14 +28,14 @@ const router = createRouter({
   routes,
 });
 router.beforeEach((to, from, next) => {
-  store.dispatch("fetchAccessToken");
+  $storex.auth.fetchAccessToken()
   if (to.fullPath === "/") {
-    if (!store.state.auth) {
+    if (!$storex.auth.authenticated) {
       next("/login");
     }
   }
   if (to.fullPath === "/login") {
-    if (store.state.auth) {
+    if ($storex.auth.authenticated) {
       next("/");
     }
   }

@@ -1,18 +1,9 @@
 <template>
-  <div class="max-w-md py-2 border border-gray-400 h-full">
+  <div class="max-w-md py-2 h-full">
     <div class="flex items-center justify-between pt-4 md:px-8 px-6">
       <p class="font-medium text-2xl lg:text-3xl text-gray-100 text-center">
         My Profile
       </p>
-      <div class="flex items-center">
-        <button
-          @click="logout"
-          class="text-white mx-2 tracking-wide font-medium cursor-pointer select-none"
-        >
-          Logout
-        </button>
-        <DotsVerticalIcon class="cursor-pointer w-5 md:w-6 text-gray-900" />
-      </div>
     </div>
     <div class="flex flex-col items-center justify-center space-y-3 pt-4">
       <div class="mt-3 relative flex">
@@ -85,7 +76,6 @@
 </template>
 <script>
 import {
-  DotsVerticalIcon,
   UserIcon,
   ChevronDownIcon,
   ChevronUpIcon,
@@ -95,7 +85,6 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 export default {
   components: {
-    DotsVerticalIcon,
     UserIcon,
     ChevronDownIcon,
     ChevronUpIcon,

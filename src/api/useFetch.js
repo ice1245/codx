@@ -1,8 +1,12 @@
 import axios from "axios";
-const useFetch = axios.create({
+import fakeApi from "@/api/fakeApi"
+
+const apiURL = process.env.VUE_APP_API
+const useFakeApi = apiURL === 'fakeApi'
+const api = axios.create({
   baseURL: process.env.VUE_APP_API,
 });
-useFetch.interceptors.request.use(
+api.interceptors.request.use(
   async (config) => {
     config.header = config.headers;
     if (localStorage.getItem("token")) {
@@ -15,7 +19,8 @@ useFetch.interceptors.request.use(
   }
 );
 
-useFetch.interceptors.response.use(function (response) {
+api.interceptors.response.use(function (response) {
   return response;
 });
-export { useFetch };
+
+export const useFetch = useFakeApi ? fakeApi : api

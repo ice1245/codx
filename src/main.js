@@ -5,5 +5,11 @@ import "./assets/tailwind.css";
 import store from "./store";
 import VueToast from "vue-toast-notification";
 import "vue-toast-notification/dist/theme-sugar.css";
-const app = createApp(App).use(store).use(router).use(VueToast).mount("#app");
+import Vuex from 'vuex'
+const app = createApp(App)
+  .use(store)
+  .use(router)
+  .use(VueToast)
+  .use(Vuex)
+  .mount("#app");
 store.app = app;
