@@ -27,17 +27,15 @@ const router = createRouter({
   history: createWebHistory(process.env.VUE_APP_BASE_URL),
   routes,
 });
-router.beforeEach((to, from, next) => {
-  $storex.auth.fetchAccessToken()
-  if (to.fullPath === "/") {
-    if (!$storex.auth.authenticated) {
-      next("/login");
-    }
+router.beforeEach(async (to, from, next) => {
+  const { fullPath } = to
+  if (fullPath === "/logout") {
+    await $storex.auth.logout()
+  } else {
+    await $storex.auth.fetchAccessToken()
   }
-  if (to.fullPath === "/login") {
-    if ($storex.auth.authenticated) {
-      next("/");
-    }
+  if (!$storex.auth.authenticated) {
+    fullPath !== '/login' && next("/login");
   }
   next();
 });
