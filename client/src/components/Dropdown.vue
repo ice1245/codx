@@ -37,6 +37,21 @@
               />
             </a>
           </MenuItem>
+          <MenuItem v-slot="{ active }">
+            <a
+              :class="[
+                active ? 'bg-black-300 text-gray-900' : 'text-gray-900',
+                'group flex items-center justify-between transition-all font-medium hover:text-gray-500 px-6 py-1 text-md',
+              ]"
+              @click="$router.push('/logout')"
+            >
+              Logout
+              <LogoutIcon
+                class="ml-3 h-4 w-4 text-gray-900 group-hover:text-gray-500"
+                aria-hidden="true"
+              />
+            </a>
+          </MenuItem>
         </div>
       </MenuItems>
     </transition>
@@ -45,7 +60,7 @@
 
 <script>
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { PencilAltIcon } from "@heroicons/vue/solid";
+import { PencilAltIcon, LogoutIcon } from "@heroicons/vue/solid";
 
 export default {
   components: {
@@ -54,6 +69,7 @@ export default {
     MenuItem,
     MenuItems,
     PencilAltIcon,
+    LogoutIcon,
   },
   props: {
     imgClass: { type: String, default: "h-8 w-8 rounded-full" },

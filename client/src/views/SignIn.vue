@@ -54,7 +54,7 @@
               Password
             </label>
             <div class="md:text-base text-md">
-              <router-link to="{forgotLink}" class="font-medium text-gray-900">
+              <router-link to="/reset" class="font-medium text-gray-900">
                 Forgot your password?
               </router-link>
             </div>
@@ -87,6 +87,16 @@
             </button>
           </div>
         </div>
+        <br/>
+        <label
+          htmlFor="password"
+          class="block md:text-lg text-md font-medium text-gray-900"
+        >
+           Don't have an account yet? 
+          <router-link to="/signup" class="font-medium text-primary">
+            Register...
+          </router-link>
+        </label>
       </div>
     </div>
   </div>

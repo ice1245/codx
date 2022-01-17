@@ -115,7 +115,7 @@
 <script>
 import { MailIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/outline";
 import { useForm } from "vue-hooks-form";
-import { useStore } from "vuex";
+import { $storex } from '@/store'
 import { useRouter } from "vue-router";
 
 export default {
@@ -125,7 +125,6 @@ export default {
     UserIcon,
   },
   setup() {
-    const store = useStore();
     const router = useRouter();
 
     const { useField, handleSubmit } = useForm({
@@ -147,8 +146,8 @@ export default {
       },
     });
 
-    const onSubmit = (data) => {
-      store.dispatch("signup", data);
+    const onSubmit = async (data) => {
+      await $storex.auth.signup(data)
       return router.push("/");
     };
     return {
