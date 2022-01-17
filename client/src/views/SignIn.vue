@@ -17,11 +17,8 @@
       <div
         class="bg-black-600 w-full md:py-10 py-6 px-3 shadow sm:rounded sm:px-8"
       >
-        <form
-          @submit="submit"
+        <div
           class="space-y-3 md:py-4 pb-4 px-4"
-          action="{action}"
-          method=""
         >
           <label
             htmlFor="identifier"
@@ -82,13 +79,14 @@
           }}</span>
           <div class="pt-5">
             <button
+              @click="submit"
               type="submit"
               class="capitalize w-full flex justify-center md:py-3 py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-primary hover:bg-info-600/90 focus:outline-none"
             >
               Sign in
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>
@@ -111,11 +109,10 @@ export default {
     }
   },
   methods: {
-    async submit (data) {
-      const oThis = this
-      console.log("vue this ", oThis)
-      await this.$storex.auth.login(data);
-      return this.$router.push("/");
+    async submit () {
+      const { identifier, password } = this
+      await this.$storex.auth.login({ identifier, password })
+      return this.$router.push("/")
     }
   }
 };

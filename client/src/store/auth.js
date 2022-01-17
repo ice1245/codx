@@ -66,9 +66,9 @@ export const actions = actionTree(
           })
         }
     },
-    login(ctx, loginload) {
+    async login(ctx, loginload) {
       try {
-        const res = useFetch
+        const res = await useFetch
           .post("api/auth/local", {
             ...loginload,
           })
