@@ -1,0 +1,46 @@
+version: "2"
+services:
+  api:
+    image: node:16
+    container_name: codx-api
+    working_dir: /src
+    command: bash -c "yarn build && yarn develop"
+    volumes:
+      - "$CODX_PATH/server:/src"
+    restart: unless-stopped
+    environment:
+      - "NODE_ENV=$NODE_ENV"
+      - "BASE_URL=$API_BASE_URL"
+      - "STRAPI_ADMIN_BACKEND_URL=$API_BASE_URL"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.codx-api.rule=Host(`$API_DOMAIN`)"
+      - "traefik.http.routers.codx-api.entrypoints=websecure"
+      - "traefik.http.routers.codx-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.codx-api.service=codx-api"
+      - "traefik.http.services.codx-api.loadbalancer.server.port=1337"
+
+  web:
+    image: node:16
+    container_name: codx-web
+    working_dir: /src
+    command: bash -c "yarn && yarn serve"
+    volumes:
+      - "$CODX_PATH/client:/src"
+    restart: unless-stopped
+    environment:
+      - "NODE_ENV=$NODE_ENV"
+      - "BASE_URL=$WEB_BASE_URL"
+      - "VUE_APP_API=$API_BASE_URL"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.codx-web.rule=Host(`$WEB_DOMAIN`)"
+      - "traefik.http.routers.codx-web.entrypoints=websecure"
+      - "traefik.http.routers.codx-web.tls.certresolver=myresolver"
+      - "traefik.http.routers.codx-web.service=codx-web"
+      - "traefik.http.services.codx-web.loadbalancer.server.port=8080"
+
+networks:
+  default:
+    external: true
+    name: coder_default

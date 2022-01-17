@@ -18,7 +18,7 @@
         class="bg-black-600 w-full md:py-10 py-6 px-3 shadow sm:rounded sm:px-8"
       >
         <form
-          @submit="onSubmit"
+          @submit="submit"
           class="space-y-3 md:py-4 pb-4 px-4"
           action="{action}"
           method=""
@@ -38,17 +38,16 @@
               <MailIcon class="cursor-pointer w-5 text-gray-900" />
             </div>
             <input
-              :ref="identifier.ref"
-              v-model="identifier.value"
+              v-model="identifier"
               type="email"
               class="block w-full md:px-4 px-3 md:py-3 py-2.5 placeholder-gray-200 text-gray-200 focus:outline-none sm:text-base text-sm border-gray-300 bg-transparent font-medium"
               placeholder="example@gmail.com"
             />
           </div>
           <span
-            v-if="identifier.error"
+            v-if="errorIdentifier"
             class="pt-1 block text-sm text-red-400"
-            >{{ identifier.error.message }}</span
+            >{{ errorIdentifier }}</span
           >
           <div class="flex items-center justify-between pt-2">
             <label
@@ -72,15 +71,14 @@
               <LockClosedIcon class="cursor-pointer w-5 text-gray-900" />
             </div>
             <input
-              :ref="password.ref"
-              v-model="password.value"
+              v-model="password"
               type="password"
               class="block w-full md:px-4 px-3 md:py-3 py-2.5 placeholder-gray-200 text-gray-200 focus:outline-none sm:text-base text-sm border-gray-300 bg-transparent font-medium"
               placeholder="Enter your password"
             />
           </div>
-          <span v-if="password.error" class="pt-1 block text-sm text-red-400">{{
-            password.error.message
+          <span v-if="errorPassword" class="pt-1 block text-sm text-red-400">{{
+            errorPassword
           }}</span>
           <div class="pt-5">
             <button
@@ -98,44 +96,28 @@
 
 <script>
 import { MailIcon, LockClosedIcon } from "@heroicons/vue/outline";
-import { useForm } from "vue-hooks-form";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
 
 export default {
   components: {
     MailIcon,
     LockClosedIcon,
   },
-  setup() {
-    const store = useStore();
-    const { useField, handleSubmit } = useForm({
-      defaultValues: {},
-      shouldUnregister: true,
-      validateMode: "change",
-    });
-    const identifier = useField("identifier", {
-      rule: { required: true },
-    });
-    const password = useField("password", {
-      rule: {
-        required: true,
-        min: 6,
-        max: 10,
-      },
-    });
-    const router = useRouter();
-
-    const onSubmit = async (data) => {
-      await store.dispatch("login", data);
-      return router.push("/");
-    };
+  data () {
     return {
-      identifier,
-      password,
-      onSubmit: handleSubmit(onSubmit),
-    };
+      identifier: null,
+      password: null,
+      errorIdentifier: null,
+      errorPassword: null
+    }
   },
+  methods: {
+    async submit (data) {
+      const oThis = this
+      console.log("vue this ", oThis)
+      await this.$storex.auth.login(data);
+      return this.$router.push("/");
+    }
+  }
 };
 </script>
 

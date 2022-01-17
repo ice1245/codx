@@ -58,3 +58,5 @@ dist
 # TernJS port file
 .tern-port
 .env.local
+
+docker/.env

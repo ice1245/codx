@@ -3,4 +3,7 @@
     <router-view />
   </div>
 </template>
-./views/ChatList.vue
+<script>
+export default {
+}
+</script>
