@@ -5,7 +5,9 @@ export const namespaced = true
 
 export const state = () => ({
   chats: [],
-  onlineUsers: {}
+  onlineUsers: {},
+  channels: null,
+  live: null
 })
 
 export const getters = getterTree(state, {
@@ -14,6 +16,12 @@ export const getters = getterTree(state, {
 export const mutations = mutationTree(state, {
   setChats (state, chats) {
     state.chats = chats
+  },
+  setChannels (state, channels) {
+    state.channels = channels
+  },
+  setLive (state, live) {
+    state.live = live
   },
   setOnlineUser (state, user) {
     const { onlineUsers } = state

@@ -17,14 +17,15 @@ export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
-  onSignup (state, payload) {
-    state.authenticated = payload.authenticated
-    state.token = payload.token
-    state.user = payload.user
+  onSignup (state, { authenticated, user, token }) {
+    state.authenticated = authenticated
+    state.token = token
+    state.user = user
     state.lastLogin = new Date()
-  },
-  verify (state, payload) {
-    state.authenticated = payload
+    const { chats, channels, live } = user
+    $storex.chat.setChats(chats)
+    $storex.chat.setChannels(channels)
+    $storex.chat.setLive(live)
   }
 })
 

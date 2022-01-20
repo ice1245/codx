@@ -6,6 +6,7 @@ const useFakeApi = apiURL === 'fakeApi'
 const api = axios.create({
   baseURL: process.env.VUE_APP_API,
 });
+/*
 api.interceptors.request.use(
   async (config) => {
     config.header = config.headers;
@@ -22,5 +23,5 @@ api.interceptors.request.use(
 api.interceptors.response.use(function (response) {
   return response;
 });
-
+*/
 export const useFetch = useFakeApi ? fakeApi : api

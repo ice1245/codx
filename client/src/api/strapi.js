@@ -10,7 +10,7 @@ class Strapi {
     }
   }
   me (token) {
-    this.toke = token
+    this.token = token
     const { headers } = this
     return token ? useFetch.get("api/users/me", { headers }) : null
   }

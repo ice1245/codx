@@ -1,15 +1,17 @@
 <template>
   <div
-    class="bg-black-300 lg:px-3 md:px-12 px-3.5 lg:py-5 py-2 lg:h-full lg:w-20 w-full flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50"
+    class="bg-black-300 lg:px-2 md:px-12 px-3.5 lg:py-4 py-3 lg:h-full lg:w-20 w-full flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50"
   >
     <img
-      src="@/assets/logo.svg"
-      class="w-8 cursor-pointer hidden lg:block"
+      :src="logos[logoIx]"
+      class="w-10 cursor-pointer hidden lg:block"
       alt=""
+      @click="logoIx = (logoIx + 1 >= logos.length ? 0 : logoIx + 1)"
     />
     <div
       id="nav"
       class="lg:space-y-4 flex lg:flex-col items-center lg:justify-center justify-between w-full lg:w-auto"
+      v-if="false"
     >
       <a
         class="router-link-exact-active group hover:text-primary lg:w-14 w-11 lg:h-14 h-11 flex items-center justify-center rounded-lg"
@@ -68,6 +70,18 @@ export default {
     ChatAltIcon,
     Dropdown,
   },
+  data () {
+    return {
+      logos: [
+        'codx-A_logo.png',
+        'codx-B_logo.png',
+        'codx-C_logo.png',
+        'codx-C_logo_white.png',
+        'codx-D_logo.png',
+      ],
+      logoIx: 0
+    }
+  }
 };
 </script>
 <style>
@@ -77,5 +91,9 @@ export default {
 #nav a.router-link-exact-active {
   color: #7169ef !important;
   background: #3e4a56;
+}
+.no-text {
+    height: 22px;
+    background-size: 32px 32px;
 }
 </style>

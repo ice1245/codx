@@ -3,6 +3,7 @@
     <SideBar @sideBar="toggleSideBar" />
     <div class="bg-black-400 text-white md:p-3 p-2 py-5 h-full lg:w-96 w-full">
       <ChatList :click="showChat" v-if="sideBar === 'chats'" />
+      <Explorer :click="showExplorer" v-if="sideBar === 'explorer'" />
       <Profile v-if="sideBar === 'profile'" />
     </div>
     <div
@@ -24,18 +25,20 @@ import SideBar from "@/components/SideBar";
 import ChatBox from "@/components/ChatBox";
 import Profile from "@/components/Profile";
 import ChatList from "@/views/ChatList";
+import Explorer from "@/views/Explorer";
 export default {
   components: {
     SideBar,
     ChatBox,
     ChatList,
-    Profile
+    Profile,
+    Explorer
   },
   data() {
     return {
       show: false,
       list: [{}, {}],
-      sideBar: 'chats'
+      sideBar: 'explorer'
     };
   },
   methods: {
