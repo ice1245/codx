@@ -79,21 +79,16 @@ export const actions = actionTree(
         localStorage.setItem("token", token)
         localStorage.setItem("user", JSON.stringify(user))
         $storex.user.onSignup(payload)
-        this.app.$toast.open({
-          message: "Sign Up Successfully!!",
-          type: "success",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+            text: "Success",
+            group: "success"
+          }, 2000);
         } catch (e) {
-          this.app.$toast.open({
-            message: e.response?.data?.error?.message,
-            type: "error",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          })
+          this.app.$notify({
+              text: e.response?.data?.error?.message,
+              group: "error"
+            }, 2000);
+          throw e
         }
     },
     async login({}, loginload) {
@@ -108,21 +103,16 @@ export const actions = actionTree(
         localStorage.setItem("user", JSON.stringify(user))
         localStorage.setItem("token", token)
         $storex.user.onSignup(payload)
-        this.app.$toast.open({
-          message: "Login Successfully!",
-          type: "success",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+          text: "Success",
+          group: "success"
+        }, 2000);
       } catch(e) {
-        this.app.$toast.open({
-          message: e.response?.data?.error?.message,
-          type: "error",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+          text: e.response?.data?.error?.message,
+          group: "error"
+        }, 2000);
+        throw e
       }
     },
     async logout () {

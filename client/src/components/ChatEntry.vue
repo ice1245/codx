@@ -9,17 +9,17 @@
         <div class="flex items-start space-x-1 chat">
           <div class="ml-3 w-full flex flex-col items-start">
             <div
-              class="bg-primary w-full rounded-lg rounded-bl-none text-right p-3 px-5 space-y-1"
+              class="bg-primary text-primary-content w-full rounded-lg rounded-bl-none text-right p-3 px-5 space-y-1"
             >
-              <h3 class="text-white text-md md:text-base">{{ formatMessage(message) }}</h3>
-              <p class="text-gray-200 text-2xs flex items-center justify-end">
+              <h3 class="ttext-md md:text-base">{{ formatMessage(message) }}</h3>
+              <p class="text-2xs flex items-center justify-end">
                 <ClockIcon class="w-3 mr-0.5" />
                 {{ formatTime(message) }}
               </p>
             </div>
-            <div class="arrow_icon_left bg-primary w-3 h-3"></div>
+            <div class="arrow_icon_left bg-primary text-primary-content w-3 h-3"></div>
 
-            <p class="text-sm font-medium text-gray-200">{{ message.username }}</p>
+            <p class="text-sm font-medium ">{{ message.username }}</p>
           </div>
           <div class="hidden md:block mt-2">
             <MessageOptions
@@ -46,18 +46,18 @@
           </div>
           <div class="w-full flex flex-col items-end">
             <div
-              class="bg-black-300 rounded-lg rounded-br-none text-left p-3 px-5 space-y-1"
+              class="bg-secondary text-secondary-content rounded-lg rounded-br-none text-left p-3 px-5 space-y-1"
             >
-              <h3 class="text-white text-right text-md md:text-base">
+              <h3 class="ttext-right text-md md:text-base">
                 {{ formatMessage(message) }}
               </h3>
-              <p class="text-gray-200 text-2xs flex items-center">
+              <p class="text-2xs flex items-center">
                 <ClockIcon class="w-3 mr-0.5" />
                 {{ formatTime(message) }}
               </p>
             </div>
-            <div class="arrow_icon_right bg-black-300 w-3 h-3"></div>
-            <p class="text-sm font-medium text-gray-200">{{ message.username }}</p>
+            <div class="arrow_icon_right w-3 h-3"></div>
+            <p class="text-sm font-medium ">{{ message.username }}</p>
           </div>
         </div>
         <div class="">

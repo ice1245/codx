@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-black-300 lg:py-4 py-3 lg:h-full lg:px-2 flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50"
+    class="lg:py-4 py-3 lg:h-full lg:px-2 flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50"
   >
     <img
       :src="logos[logoIx]"
@@ -43,7 +43,6 @@
     <div
       class="lg:space-y-8 lg:flex hidden lg:flex-col justify-center items-center"
     >
-      <SunIcon class="text-gray-200 cursor-pointer w-7 hidden lg:block" />
       <Dropdown
         menuItemClass="-left-3.5 bottom-12"
         imgClass="h-8 w-8 rounded-full"
@@ -56,15 +55,13 @@
 
 <script>
 import {
-  SunIcon,
   CogIcon,
   UsersIcon,
   ChatAltIcon,
 } from "@heroicons/vue/outline";
-import Dropdown from "./Dropdown.vue";
+import Dropdown from "./UserMenu.vue";
 export default {
   components: {
-    SunIcon,
     CogIcon,
     UsersIcon,
     ChatAltIcon,

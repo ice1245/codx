@@ -69,6 +69,16 @@
   resolved "https://registry.yarnpkg.com/@socket.io/component-emitter/-/component-emitter-3.0.0.tgz#8863915676f837d9dad7b76f50cb500c1e9422e9"
   integrity sha512-2pTGuibAXJswAPJjaKisthqS/NOK5ypG4LYT6tEAV0S/mxW0zOIvYvGK0V8w8+SHxAm6vRMSjqSalFXeBAqs+Q==
 
+"@tailwindcss/typography@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/typography/-/typography-0.5.0.tgz#47886ec46ac41e1211d24fea05301046d9b30906"
+  integrity sha512-1p/3C6C+JJziS/ghtG8ACYalbA2SyLJY27Pm33cVTlAoY6VQ7zfm2H64cPxUMBkVIlWXTtWHhZcZJPobMRmQAA==
+  dependencies:
+    lodash.castarray "^4.4.0"
+    lodash.isplainobject "^4.0.6"
+    lodash.merge "^4.6.2"
+    lodash.uniq "^4.5.0"
+
 "@types/component-emitter@^1.2.10":
   version "1.2.11"
   resolved "https://registry.yarnpkg.com/@types/component-emitter/-/component-emitter-1.2.11.tgz#50d47d42b347253817a39709fef03ce66a108506"
@@ -424,6 +434,11 @@ csstype@^2.6.8:
   version "2.6.19"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.19.tgz#feeb5aae89020bb389e1f63669a5ed490e391caa"
   integrity sha512-ZVxXaNy28/k3kJg0Fou5MiYpp88j7H9hLZp8PDC3jV0WFjfH5E9xHb56L0W59cPbKbcHXeP4qyT8PrHp8t6LcQ==
+
+daisyui@^1.25.4:
+  version "1.25.4"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-1.25.4.tgz#d143f5eca073336b20e21a7d9ba12dbe0b30e3c6"
+  integrity sha512-Y9DrFYjjfwK09Fc8/05DhpWgwqhqRuhuH4gMdQxCeZ9dLJ82y5xb6kvwLuK1cWLfCckDOWk3reEKXsciaMHyAw==
 
 debug@~4.3.1, debug@~4.3.2:
   version "4.3.3"
@@ -789,10 +804,20 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.2.4.tgz#eca284f75d2965079309dc0ad9255abb2ebc1632"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
+lodash.castarray@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/lodash.castarray/-/lodash.castarray-4.4.0.tgz#c02513515e309daddd4c24c60cfddcf5976d9115"
+  integrity sha1-wCUTUV4wna3dTCTGDP3c9ZdtkRU=
+
 lodash.get@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
   integrity sha1-LRd/ZS+jHpObRDjVNBSZ36OCXpk=
+
+lodash.isplainobject@^4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz#7c526a52d89b45c45cc690b88163be0497f550cb"
+  integrity sha1-fFJqUtibRcRcxpC4gWO+BJf1UMs=
 
 lodash.merge@^4.6.2:
   version "4.6.2"
@@ -813,6 +838,11 @@ lodash.topath@^4.5.2:
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/lodash.topath/-/lodash.topath-4.5.2.tgz#3616351f3bba61994a0931989660bd03254fd009"
   integrity sha1-NhY1Hzu6YZlKCTGYlmC9AyVP0Ak=
+
+lodash.uniq@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.uniq/-/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
+  integrity sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=
 
 magic-string@^0.25.7:
   version "0.25.7"
@@ -890,6 +920,11 @@ normalize-range@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
   integrity sha1-LRDAa9/TEuqXd2laTShDlFa3WUI=
+
+notiwind@^1.2.5:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/notiwind/-/notiwind-1.2.5.tgz#4a1ab3d3afa0c88f6539c6730d619feb9d528230"
+  integrity sha512-i0WHk96skvQ0xt3uMeAI+tVZ2sgAOSpuNIeTycQZjwXh4DheLbpJffLjYOXT93C3CqZYVTal0hnGCpZIlG0jgQ==
 
 object-assign@^4:
   version "4.1.1"
@@ -1179,6 +1214,11 @@ tailwindcss@^3.0.16:
     postcss-value-parser "^4.2.0"
     quick-lru "^5.1.1"
     resolve "^1.21.0"
+
+theme-change@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/theme-change/-/theme-change-2.0.2.tgz#142aa0669fde5ca7e625f5d3c09074ebb5bdb374"
+  integrity sha512-YvQqavf8nlGB3J7PdO0zLLhSLlgYhrqZL6By3FuzFIlWBsPTSPG/V98cHJllK3mmU97Jecei8XYiHalhy2umUw==
 
 to-regex-range@^5.0.1:
   version "5.0.1"
