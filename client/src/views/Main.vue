@@ -3,20 +3,18 @@
     <SideBar @sideBar="toggleSideBar" />
     <div class="bg-black-400 text-white md:p-3 p-2 py-5 h-full lg:w-96 w-full">
       <ChatList :click="showChat" v-if="sideBar === 'chats'" />
-      <Explorer :click="showExplorer" v-if="sideBar === 'explorer'" />
+      <Explorer v-if="sideBar === 'explorer'" />
       <Profile v-if="sideBar === 'profile'" />
     </div>
-    <div
-      v-if="show === true"
-      class="bg-black-500 lg:w-auto flex-1 lg:flex absolute lg:relative top-0 left-0 w-full h-full z-50"
-    >
-      <ChatBox :click="showChat" />
-    </div>
-    <div
-      v-else
-      class="bg-black-500 lg:w-auto flex-1 lg:flex hidden w-full h-full z-50"
-    >
-      <ChatBox />
+    <div class="container w-full h-full">
+      <div class="lg:flex flex-col h-full w-full">
+        <Header class="bg-black-500"
+          :chat="$storex.chat.openedChat" />
+        <div class="bg-black-500 lg:flex flex-row hidden h-full w-full">
+          <ChatBox class="grow" :chat="$storex.chat.openedChat" />
+          <VideoCall class="flex-none w-14" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -26,20 +24,30 @@ import ChatBox from "@/components/ChatBox";
 import Profile from "@/components/Profile";
 import ChatList from "@/views/ChatList";
 import Explorer from "@/views/Explorer";
+import VideoCall from "@/views/VideoCall"
+import Header from "@/components/Header"
 export default {
   components: {
     SideBar,
     ChatBox,
     ChatList,
     Profile,
-    Explorer
+    Explorer,
+    VideoCall,
+    Header
   },
   data() {
     return {
-      show: false,
+      show: 1,
       list: [{}, {}],
       sideBar: 'explorer'
     };
+  },
+  computed: {
+    openChat () {
+      const { chats, openedChat } = this.$storex.chat
+      return chats.filter(c => c.id === openedChat)[0]
+    }
   },
   methods: {
     showChat() {
@@ -48,6 +56,6 @@ export default {
     toggleSideBar (view) {
       this.sideBar = view
     }
-  },
+  }
 };
 </script>

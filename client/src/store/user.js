@@ -1,6 +1,7 @@
 /* eslint no-empty-pattern: 0 */
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import { $storex } from '@/store'
+import WebRTCRoom from '../webrtc'
 
 export const namespaced = true
 
@@ -10,22 +11,36 @@ export const state = () => ({
   authenticated: false,
   token: localStorage.getItem("token") || "",
   user: null,
-  lastLogin: null
+  lastLogin: null,
+  userRoom: null,
+  session: null
 })
 
 export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
-  onSignup (state, { authenticated, user, token }) {
+  async onSignup (state, { authenticated, user, token }) {
     state.authenticated = authenticated
     state.token = token
     state.user = user
     state.lastLogin = new Date()
-    const { chats, channels, live } = user
+    const { chats, channels, clinics, session = {}, roomId } = user || {}
+    state.session = session
     $storex.chat.setChats(chats)
     $storex.chat.setChannels(channels)
-    $storex.chat.setLive(live)
+    $storex.clinic.setClinics(clinics)
+    $storex.chat.setOpenedChat(session.lastOpenChat)
+    if (user) {
+      state.userRoom = await WebRTCRoom.newRoom({ name: roomId })
+    } else if(state.userRoom){
+      state.userRoom.disconnect()
+      state.userRoom = null
+    }
+  },
+  setOpenedChat ({ session }, id) {
+    session.lastOpenChat = id
+    $storex.chat.setOpenedChat(session.lastOpenChat)
   }
 })
 
@@ -50,19 +65,20 @@ export const actions = actionTree(
           console.error("Invalid token: ", token)
         }
       }
-      $storex.auth.onSignup(fecthPayload)
+      $storex.user.onSignup(fecthPayload)
     },
     async signup({}, signload) {
       try {
-        const res = await api.signup(signload)
+        const { data: { jwt: token }} = await api.signup(signload)
+        const { data: user } = await api.me(token)
         const payload = {
-          token: res?.data?.jwt,
-          user: res?.data?.user,
+          token: token,
+          user: user,
           authenticated: true,
         }
-        localStorage.setItem("token", res?.data?.jwt)
-        localStorage.setItem("user", JSON.stringify(res?.data?.user))
-        $storex.auth.onSignup(payload)
+        localStorage.setItem("token", token)
+        localStorage.setItem("user", JSON.stringify(user))
+        $storex.user.onSignup(payload)
         this.app.$toast.open({
           message: "Sign Up Successfully!!",
           type: "success",
@@ -82,36 +98,37 @@ export const actions = actionTree(
     },
     async login({}, loginload) {
       try {
-        const res = await api.login(loginload)
-          const payload = {
-            token: res?.data?.jwt,
-            user: res?.data?.user,
-            authenticated: true,
-          }
-          localStorage.setItem("user", JSON.stringify(res?.data?.user))
-          localStorage.setItem("token", res?.data?.jwt)
-          $storex.auth.onSignup(payload)
-          this.app.$toast.open({
-            message: "Login Successfully!",
-            type: "success",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          })
-        } catch(e) {
-          this.app.$toast.open({
-            message: e.response?.data?.error?.message,
-            type: "error",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          })
+        const { data: { jwt: token }} = await api.login(loginload)
+        const { data: user } = await api.me(token)
+        const payload = {
+          token: token,
+          user: user,
+          authenticated: true,
         }
+        localStorage.setItem("user", JSON.stringify(user))
+        localStorage.setItem("token", token)
+        $storex.user.onSignup(payload)
+        this.app.$toast.open({
+          message: "Login Successfully!",
+          type: "success",
+          duration: 1000,
+          dismissible: true,
+          position: "top-right",
+        })
+      } catch(e) {
+        this.app.$toast.open({
+          message: e.response?.data?.error?.message,
+          type: "error",
+          duration: 1000,
+          dismissible: true,
+          position: "top-right",
+        })
+      }
     },
     async logout () {
       localStorage.removeItem("user")
       localStorage.removeItem("token")
-      $storex.auth.onSignup({ authenticated: false })
+      $storex.user.onSignup({ authenticated: false })
     }
   }
 )

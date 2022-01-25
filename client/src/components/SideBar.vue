@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-black-300 lg:px-2 md:px-12 px-3.5 lg:py-4 py-3 lg:h-full lg:w-20 w-full flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50"
+    class="bg-black-300 lg:py-4 py-3 lg:h-full lg:px-2 flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50"
   >
     <img
       :src="logos[logoIx]"
@@ -47,7 +47,7 @@
       <Dropdown
         menuItemClass="-left-3.5 bottom-12"
         imgClass="h-8 w-8 rounded-full"
-        :src="$storex.auth.user.avatar"
+        :src="$storex.user.user.avatar"
         @option="opt => $emit('sideBar', opt)"
       />
     </div>

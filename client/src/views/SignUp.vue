@@ -147,7 +147,7 @@ export default {
     });
 
     const onSubmit = async (data) => {
-      await $storex.auth.signup(data)
+      await $storex.user.signup(data)
       return router.push("/");
     };
     return {

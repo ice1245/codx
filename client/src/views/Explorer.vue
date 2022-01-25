@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div :class="['text-gray-100 text-base pl-3 cursor-pointer', liveSessions.length ? 'font-bold' : '']"><FireIcon class="text-gray-200 h-5 w-5 float-left mr-2" />Live sessions</div>
+    <div :class="['text-gray-100 text-base pl-3 cursor-pointer', liveClinics.length ? 'font-bold' : '']"><FireIcon class="text-gray-200 h-5 w-5 float-left mr-2" />Live sessions</div>
     <div class="text-gray-100 text-base pl-3 cursor-pointer"><ChatAltIcon class="text-gray-200 h-5 w-5 float-left mr-2" />Recent</div>
     <div class="text-gray-100 text-base pl-3 cursor-pointer"><StarIcon class="text-gray-200 h-5 w-5 float-left mr-2" />Starred messaged</div>
 
@@ -86,11 +86,13 @@
       style="max-height: calc(100vh - 280px)"
       v-if="directMessagesOpen"
     >
-      <div class="text-gray-100 text-base pl-3 cursor-pointer ml-3 mt-2"
+      <div
         v-for="(chat, ix) in $storex.chat.chats" :key="ix"
+        :class="['text-gray-100 text-base pl-3 cursor-pointer ml-3 mt-2', chat.id === session.lastOpenChat ? 'font-bold' : '']"
+        @click="$storex.user.setOpenedChat(chat.id)"
       >
-        <AtSymbolIcon class="text-gray-200 h-5 w-5 float-left mr-2" /> {{ chat.users.map(u => u.username).join(" - ") }}
-
+        <AtSymbolIcon :class="['text-gray-200 h-5 w-5 float-left mr-2']" />
+          <span :data-id="chat.id">{{ chat.users.map(u => u.username).join(" - ") }}</span>
       </div>
       <div class="text-gray-100 text-base pl-3 cursor-pointer ml-3 mt-2">
         <PlusIcon class="text-gray-200 h-5 w-5 float-left mr-2" /> New chat
@@ -112,9 +114,12 @@ export default {
     }
   },
   computed: {
-    liveSessions () {
-      const { live } = this.$storex.chat
-      return live || []
+    liveClinics () {
+      const { clinics } = this.$storex.clinic
+      return clinics || []
+    },
+    session () {
+      return this.$storex.user.session
     }
   }
 };

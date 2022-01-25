@@ -14,12 +14,12 @@ export default createStore({
   },
   mutations: {
     onSignup: (state, payload) => {
-      state.auth = payload.auth;
+      state.user = payload.user;
       state.token = payload.token;
       state.user = payload.user;
     },
     verify(state, payload) {
-      state.auth = payload;
+      state.user = payload;
     },
   },
   actions: {

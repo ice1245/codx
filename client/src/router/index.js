@@ -30,12 +30,12 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   let { fullPath } = to
   if (fullPath === "/logout") {
-    await $storex.auth.logout()
+    await $storex.user.logout()
     fullPath = '/'
   } else {
-    await $storex.auth.fetchAccessToken()
+    await $storex.user.fetchAccessToken()
   }
-  if (!$storex.auth.authenticated) {
+  if (!$storex.user.authenticated) {
     fullPath === '/' && next("/login");
   }
   next();

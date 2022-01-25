@@ -4,7 +4,8 @@
       <MenuButton
         class="flex items-center justify-center w-full text-sm font-medium text-gray-200 focus:outline-none"
       >
-        <Avatar :url="src" />
+        <!-- <img class="h-8 w-8 rounded-full" :src="src" alt="" /> -->
+        <img :class="imgClass" :src="src" alt="" />
       </MenuButton>
     </div>
 
@@ -60,7 +61,6 @@
 <script>
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { PencilAltIcon, LogoutIcon } from "@heroicons/vue/solid";
-import Avatar from './Avatar'
 
 export default {
   components: {
@@ -70,7 +70,6 @@ export default {
     MenuItems,
     PencilAltIcon,
     LogoutIcon,
-    Avatar
   },
   props: {
     imgClass: { type: String, default: "h-8 w-8 rounded-full" },

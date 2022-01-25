@@ -3,11 +3,12 @@ import {
   useAccessor,
 } from 'typed-vuex'
 
-import * as auth from './auth' 
-import * as chat from './chat' 
+import * as user from './user'
+import * as chat from './chat'
+import * as clinic from './clinic'
 
 const storePattern = {
-  modules: { auth, chat },
+  modules: { user, chat, clinic },
 }
 
 const store = new Vuex.Store(storePattern)

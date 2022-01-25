@@ -1,13 +1,11 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 export const namespaced = true
 
-// import { useFetch } from "@/api/useFetch";
-
 export const state = () => ({
   chats: [],
   onlineUsers: {},
   channels: null,
-  live: null
+  openedChat: null
 })
 
 export const getters = getterTree(state, {
@@ -20,9 +18,6 @@ export const mutations = mutationTree(state, {
   setChannels (state, channels) {
     state.channels = channels
   },
-  setLive (state, live) {
-    state.live = live
-  },
   setOnlineUser (state, user) {
     const { onlineUsers } = state
     const { id } = user
@@ -34,6 +29,9 @@ export const mutations = mutationTree(state, {
     state.onlineUsers = {
       ...onlineUsers
     }
+  },
+  setOpenedChat (state, id) {
+    state.openedChat = state.chats.filter(c => c.id === id)[0]
   }
 })
 

@@ -121,7 +121,7 @@ export default {
   methods: {
     async submit () {
       const { identifier, password } = this
-      await this.$storex.auth.login({ identifier, password })
+      await this.$storex.user.login({ identifier, password })
       return this.$router.push("/")
     }
   }
