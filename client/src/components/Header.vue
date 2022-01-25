@@ -29,7 +29,6 @@
           class="hidden md:block cursor-pointer w-5 text-gray-200"
         />
         <UserIcon class="hidden md:block cursor-pointer w-5 text-gray-200" />
-        <Dropdown menuItemClass="right-0 top-9" imgClass="w-6" />
       </div>
     </div>
 </template>
@@ -40,16 +39,14 @@ import {
   VideoCameraIcon,
   PhoneIcon,
   ChevronLeftIcon
-} from "@heroicons/vue/outline";
-import Dropdown from "./Dropdown.vue";
-import Avatar from './Avatar'
+} from "@heroicons/vue/outline"
+import Avatar from './Avatar.vue'
 export default {
   components: {
     UserIcon,
     SearchIcon,
     VideoCameraIcon,
     PhoneIcon,
-    Dropdown,
     ChevronLeftIcon,
     Avatar
   },

@@ -1,4 +1,4 @@
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import {
   useAccessor,
 } from 'typed-vuex'
@@ -11,7 +11,7 @@ const storePattern = {
   modules: { user, chat, clinic },
 }
 
-const store = new Vuex.Store(storePattern)
+const store = createStore(storePattern)
 
 export const $storex = useAccessor(store, storePattern)
 window.$storex = $storex

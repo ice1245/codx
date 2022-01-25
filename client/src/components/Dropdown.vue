@@ -58,9 +58,9 @@
 </template>
 
 <script>
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { PencilAltIcon, LogoutIcon } from "@heroicons/vue/solid";
-import Avatar from './Avatar'
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue"
+import { PencilAltIcon, LogoutIcon } from "@heroicons/vue/solid"
+import Avatar from './Avatar.vue'
 
 export default {
   components: {
@@ -74,7 +74,7 @@ export default {
   },
   props: {
     imgClass: { type: String, default: "h-8 w-8 rounded-full" },
-    src: { type: String, default: require("@/assets/dots.svg") },
+    src: { type: String, default: "../../assets/dots.svg" },
     menuItemClass: { type: String, default: "" },
   },
 };

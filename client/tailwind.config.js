@@ -4,7 +4,7 @@ module.exports = {
   mode: 'jit',
   purge: ["./public/**/*.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   presets: [],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: 'media', // or 'media' or 'class'
   theme: {
     screens: {
       sm: "640px",
@@ -28,7 +28,7 @@ module.exports = {
       },
       white: colors.white,
       gray: {
-        ...colors.coolGray,
+        ...colors.gray,
         100: "#e1e9f1",
         200: "#abb4d2",
         300: "#3E4A56",

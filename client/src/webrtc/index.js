@@ -1,6 +1,5 @@
 import RTCMulticonnection from './AsyncRTCMulticonnection'
 import io from 'socket.io-client'
-import { Stream } from 'stream'
 
 window.io = io
 
@@ -9,7 +8,7 @@ export default class WebRTCRoom {
   roomId = null
   streams = {}
   constructor ({ video, audio }) {
-    this.connection = new RTCMulticonnection()
+    this.connection = RTCMulticonnection()
     this.connection.socketURL = `${process.env.VUE_APP_API}/`
     this.connection.session = {
         audio,

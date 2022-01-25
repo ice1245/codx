@@ -19,13 +19,13 @@
   </div>
 </template>
 <script>
-import SideBar from "@/components/SideBar";
-import ChatBox from "@/components/ChatBox";
-import Profile from "@/components/Profile";
-import ChatList from "@/views/ChatList";
-import Explorer from "@/views/Explorer";
-import VideoCall from "@/views/VideoCall"
-import Header from "@/components/Header"
+import SideBar from "@/components/SideBar.vue"
+import ChatBox from "@/components/ChatBox.vue"
+import Profile from "@/components/Profile.vue"
+import ChatList from "@/views/ChatList.vue"
+import Explorer from "@/views/Explorer.vue"
+import VideoCall from "@/views/VideoCall.vue"
+import Header from "@/components/Header.vue"
 export default {
   components: {
     SideBar,

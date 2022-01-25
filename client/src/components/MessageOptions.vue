@@ -5,7 +5,7 @@
         class="flex items-center justify-center w-full text-sm font-medium text-gray-200 focus:outline-none"
       >
         <!-- <img class="h-8 w-8 rounded-full" :src="src" alt="" /> -->
-        <img :class="imgClass" :src="src" alt="" />
+        <img :class="imgClass" src="@/assets/dots.svg" alt="" />
       </MenuButton>
     </div>
 
@@ -73,7 +73,7 @@ export default {
   },
   props: {
     imgClass: { type: String, default: "h-8 w-8 rounded-full" },
-    src: { type: String, default: require("@/assets/dots.svg") },
+    src: { type: String, default: "../../assets/dots.svg" },
     menuItemClass: { type: String, default: "" },
   },
 };

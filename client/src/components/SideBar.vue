@@ -77,6 +77,7 @@ export default {
         'codx-B_logo.png',
         'codx-C_logo.png',
         'codx-C_logo_white.png',
+        'codx-C_logo_blues.png',
         'codx-D_logo.png',
       ],
       logoIx: 0
