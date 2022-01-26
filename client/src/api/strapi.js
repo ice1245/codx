@@ -39,6 +39,11 @@ class Strapi {
     const { headers } = this
     return useFetch.post("api/chat-messages", chatMessage, { headers })
   }
+
+  async chatAddUser({ chat, user }) {
+    const { headers } = this
+    return useFetch.put("api/chats/" + chat.id, { guest: user }, { headers })
+  }
 }
 
 export default new Strapi()

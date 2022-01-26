@@ -33,26 +33,26 @@
           @click="$storex.call.createNewCall({ type: 'video', users: chat.users })"
           v-if="!$storex.call.currentCall"
         />
-        <UserAddIcon class="hidden md:block cursor-pointer w-5 " />
+        <UserAdd @user="user => addUser(user)" />
       </div>
     </div>
 </template>
 <script>
 import {
-  UserAddIcon,
   SearchIcon,
   VideoCameraIcon,
   PhoneIcon,
   ChevronLeftIcon
 } from "@heroicons/vue/outline"
+import UserAdd from '@/components/UserAdd.vue'
 import Avatar from '@/components/Avatar.vue'
 export default {
   components: {
-    UserAddIcon,
     SearchIcon,
     VideoCameraIcon,
     PhoneIcon,
     ChevronLeftIcon,
+    UserAdd,
     Avatar
   },
   props: ['chat'],
@@ -62,6 +62,10 @@ export default {
     }
   },
   methods: {
+    addUser (user) {
+      const { chat } = this
+      this.$storex.chat.addUser({ chat, user })
+    }
   }
 }
 </script>

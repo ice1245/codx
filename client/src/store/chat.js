@@ -5,7 +5,6 @@ export const namespaced = true
 
 export const state = () => ({
   chats: null,
-  onlineUsers: {},
   channels: null,
   openedChat: null
 })
@@ -33,18 +32,6 @@ export const mutations = mutationTree(state, {
   },
   setChannels (state, channels) {
     state.channels = channels
-  },
-  setOnlineUser (state, user) {
-    const { onlineUsers } = state
-    const { id } = user
-    if (!user.online) {
-      delete onlineUsers[id]
-    } else {
-      onlineUsers[id] = user
-    }
-    state.onlineUsers = {
-      ...onlineUsers
-    }
   },
   async setOpenedChat (state, id) {
     if (id) {
@@ -88,6 +75,10 @@ export const actions = actionTree(
     async sendMessage (ctx, { chat, content }) {
       const { user: from } = $storex.user
       await api.sendMessage({ chat, content, from })
+    },
+    async addUser (ctx, chatAddUser) {
+      await api.chatAddUser(chatAddUser)
+      $storex.chat.setOpenedChat(chatAddUser.chat.id)
     }
   },
 )

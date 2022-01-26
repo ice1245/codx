@@ -4,7 +4,7 @@
       <div class="h-full overflow-y-auto md:p-6 p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
         <ChatEntry
           v-for="(message, ix) in chat.messages" :key="ix"
-          :left="me.id !== message.from"
+          :left="me.id !== message.from.id"
           :message="buildMessage(message)"/>
       </div>
       <div

@@ -3,7 +3,7 @@
     <div class="flex items-end justify-start" v-if="left">
         <div>
           <div class="h-9 w-10">
-            <Avatar :url="message.avatar" />
+            <Avatar :url="message.from.avatar" />
           </div>
         </div>
         <div class="flex items-start space-x-1 chat">
@@ -62,7 +62,7 @@
         </div>
         <div class="">
           <div class="ml-3 h-9 w-10">
-            <Avatar :url="message.avatar" />
+            <Avatar :url="message.from.avatar" />
           </div>
         </div>
       </div>
@@ -87,10 +87,10 @@ export default {
   props: ['left', 'message'],
   methods: {
     formatMessage (message) {
-      return message.content.message
+      return message.content
     },
     formatTime (message) {
-      return moment(message.ts).fromNow()
+      return moment(message.createdAt).fromNow()
     }
   }
 }

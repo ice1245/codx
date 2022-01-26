@@ -4,7 +4,8 @@ import { $storex } from '.'
 export const namespaced = true
 
 export const state = () => ({
-  friends: null
+  friends: null,
+  onlineFriends: null
 })
 
 export const getters = getterTree(state, {
@@ -13,6 +14,7 @@ export const getters = getterTree(state, {
 export const mutations = mutationTree(state, {
   setNetwork (state, { friends }) {
     state.friends = friends
+    state.onlineFriends = friends
   }
 })
 

@@ -1,3 +1,5 @@
+const { NETWORK_SERVICE, CHAT_SERVICE } = require('../../../api/constants')
+
 module.exports = ({ controllers }) => {
   const { user } = controllers
   const orgMe = user.me
@@ -6,17 +8,27 @@ module.exports = ({ controllers }) => {
   user.me = async ctx => {
     await orgMe(ctx)
     const sme = ctx.body
+    const networks = await strapi.entityService.findMany(NETWORK_SERVICE, { 
+      filters: { user: sme.id },
+      populate: { friends: true, following: true, followed: true }
+    })
+    const guestChats = await strapi.entityService.findMany(CHAT_SERVICE, { 
+      filters: { guests: [sme.id] },
+      populate: { admins: true, guests: true }
+    })
+    const adminChats = await strapi.entityService.findMany(CHAT_SERVICE, { 
+      filters: { admins: [sme.id] },
+      populate: { admins: true, guests: true }
+    })
     const ds = new Date().getTime()
     ctx.body = {
       ...sme,
       roomId: `@${sme.username}`,
-      session: {
-        lastOpenChat: 1
-      },
-      network: {
-        friends: [ guest10, guest20 ]
-      },
+      session: {},
+      network: networks[0],
       chats: [
+        ...guestChats,
+        ...adminChats,
         {
           id: 1,
           starred: true,
@@ -27,9 +39,9 @@ module.exports = ({ controllers }) => {
             guest10
           ],
           messages: [
-            { from: 10, to: sme.id, content: { message: "Hey!" }, ts: ds - 60000 },
-            { from: sme.id, to: 10, content: { message: "Hey!" }, ts: new Date() - 10000 },
-            { from: sme.id, to: 10, content: { message: "how's going?" }, ts: new Date() }
+            { from: guest10, content: "Hey!", createdAt: ds - 60000 },
+            { from: sme.id, content: "Hey!", createdAt: new Date() - 10000 },
+            { from: sme.id, content: "how's going?", createdAt: new Date() }
           ]
         },
         {
@@ -42,18 +54,18 @@ module.exports = ({ controllers }) => {
             guest20
           ],
           messages: [
-            { from: 20, to: sme.id, content: { message: "Hey!" }, ts: ds - 60000 },
-            { from: sme.id, to: 20, content: { message: "Hey!" }, ts: new Date() - 10000 },
-            { from: sme.id, to: 20, content: { message: "how's going?" }, ts: new Date() },
-            { from: 20, to: sme.id, content: { message: "Hey!" }, ts: ds - 60000 },
-            { from: sme.id, to: 20, content: { message: "Hey!" }, ts: new Date() - 10000 },
-            { from: sme.id, to: 20, content: { message: "how's going?" }, ts: new Date() },
-            { from: 20, to: sme.id, content: { message: "Hey!" }, ts: ds - 60000 },
-            { from: sme.id, to: 20, content: { message: "Hey!" }, ts: new Date() - 10000 },
-            { from: sme.id, to: 20, content: { message: "how's going?" }, ts: new Date() },
-            { from: 20, to: sme.id, content: { message: "Hey!" }, ts: ds - 60000 },
-            { from: sme.id, to: 20, content: { message: "Hey!" }, ts: new Date() - 10000 },
-            { from: sme.id, to: 20, content: { message: "how's going?" }, ts: new Date() }
+            { from: 20, to: sme.id, content: "Hey!", createdAt: ds - 60000 },
+            { from: sme.id, to: 20, content: "Hey!", createdAt: new Date() - 10000 },
+            { from: sme.id, to: 20, content: "how's going?", createdAt: new Date() },
+            { from: 20, to: sme.id, content: "Hey!", createdAt: ds - 60000 },
+            { from: sme.id, to: 20, content: "Hey!", createdAt: new Date() - 10000 },
+            { from: sme.id, to: 20, content: "how's going?", createdAt: new Date() },
+            { from: 20, to: sme.id, content: "Hey!", createdAt: ds - 60000 },
+            { from: sme.id, to: 20, content: "Hey!", createdAt: new Date() - 10000 },
+            { from: sme.id, to: 20, content: "how's going?", createdAt: new Date() },
+            { from: 20, to: sme.id, content: "Hey!", createdAt: ds - 60000 },
+            { from: sme.id, to: 20, content: "Hey!", createdAt: new Date() - 10000 },
+            { from: sme.id, to: 20, content: "how's going?", createdAt: new Date() }
           ]
         }
       ],

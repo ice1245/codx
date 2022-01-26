@@ -32,6 +32,7 @@ export const mutations = mutationTree(state, {
       $storex.chat.setOpenedChat(session.lastOpenChat)
     } catch {}
     $storex.session.init()
+    $storex.network.init()
   },
   setOpenedChat ({ session }, id) {
     session.lastOpenChat = id
