@@ -1,5 +1,6 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import { $storex } from '@/store'
+import WebRTCRoom from '@/webrtc'
 
 export const namespaced = true
 
@@ -26,13 +27,22 @@ export const actions = actionTree(
     init () {
     },
     async createNewCall (ctx, settings) {
+      const { type = "audio" } = settings
+      const rtc = await WebRTCRoom.newRoom({
+        video: type === "video",
+        audio: true,
+        userid: $storex.user.user.id
+      })
       $storex.call.setCalls([{
         id: 1,
-        ...settings
+        ...settings,
+        callee: $storex.user.user,
+        rtc
       }])
       $storex.call.setCurrentCall(1)
     },
-    async endCurrentCall () {
+    async endCurrentCall ({ state }) {
+      await state.currentCall.rtc.disconnect()
       $storex.call.setCurrentCall()
     }
   },

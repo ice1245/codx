@@ -7,9 +7,11 @@ import * as user from './user'
 import * as chat from './chat'
 import * as clinic from './clinic'
 import * as call from './call'
+import * as session from './session'
+import * as network from './network'
 
 const storePattern = {
-  modules: { user, chat, clinic, call },
+  modules: { user, chat, clinic, call, session, network },
 }
 
 const store = createStore(storePattern)

@@ -1,7 +1,6 @@
 /* eslint no-empty-pattern: 0 */
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import { $storex } from '@/store'
-import WebRTCRoom from '../webrtc'
 
 export const namespaced = true
 
@@ -12,7 +11,6 @@ export const state = () => ({
   token: localStorage.getItem("token") || "",
   user: null,
   lastLogin: null,
-  userRoom: null,
   session: null
 })
 
@@ -25,18 +23,15 @@ export const mutations = mutationTree(state, {
     state.token = token
     state.user = user
     state.lastLogin = new Date()
-    const { chats, channels, clinics, session = {}, roomId } = user || {}
+    const { chats, channels, clinics, session = {} } = user || {}
     state.session = session
     $storex.chat.setChats(chats)
     $storex.chat.setChannels(channels)
     $storex.clinic.setClinics(clinics)
-    $storex.chat.setOpenedChat(session.lastOpenChat)
-    if (user) {
-      state.userRoom = await WebRTCRoom.newRoom({ name: roomId })
-    } else if(state.userRoom){
-      state.userRoom.disconnect()
-      state.userRoom = null
-    }
+    try {
+      $storex.chat.setOpenedChat(session.lastOpenChat)
+    } catch {}
+    $storex.session.init()
   },
   setOpenedChat ({ session }, id) {
     session.lastOpenChat = id

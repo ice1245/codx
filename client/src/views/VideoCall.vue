@@ -1,17 +1,78 @@
 <template>
-  <div>
-    {{ call.type }} call
-    <div class="flex -space-x-1 overflow-hidden">
-      <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
-      <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
-      <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80" alt="">
-      <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+  <div class="flex flex-col items-center">
+    <div class="prose text-primary">
+      <h1 class="m-5">
+        {{ call.callee.username }}
+      </h1>
     </div>
-    <button class="btn btn-primary">daisyUI Button</button>
+    <video
+      autoplay
+      :muted="calleeVideo.type === 'local'"
+      :src-object.prop.camel="calleeVideo.stream"
+      v-if="calleeVideo"
+      class="rounded-md object-fill"
+    ></video>
+    <Avatar
+      class="animate-pulse"
+      :size="24"
+      :url="call.callee.avatar"
+      :ring="100"
+      v-else
+    />
+    <div class="prose text-primary">
+      <h6 class="m-5">
+        {{ call.rtc.roomId }}
+      </h6>
+    </div>
+    <div class="flex flex-row px-10 w-full justify-between items-center">
+      <div class="rounded-full border p-2">
+        <MicrophoneIcon
+          class="hidden md:block cursor-pointer w-10 h-10 "
+        />
+      </div>
+      <div :class="['rounded-full border p-2']">
+        <VideoCameraIcon
+          :class="['rounded-full hidden md:block cursor-pointer w-10',
+            , call.type === 'video' ? 'fill-currentColor' : 'fill-gray-50']"
+        />
+      </div>
+      <div class="rounded-full border p-2 bg-error">
+        <PhoneMissedCallIcon
+          class="rounded-full hidden md:block cursor-pointer w-10 fill-white"
+          @click="$storex.call.endCurrentCall()"
+        />
+      </div>
+    </div>
+    <div class="mt-10 fex flex-row">
+      <Avatar
+        v-for="(user, ix) in call.users" :key="ix"
+        :size="12"
+        :url="user.avatar"
+        :ring="100"
+      />
+    </div>
   </div>
 </template>
 <script>
+import Avatar from '@/components/Avatar.vue'
+import {
+  MicrophoneIcon,
+  VideoCameraIcon,
+  PhoneMissedCallIcon
+} from '@heroicons/vue/solid'
 export default {
-  props: ['call']
-}
+  components: {
+    Avatar,
+    MicrophoneIcon,
+    VideoCameraIcon,
+    PhoneMissedCallIcon
+  },
+  props: ["call"],
+  computed: {
+    calleeVideo () {
+      return this.call.rtc.streams[this.call.callee.id]
+      // parentNode.insertBefore(e.mediaElement
+    }
+  }
+};
 </script>

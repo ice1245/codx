@@ -1,9 +1,9 @@
 <template>
- <div>
-  <select
-   v-model="key"
-   class="select select-bordered select-sm"
-   data-choose-theme
+ <div class="text-primary">
+   <select
+    v-model="key"
+    class="select select-bordered w-full max-w-xs"
+    data-choose-theme
   >
    <option v-for="(theme, index) in themes" :key="index" class="mr-5">
     {{ theme }}

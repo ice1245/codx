@@ -6,7 +6,7 @@
       :src="logos[logoIx]"
       class="w-10 cursor-pointer hidden lg:block"
       alt=""
-      @click="logoIx = (logoIx + 1 >= logos.length ? 0 : logoIx + 1)"
+      @click="logoClick"
     />
     <div
       id="nav"
@@ -43,7 +43,7 @@
     <div
       class="lg:space-y-8 lg:flex hidden lg:flex-col justify-center items-center"
     >
-      <Dropdown
+      <UserMenu
         menuItemClass="-left-3.5 bottom-12"
         imgClass="h-8 w-8 rounded-full"
         :src="$storex.user.user.avatar"
@@ -59,13 +59,13 @@ import {
   UsersIcon,
   ChatAltIcon,
 } from "@heroicons/vue/outline";
-import Dropdown from "./UserMenu.vue";
+import UserMenu from "./UserMenu.vue";
 export default {
   components: {
     CogIcon,
     UsersIcon,
     ChatAltIcon,
-    Dropdown,
+    UserMenu,
   },
   data () {
     return {
@@ -78,6 +78,13 @@ export default {
         'codx-D_logo.png',
       ],
       logoIx: 0
+    }
+  },
+  methods: {
+    logoClick () {
+      const { logos, logoIx } = this
+      this.logoIx = (logoIx + 1 >= logos.length ? 0 : logoIx + 1)
+      this.$emit('sideBar', 'explorer')
     }
   }
 };

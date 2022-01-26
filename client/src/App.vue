@@ -6,9 +6,13 @@
 </template>
 <script>
 import Notifications from '@/components/Notifications.vue'
+import { themeChange } from 'theme-change'
 export default {
   components: {
     Notifications
+  },
+  mounted () {
+    themeChange(false)
   }
 }
 </script>

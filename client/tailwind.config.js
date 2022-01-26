@@ -4,6 +4,7 @@ module.exports = {
   content: ["./src/**/*.{html,js,vue}"],
   plugins: [
     require('@tailwindcss/typography'),
-    require('daisyui')
+    require('daisyui'),
+    require('tailwind-scrollbar')
   ],
 }

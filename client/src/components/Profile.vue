@@ -1,113 +1,224 @@
 <template>
-  <div class="max-w-md py-2 h-full">
-    <div class="flex items-center justify-between pt-4 md:px-8 px-6">
-      <p class="font-medium text-2xl lg:text-3xl text-center">
-        My Profile
-      </p>
-    </div>
-    <div class="flex flex-col items-center justify-center space-y-3 pt-4">
-      <div class="mt-3 relative flex">
-        <img
-          class="inline-block h-26 w-26 rounded-full ring-white"
-          src="https://w7.pngwing.com/pngs/524/696/png-transparent-computer-icons-user-symbol-symbol-miscellaneous-black-computer-icons.png"
-          alt="avatar"
-        />
-        <t-tag
-          tag-name="span"
-          variant="badge"
-          class="h-11 w-11 rounded-full absolute -bottom-1 -right-1 flex items-center justify-center"
-        >
-          <PencilIcon
-            class="cursor-pointer w-5 flex items-center text-center justify-center"
-          />
-        </t-tag>
-      </div>
-      <p
-        class="font-semibold tracking-tight text-xl text-center pt-4"
-      >
-        Patricia Smith
-      </p>
-      <div class="flex items-center space-x-3 pb-7">
-        <div class="ring-4 rounded-full ring-green-500 h-0.5 w-0.5"></div>
-        <p class="font-medium text-lg ">Active</p>
-      </div>
-      <hr class="border-gray-300 w-full" />
-      <p
-        class="font-medium text-lg tracking-tight md:pt-6 pt-3 md:px-8 px-6"
-      >
-        If several languages coalesce, the grammer of the resulting language is
-        more simple and regular than that of the individual.
-      </p>
-    </div>
-    <div
-      class="my-6 md:mx-8 mx-6 rounded-md overflow-hidden border border-gray-400"
-    >
-      <div class="tab__header">
-        <a
-          href="#"
-          class="tab__link p-4 hover:bg-blue-darker no-underline flex items-center justify-between"
-          @click.prevent="active = !active"
-        >
-          <div class="flex items-center space-x-3">
-            <UserIcon class="cursor-pointer w-4 " />
-            <strong class="font-medium">About</strong>
+  <div
+    class="
+      grid
+      items-center
+      gap-4
+      p-4
+      py-8
+      place-items-center
+      flex-shrink-0
+      col-span-3
+      row-span-3
+      mx-2
+      xl:mx-0
+      w-72
+      xl:w-auto
+      place-self-start
+      xl:w-full
+    "
+  >
+    <div class="dropdown">
+      <div tabindex="0">
+        <div class="avatar online">
+          <div
+            class="
+              w-24
+              h-24
+              p-px
+              mask mask-squircle
+              bg-base-content bg-opacity-10
+            "
+          >
+            <img
+              :src="user.avatar"
+              width="94"
+              height="94"
+              alt="Avatar Tailwind CSS Component"
+              class="mask mask-squircle"
+            />
           </div>
-
-          <span class="down-Arrow" v-show="!active">
-            <ChevronDownIcon class="cursor-pointer w-4 " />
-          </span>
-          <span class="up-Arrow" v-show="active">
-            <ChevronUpIcon class="cursor-pointer w-4 " />
-          </span>
-        </a>
+        </div>
       </div>
-      <div class="tab__content p-6" v-show="active">
-        <p class="font-medium text-lg pb-0.5">Name</p>
-        <p class="font-medium text-lg ">Patricia Smith</p>
-        <p class="font-medium text-lg pb-0.5 pt-7">Email</p>
-        <p class="font-medium text-lg ">Patriciasmith@1.co</p>
-        <p class="font-medium text-lg pb-0.5 pt-7">Time</p>
-        <p class="font-medium text-lg ">11:00 AM</p>
-        <p class="font-medium text-lg pb-0.5 pt-7">Location</p>
-        <p class="font-medium text-lg ">USA</p>
+      <div tabindex="0" class="py-2 dropdown-content">
+        <div
+          class="
+            shadow-xl
+            w-72
+            card
+            compact
+            bg-neutral-focus
+            text-neutral-content
+            rounded-box
+          "
+        >
+          <div class="card-body">
+            <h2 class="font-extrabold capitalize card-title">
+              avatar component
+            </h2>
+            <p class="text-sm text-neutral-content text-opacity-80">
+              Use avatar component with any size
+            </p>
+            <div class="flex justify-end mt-4">
+              <a
+                href="/components/avatar"
+                class="btn btn-primary btn-sm xl:btn-md"
+              >
+                See component
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
+    <div>
+      <div class="dropdown w-full">
+        <div tabindex="0">
+          <div class="text-center">
+            <div class="text-lg font-extrabold">Betsy Braddock</div>
+            <div class="my-3 text-sm text-base-content text-opacity-60">
+              Strategic Art Manager
+              <br />Global Illustration Observer <br />Business Alignment
+              Developer
+            </div>
+          </div>
+        </div>
+        <div tabindex="0" class="py-2 dropdown-content">
+          <div
+            class="
+              shadow-xl
+              w-72
+              card
+              compact
+              bg-neutral-focus
+              text-neutral-content
+              rounded-box
+            "
+          >
+            <div class="card-body">
+              <h2 class="font-extrabold capitalize card-title">
+                card component
+              </h2>
+              <p class="text-sm text-neutral-content text-opacity-80">
+                Card component is used to show products, features and more.
+              </p>
+              <div class="flex justify-end mt-4">
+                <a
+                  href="/components/card"
+                  class="btn btn-primary btn-sm xl:btn-md"
+                >
+                  See component
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="dropdown w-full">
+        <div tabindex="0">
+          <div class="mt-2 text-center">
+            <div class="badge badge-ghost">Design</div>
+            <div class="badge badge-ghost">Art</div>
+            <div class="badge badge-ghost">Illustration</div>
+          </div>
+        </div>
+        <div tabindex="0" class="py-2 dropdown-content">
+          <div
+            class="
+              shadow-xl
+              w-72
+              card
+              compact
+              bg-neutral-focus
+              text-neutral-content
+              rounded-box
+            "
+          >
+            <div class="card-body">
+              <h2 class="font-extrabold capitalize card-title">
+                badge component
+              </h2>
+              <p class="text-sm text-neutral-content text-opacity-80">
+                Use badge component to highlight small inline items
+              </p>
+              <div class="flex justify-end mt-4">
+                <a
+                  href="/components/badge"
+                  class="btn btn-primary btn-sm xl:btn-md"
+                >
+                  See component
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dropdown dropdown-top">
+      <div tabindex="0">
+        <div class="btn-group">
+          <button class="btn btn-accent btn-sm">Follow</button>
+          <button
+            aria-label="button component"
+            class="btn btn-accent btn-sm btn-square"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              class="w-6 h-6 stroke-current"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div tabindex="0" class="py-2 dropdown-content">
+        <div
+          class="
+            shadow-xl
+            w-72
+            card
+            compact
+            bg-neutral-focus
+            text-neutral-content
+            rounded-box
+          "
+        >
+          <div class="card-body">
+            <h2 class="font-extrabold capitalize card-title">
+              button group component
+            </h2>
+            <p class="text-sm text-neutral-content text-opacity-80">
+              Use it to group multiple buttons together
+            </p>
+            <div class="flex justify-end mt-4">
+              <a
+                href="/components/button-group"
+                class="btn btn-primary btn-sm xl:btn-md"
+              >
+                See component
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ThemeSelector />
   </div>
 </template>
 <script>
-import {
-  UserIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "@heroicons/vue/outline";
-import { PencilIcon } from "@heroicons/vue/solid";
-import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+import ThemeSelector from './ThemeSelector.vue'
 export default {
   components: {
-    UserIcon,
-    ChevronDownIcon,
-    ChevronUpIcon,
-    PencilIcon,
+    ThemeSelector
   },
-  setup() {
-    const store = useStore();
-    const router = useRouter();
-
-    const logout = () => {
-      localStorage.clear();
-      store.dispatch("fetchAccessToken");
-      return router.push("/login");
-    };
-    return {
-      logout,
-    };
-  },
-  data() {
-    return {
-      active: true,
-    };
-  },
+  props: ['user']
 };
 </script>
 <style scoped></style>
