@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_components_user_with_roles",
+  "info": {
+    "displayName": "UserWithRole",
+    "icon": "user-shield"
+  },
+  "options": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "role": {
+      "type": "enumeration",
+      "enum": [
+        "admin",
+        "guest"
+      ]
+    }
+  }
+}

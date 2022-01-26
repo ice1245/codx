@@ -25,6 +25,20 @@ class Strapi {
       .post("api/auth/local/register", payload)
   }
 
+  async createChat (chatSettings) {
+    const { headers } = this
+    return useFetch.post("api/chats", chatSettings, { headers })
+  }
+
+  async loadChat (id) {
+    const { headers } = this
+    return useFetch.get(`api/chats/${id}?populate=admins,guests`, { headers })
+  }
+
+  async sendMessage(chatMessage) {
+    const { headers } = this
+    return useFetch.post("api/chat-messages", chatMessage, { headers })
+  }
 }
 
 export default new Strapi()

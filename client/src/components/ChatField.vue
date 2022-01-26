@@ -9,8 +9,8 @@
     >
       <div
         :class="[
-          active ? 'bg-gray-400' : '',
-          checked ? 'bg-gray-400' : 'hover:bg-gray-400',
+          active ? '' : '',
+          checked ? '' : 'hover:',
           'rounded py-3.5 px-5 flex cursor-pointer focus:outline-none items-center',
         ]"
       >
@@ -26,10 +26,10 @@
         </div>
         <div class="ml-3 w-full">
           <div class="flex items-center justify-between">
-            <p class="text-md font-semibold text-gray-100">{{ option.name }}</p>
-            <p class="text-2xs text-gray-200">05 min</p>
+            <p class="text-md font-semibold ">{{ option.name }}</p>
+            <p class="text-2xs ">05 min</p>
           </div>
-          <p class="text-sm pt-0.5 font-normal text-gray-200">
+          <p class="text-sm pt-0.5 font-normal ">
             {{ option.text }}
           </p>
         </div>

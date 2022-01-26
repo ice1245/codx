@@ -1,7 +1,6 @@
 /* eslint no-empty-pattern: 0 */
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import { $storex } from '@/store'
-import WebRTCRoom from '../webrtc'
 
 export const namespaced = true
 
@@ -12,7 +11,6 @@ export const state = () => ({
   token: localStorage.getItem("token") || "",
   user: null,
   lastLogin: null,
-  userRoom: null,
   session: null
 })
 
@@ -25,18 +23,15 @@ export const mutations = mutationTree(state, {
     state.token = token
     state.user = user
     state.lastLogin = new Date()
-    const { chats, channels, clinics, session = {}, roomId } = user || {}
+    const { chats, channels, clinics, session = {} } = user || {}
     state.session = session
     $storex.chat.setChats(chats)
     $storex.chat.setChannels(channels)
     $storex.clinic.setClinics(clinics)
-    $storex.chat.setOpenedChat(session.lastOpenChat)
-    if (user) {
-      state.userRoom = await WebRTCRoom.newRoom({ name: roomId })
-    } else if(state.userRoom){
-      state.userRoom.disconnect()
-      state.userRoom = null
-    }
+    try {
+      $storex.chat.setOpenedChat(session.lastOpenChat)
+    } catch {}
+    $storex.session.init()
   },
   setOpenedChat ({ session }, id) {
     session.lastOpenChat = id
@@ -79,21 +74,16 @@ export const actions = actionTree(
         localStorage.setItem("token", token)
         localStorage.setItem("user", JSON.stringify(user))
         $storex.user.onSignup(payload)
-        this.app.$toast.open({
-          message: "Sign Up Successfully!!",
-          type: "success",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+            text: "Success",
+            group: "success"
+          }, 2000);
         } catch (e) {
-          this.app.$toast.open({
-            message: e.response?.data?.error?.message,
-            type: "error",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          })
+          this.app.$notify({
+              text: e.response?.data?.error?.message,
+              group: "error"
+            }, 2000);
+          throw e
         }
     },
     async login({}, loginload) {
@@ -108,21 +98,16 @@ export const actions = actionTree(
         localStorage.setItem("user", JSON.stringify(user))
         localStorage.setItem("token", token)
         $storex.user.onSignup(payload)
-        this.app.$toast.open({
-          message: "Login Successfully!",
-          type: "success",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+          text: "Success",
+          group: "success"
+        }, 2000);
       } catch(e) {
-        this.app.$toast.open({
-          message: e.response?.data?.error?.message,
-          type: "error",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+          text: e.response?.data?.error?.message,
+          group: "error"
+        }, 2000);
+        throw e
       }
     },
     async logout () {

@@ -1,26 +1,12 @@
 <template>
-  <div class="avatar">
-    <div class="w-16 h-16">
-      <img :src="url">
-    </div>
-  </div> 
+  <div :class="['avatar', online ? 'online' : '' ]">
+  <div :class="[`bg-primary rounded-full w-${size || 12} h-${size || 12}`, (ring ? `ring ring-primary ring-offset-base-${ring} ring-offset-2` : '')]">
+    <img :src="url">
+  </div>
+</div> 
 </template>
 <script>
 export default {
-  props: ['url']
+  props: ['url', 'size', 'ring', 'online']
 }
 </script>
-<style>
-.avatar {
-    border-radius: 30px;
-    overflow: hidden;
-    width: 36px;
-    height: 36px;
-    border: 1px solid;
-    background-color: #36404a;
-}
-.avatar img {
-  width: 36px;
-  height: 36px;
-}
-</style>

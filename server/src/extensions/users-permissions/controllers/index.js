@@ -1,6 +1,8 @@
 module.exports = ({ controllers }) => {
   const { user } = controllers
   const orgMe = user.me
+  const guest10 = { id: 10, username: 'Marc-D', avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" }
+  const guest20 = { id: 20, username: 'JoeyRM10', avatar: "https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraightStrand&accessoriesType=Sunglasses&hairColor=Blonde&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=CollarSweater&clotheColor=Gray01&eyeType=Side&eyebrowType=Default&mouthType=Serious&skinColor=Black" }
   user.me = async ctx => {
     await orgMe(ctx)
     const sme = ctx.body
@@ -11,13 +13,18 @@ module.exports = ({ controllers }) => {
       session: {
         lastOpenChat: 1
       },
+      network: {
+        friends: [ guest10, guest20 ]
+      },
       chats: [
         {
           id: 1,
           starred: true,
-          users: [
-            { id: 10, username: 'Marc-D', avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" },
+          admins: [
             sme
+          ],
+          guests: [
+            guest10
           ],
           messages: [
             { from: 10, to: sme.id, content: { message: "Hey!" }, ts: ds - 60000 },
@@ -28,9 +35,11 @@ module.exports = ({ controllers }) => {
         {
           id: 2,
           starred: true,
-          users: [
-            { id: 20, username: 'JoeyRM10', avatar: "https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraightStrand&accessoriesType=Sunglasses&hairColor=Blonde&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=CollarSweater&clotheColor=Gray01&eyeType=Side&eyebrowType=Default&mouthType=Serious&skinColor=Black" },
+          admins: [
             sme
+          ],
+          guests: [
+            guest20
           ],
           messages: [
             { from: 20, to: sme.id, content: { message: "Hey!" }, ts: ds - 60000 },

@@ -63,12 +63,6 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "chats": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::chat.chat",
-      "inversedBy": "users"
-    },
     "avatar": {
       "type": "string"
     }

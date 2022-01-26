@@ -44,23 +44,17 @@ export default createStore({
           localStorage.setItem("token", res?.data?.jwt);
           localStorage.setItem("user", JSON.stringify(res?.data?.user));
           ctx.commit("onSignup", payload);
-          this.app.$toast.open({
-            message: "Sign Up Successfully!!",
-            type: "success",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          });
+          this.app.$notify({
+            text: "Sign Up Successfully!!",
+            group: "success"
+          }, 2000);
           return res;
         })
         .catch((e) => {
-          this.app.$toast.open({
-            message: e.response?.data?.error?.message,
-            type: "error",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          });
+          this.app.$notify({
+            text: e.response?.data?.error?.message,
+            group: "error"
+          }, 2000);
           return null;
         });
     },
@@ -79,23 +73,17 @@ export default createStore({
           localStorage.setItem("user", JSON.stringify(res?.data?.user));
           localStorage.setItem("token", res?.data?.jwt);
           ctx.commit("onSignup", payload);
-          this.app.$toast.open({
-            message: "Login Successfully!",
-            type: "success",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          });
+          this.app.$notify({
+            text: "Login success",
+            group: "success"
+          }, 2000);
           return payload;
         })
         .catch((e) => {
-          this.app.$toast.open({
-            message: e.response?.data?.error?.message,
-            type: "error",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          });
+          this.app.$notify({
+            text: e.response?.data?.error?.message,
+            group: "error"
+          }, 2000);
           return null;
         });
     },
