@@ -25,12 +25,12 @@
       <div class="flex items-center space-x-6">
         <SearchIcon class="cursor-pointer w-5 " />
         <PhoneIcon class="hidden md:block cursor-pointer w-5 "
-          @click="$storex.call.createNewCall({ type: 'voice', users: chat.users })"
+          @click="newCall('voice')"
           v-if="!$storex.call.currentCall"
         />
         <VideoCameraIcon
           class="hidden md:block cursor-pointer w-5 "
-          @click="$storex.call.createNewCall({ type: 'video', users: chat.users })"
+          @click="newCall('video')"
           v-if="!$storex.call.currentCall"
         />
         <UserAdd @user="user => addUser(user)" />
@@ -65,6 +65,21 @@ export default {
     addUser (user) {
       const { chat } = this
       this.$storex.chat.addUser({ chat, user })
+    },
+    async newCall (type) {
+      const { chat: { roomId, users }} = this
+      const { user: { username } } = this.$storex.user
+
+      await this.$storex.call.createNewCall({ roomId, type, users })
+      this.$storex.chat.sendMessage({
+        chat: this.chat,
+        content: `@${username} started new call.`,
+        extra: {
+          event: 'call',
+          type,
+          roomId
+        }
+      })
     }
   }
 }

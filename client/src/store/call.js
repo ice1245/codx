@@ -17,7 +17,18 @@ export const mutations = mutationTree(state, {
     state.calls = calls
   },
   setCurrentCall (state, id) {
-    state.currentCall = state.calls.filter(c => c.id === id)[0]
+    state.currentCall = state.calls[id]
+  },
+  updateCallFromRtc (state, rtc) {
+    const call = state.calls[rtc.roomId]
+    if (call) {
+      call.streams = {
+        ...rtc.streams
+      }
+      if (state.currentCall && state.currentCall.id === rtc.roomId) {
+        state.currentCall = state.calls[rtc.roomId]
+      }
+    }
   }
 })
 
@@ -26,24 +37,40 @@ export const actions = actionTree(
   {
     init () {
     },
-    async createNewCall (ctx, settings) {
-      const { type = "audio" } = settings
+    async createNewCall ({ state }, { roomId, type = "audio" }) {
       const rtc = await WebRTCRoom.newRoom({
         video: type === "video",
         audio: true,
-        userid: $storex.user.user.id
+        userid: $storex.user.user.id,
+        roomId,
+        onStreamsChanged (ev) {
+          $storex.call.updateCallFromRtc(ev)
+        }
       })
-      $storex.call.setCalls([{
-        id: 1,
-        ...settings,
-        callee: $storex.user.user,
-        rtc
-      }])
-      $storex.call.setCurrentCall(1)
+      $storex.call.setCalls({
+        ...state.calls,
+        [rtc.roomId]: {
+          id: rtc.roomId,
+          type,
+          callee: $storex.user.user,
+          rtc,
+          streams: rtc.streams
+        }
+      })
+      $storex.call.setCurrentCall(rtc.roomId)
+    },
+    async joinCall (ctx, { type, roomId }) {
+      await $storex.call.createNewCall({ type, roomId })
     },
     async endCurrentCall ({ state }) {
       await state.currentCall.rtc.disconnect()
       $storex.call.setCurrentCall()
+    },
+    toggleVideo (ctx, call) {
+      call.rtc.toggleVideo()
+    },
+    toggleAudio (ctx, call) {
+      call.rtc.toggleAudio()
     }
   },
 )

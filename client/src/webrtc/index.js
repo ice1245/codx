@@ -24,6 +24,7 @@ export default class WebRTCRoom {
   connection = null
   roomId = null
   streams = {}
+  onStreamsChanged = () => {}
   constructor (settings) {
     const { video, audio } = settings
     this.connection = RTCMulticonnection()
@@ -35,17 +36,24 @@ export default class WebRTCRoom {
     }
     this.connection.extra = this.encodeExtra(settings)
     this.connection.onstream = this.onStream.bind(this)
+    this.connection.onstreamended = this.onStreamEnded.bind(this)
+    this.connection.onmute = this.onMute.bind(this)
+    this.connection.onunmute = this.onUnMute.bind(this)
   }
 
   static async newRoom (settings) {
     const room = new WebRTCRoom(settings)
+    const { onStreamsChanged } = settings
+    if (onStreamsChanged) {
+      room.onStreamsChanged = onStreamsChanged
+    }
     await room.connect(settings)
     return room
   }
 
-  async connect ({ name }) {
-    const { isRoomCreated, roomId } = await this.connection.openOrJoin(name || makeid(3))
-    this.roomId = roomId
+  async connect ({ roomId: name }) {
+    this.roomId = name || makeid(3)
+    const { isRoomCreated, roomId } = await this.connection.openOrJoin(this.roomId)
     console.log("rtc", "Room openend", isRoomCreated, roomId)
   }
 
@@ -85,10 +93,72 @@ export default class WebRTCRoom {
         extra
       }
     }
+    this.onStreamsChanged(this)
+  }
+
+  onStreamEnded (event) {
+    const { streamid } = event
+    const k = Object.keys(this.streams).filter(k => this.streams[k].streamid === streamid)[0]
+    if (k) {
+      delete this.streams[k]
+      this.onStreamsChanged(this)
+    }
   }
 
   get socket () {
     const { connection: { socket } } = this
     return socket
+  }
+
+  get allStreams () {
+    const { streams } = this
+    return Object.values(streams)
+  }
+
+  get myStreams () {
+    return this.allStreams
+      .filter(s => s.type === 'local')
+  }
+
+  onMute (event) {
+    const { streamid, muteType } = event
+    const stream = this.allStreams.filter(s => s.streamid === streamid)[0]
+    if (muteType === 'video') {
+      if (stream.paused)
+        return
+      stream.paused = true
+    }
+    if (muteType === 'audio') {
+      if (stream.muted)
+        return
+      stream.muted = true
+    }
+    this.onStreamsChanged(this)
+    console.log("onmute", event)
+  }
+
+  onUnMute (event) {
+    const { streamid, muteType } = event
+    const stream = this.allStreams.filter(s => s.streamid === streamid)[0]
+    if (muteType === 'video') {
+      if (!stream.paused)
+        return
+      stream.paused = false
+    }
+    if (muteType === 'audio') {
+      if (!stream.muted)
+        return
+      stream.muted = false
+    }
+    this.onStreamsChanged(this)
+    console.log("onunmute", event)
+  }
+
+  toggleVideo () {
+    this.myStreams.forEach(s => s.paused ? s.stream.unmute('video') : s.stream.mute('video'))
+  }
+
+  toggleAudio () {
+    this.myStreams.forEach(s => s.muted ? s.stream.unmute('audio') : s.stream.mute('audio'))
   }
 }

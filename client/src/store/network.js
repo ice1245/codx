@@ -24,7 +24,7 @@ export const actions = actionTree(
     async init ({ state }) {
       const user = $storex.user.user
       if (user) {
-        $storex.network.setNetwork(user.network)
+        $storex.network.setNetwork(user.network || {})
       } else {
         $storex.network.setNetwork({})
       }

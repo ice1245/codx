@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex items-end justify-start" v-if="left">
+    <div class="flex items-end justify-start" v-if="!isMe">
         <div>
           <div class="h-9 w-10">
             <Avatar :url="message.from.avatar" />
@@ -18,7 +18,9 @@
                   <ClockIcon class="w-3 mr-0.5" />
                   {{ formatTime(entry) }}
                 </p>
-                <h3 class="ttext-md md:text-base">{{ formatMessage(entry) }}</h3>
+                <h3 class="ttext-md md:text-base prose lg:prose-lg xl:prose-xl">
+                  <div v-html="formatMessage(entry)"></div>
+                </h3>
               </div>
             </div>
             <div class="arrow_icon_left bg-primary text-primary-content w-3 h-3"></div>
@@ -59,8 +61,8 @@
                   <ClockIcon class="w-3 mr-0.5" />
                   {{ formatTime(entry) }}
                 </p>
-                <h3 class="ttext-right text-md md:text-base">
-                  {{ formatMessage(entry) }}
+                <h3 class="ttext-md md:text-base">
+                  <div v-html="formatMessage(entry)" class="prose"></div>
                 </h3>
               </div>
             </div>
@@ -92,7 +94,7 @@ export default {
     MessageOptions,
     Avatar
   },
-  props: ['left', 'message'],
+  props: ['isMe', 'message'],
   methods: {
     formatMessage (message) {
       return message.content

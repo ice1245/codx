@@ -21,9 +21,9 @@
         <div class="lg:flex flex-row hidden h-full w-full">
           <ChatBox class="grow" :chat="$storex.chat.openedChat" v-if="chatVisible" />
           <VideoCall
-            class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 p-5 rounded-md"
+            class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 rounded-md"
             :call="$storex.call.currentCall"
-            v-if="$storex.call.currentCall"
+            v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
           />
         </div>
       </div>

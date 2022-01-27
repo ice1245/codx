@@ -1,15 +1,29 @@
 <template>
   <div class="h-full relative">
     <div class="flex flex-col justify-between absolute top-0 left-0 right-0 bottom-0">
-      <div class="h-full overflow-y-auto md:p-6 p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
+      <div ref="messageWindow"
+        class="h-full overflow-y-auto md:p-6 p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100"
+        @scroll="onMessageWindowScroll"
+      >
         <div class="chat-date"
           v-for="(dayMessages, dix) in dayMessages" :key="dix"
         >
-          <div class="divider"><span class="text-accent border rounded-lg px-3 py-1">{{ dayMessages.displayDate }}</span></div>
-          <ChatEntry
+          <div class="divider mb-6"><span class="text-accent border rounded-lg px-3 py-1">{{ dayMessages.displayDate }}</span></div>
+          <div
+            class="mb-4"
             v-for="(message, ix) in groupedMessages(dayMessages.messages)" :key="ix"
-            :left="me.id !== message.from.id"
-            :message="message"/>
+          >
+            <ChatEvent
+              :message="message"
+              @cancel="onCancelEvent(message)"
+              @ok="onConfirmEvent(message)"
+              :isMe="me.id === message.from.id"
+              v-if="message.event" />
+            <ChatEntry
+              :isMe="me.id === message.from.id"
+              :message="message"
+              v-else/>
+          </div>
         </div>
       </div>
       <div
@@ -45,17 +59,20 @@ import {
   PaperClipIcon
 } from "@heroicons/vue/outline";
 import ChatEntry from './ChatEntry.vue'
+import ChatEvent from './ChatEvent.vue'
 export default {
   components: {
     ChatAltIcon,
     EmojiHappyIcon,
     PaperClipIcon,
-    ChatEntry
+    ChatEntry,
+    ChatEvent
   },
   props: ['show', 'chat'],
   data() {
     return {
-      message: ''
+      message: '',
+      hasScrolled: false
     }
   },
   computed: {
@@ -63,25 +80,33 @@ export default {
       return this.$storex.user.user
     },
     dayMessages () {
+      !this.hasScrolled && requestAnimationFrame(this.scrollToBottom.bind(this))
       return this.chat.messages
         .filter(m => m.content)
         .reduce((acc, m) => {
           const { createdAt: ts } = m
-          const displayDate = moment(ts).fromNow()
+          const createdAt = moment(ts)
+          const displayDate = createdAt.fromNow()
           if (acc.length) {
-            const { displayDate: ldd, messages } = acc[acc.length-1]
-            if (ldd === displayDate) {
+            const { createdAt: ldd, messages } = acc[acc.length-1]
+            const sameDay = createdAt.format("DD-MM-YYYY") === ldd.format("DD-MM-YYYY")
+            const closeInTime = createdAt.diff(ldd, 'minutes') < 20
+            if (sameDay && closeInTime) {
               messages.push(m)
               return acc
             }
           }
           acc.push({
+            createdAt,
             displayDate,
             messages: [m]
           })
           return acc
         }, [])
     }
+  },
+  mounted () {
+    this.scrollToBottom()
   },
   methods: {
     async sendMessage () {
@@ -96,8 +121,10 @@ export default {
       const grouped = messages
         .reduce((acc, m) => {
           const { from, content, createdAt: ts } = m
+          const extra = m.extra || {}
+          const { event } = extra
           const createdAt = moment(ts)
-          if (acc.length) {
+          if (!event && acc.length) {
             const { id: mid } = from
             const { from: { id: lid }, entries, createdAtFormat: lcatf } = acc[acc.length-1]
             if (lid === mid) {
@@ -112,11 +139,29 @@ export default {
           acc.push({
             createdAt,
             from: users.filter(u => u.id === from.id)[0],
-            entries: [{ content, createdAt }]
+            entries: [{ content, createdAt, extra }],
+            event: event ? extra : null
           })
           return acc
         }, [])
       return grouped
+    },
+    onCancelEvent (message) {
+    },
+    async onConfirmEvent (message) {
+      const { event, roomId, type } = message.event
+      if (event === 'call') {
+        await this.$storex.call.joinCall({ type, roomId })
+      }
+    },
+    scrollToBottom () {
+      const element = this.$refs.messageWindow
+      element.scrollTop = element.scrollHeight
+    },
+    onMessageWindowScroll () {
+      const element = this.$refs.messageWindow
+      this.hasScrolled =
+        Math.abs(element.scrollTop + element.clientHeight - element.scrollHeight) > 10
     }
   }
 };
