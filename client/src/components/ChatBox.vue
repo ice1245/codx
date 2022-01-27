@@ -5,7 +5,7 @@
         <div class="chat-date"
           v-for="(dayMessages, dix) in dayMessages" :key="dix"
         >
-          <div class="divider">{{ dayMessages.displayDate }}</div>
+          <div class="divider"><span class="text-accent border rounded-lg px-3 py-1">{{ dayMessages.displayDate }}</span></div>
           <ChatEntry
             v-for="(message, ix) in groupedMessages(dayMessages.messages)" :key="ix"
             :left="me.id !== message.from.id"
