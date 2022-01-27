@@ -2,10 +2,15 @@
   <div class="h-full relative">
     <div class="flex flex-col justify-between absolute top-0 left-0 right-0 bottom-0">
       <div class="h-full overflow-y-auto md:p-6 p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
-        <ChatEntry
-          v-for="(message, ix) in chat.messages" :key="ix"
-          :left="me.id !== message.from.id"
-          :message="buildMessage(message)"/>
+        <div class="chat-date"
+          v-for="(dayMessages, dix) in dayMessages" :key="dix"
+        >
+          <div class="divider">{{ dayMessages.displayDate }}</div>
+          <ChatEntry
+            v-for="(message, ix) in groupedMessages(dayMessages.messages)" :key="ix"
+            :left="me.id !== message.from.id"
+            :message="message"/>
+        </div>
       </div>
       <div
         class="md:p-6 p-4 flex items-center md:space-x-5 space-x-3 border-t border-slate-600/50 w-full"
@@ -33,6 +38,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import {
   ChatAltIcon,
   EmojiHappyIcon,
@@ -55,24 +61,62 @@ export default {
   computed: {
     me () {
       return this.$storex.user.user
+    },
+    dayMessages () {
+      return this.chat.messages
+        .filter(m => m.content)
+        .reduce((acc, m) => {
+          const { createdAt: ts } = m
+          const displayDate = moment(ts).fromNow()
+          if (acc.length) {
+            const { displayDate: ldd, messages } = acc[acc.length-1]
+            if (ldd === displayDate) {
+              messages.push(m)
+              return acc
+            }
+          }
+          acc.push({
+            displayDate,
+            messages: [m]
+          })
+          return acc
+        }, [])
     }
   },
   methods: {
-    buildMessage (message) {
-      const { users } = this.chat
-      const { from } = message
-      const res = {
-        ...message,
-        ...users.filter(u => u.id === from)[0]
-      }
-      return res
-    },
     async sendMessage () {
       await this.$storex.chat.sendMessage({
         chat: this.chat,
         content: this.message
       })
       this.message = null
+    },
+    groupedMessages (messages) {
+      const { users } = this.chat
+      const grouped = messages
+        .reduce((acc, m) => {
+          const { from, content, createdAt: ts } = m
+          const createdAt = moment(ts)
+          if (acc.length) {
+            const { id: mid } = from
+            const { from: { id: lid }, entries, createdAtFormat: lcatf } = acc[acc.length-1]
+            if (lid === mid) {
+              const nots = createdAt.diff(lcatf, 'minutes') < 2
+              entries.push({
+                content,
+                createdAt: nots ? null : m.createdAt
+              })
+              return acc
+            }
+          }
+          acc.push({
+            createdAt,
+            from: users.filter(u => u.id === from.id)[0],
+            entries: [{ content, createdAt }]
+          })
+          return acc
+        }, [])
+      return grouped
     }
   }
 };

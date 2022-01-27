@@ -11,15 +11,19 @@
             <div
               class="bg-primary text-primary-content w-full rounded-lg rounded-bl-none text-right p-3 px-5 space-y-1"
             >
-              <h3 class="ttext-md md:text-base">{{ formatMessage(message) }}</h3>
-              <p class="text-2xs flex items-center justify-end">
-                <ClockIcon class="w-3 mr-0.5" />
-                {{ formatTime(message) }}
-              </p>
+              <div
+                v-for="(entry, ix) in message.entries" :key="ix"
+              >
+                <p class="text-2xs flex items-center justify-end" v-if="entry.createdAt">
+                  <ClockIcon class="w-3 mr-0.5" />
+                  {{ formatTime(entry) }}
+                </p>
+                <h3 class="ttext-md md:text-base">{{ formatMessage(entry) }}</h3>
+              </div>
             </div>
             <div class="arrow_icon_left bg-primary text-primary-content w-3 h-3"></div>
 
-            <p class="text-sm font-medium ">{{ message.username }}</p>
+            <p class="text-sm font-medium ">{{ message.from.username }}</p>
           </div>
           <div class="hidden md:block mt-2">
             <MessageOptions
@@ -48,16 +52,20 @@
             <div
               class="bg-secondary text-secondary-content rounded-lg rounded-br-none text-left p-3 px-5 space-y-1"
             >
-              <h3 class="ttext-right text-md md:text-base">
-                {{ formatMessage(message) }}
-              </h3>
-              <p class="text-2xs flex items-center">
-                <ClockIcon class="w-3 mr-0.5" />
-                {{ formatTime(message) }}
-              </p>
+              <div
+                v-for="(entry, ix) in message.entries" :key="ix"
+              >
+                <p class="text-2xs flex items-center" v-if="entry.createdAt">
+                  <ClockIcon class="w-3 mr-0.5" />
+                  {{ formatTime(entry) }}
+                </p>
+                <h3 class="ttext-right text-md md:text-base">
+                  {{ formatMessage(entry) }}
+                </h3>
+              </div>
             </div>
             <div class="arrow_icon_right w-3 h-3"></div>
-            <p class="text-sm font-medium ">{{ message.username }}</p>
+            <p class="text-sm font-medium ">{{ message.from.username }}</p>
           </div>
         </div>
         <div class="">
@@ -90,7 +98,7 @@ export default {
       return message.content
     },
     formatTime (message) {
-      return moment(message.createdAt).fromNow()
+      return moment(message.createdAt).format("hh:mm")
     }
   }
 }
