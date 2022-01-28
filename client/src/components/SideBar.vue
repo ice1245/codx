@@ -70,10 +70,10 @@ export default {
   data () {
     return {
       logos: [
+        'codx-C_logo_white.png',
         'codx-A_logo.png',
         'codx-B_logo.png',
         'codx-C_logo.png',
-        'codx-C_logo_white.png',
         'codx-C_logo_blues.png',
         'codx-D_logo.png',
       ],

@@ -17,13 +17,28 @@
       />
       <div class="lg:flex flex-col h-full w-full" v-else>
         <Header
-          :chat="$storex.chat.openedChat" />
+          :chat="$storex.chat.openedChat"
+          @coding-clinic="clinicList = true"
+          @leave-clinic="leaveClinic"
+        />
         <div class="lg:flex flex-row hidden h-full w-full">
+          <div class="w-2/3" v-if="$storex.clinic.currentClinic">
+            <NekoRoom
+              :room="$storex.clinic.currentClinic"
+            />
+          </div>
           <ChatBox class="grow" :chat="$storex.chat.openedChat" v-if="chatVisible" />
           <VideoCall
             class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 rounded-md"
             :call="$storex.call.currentCall"
             v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
+          />
+          <ClinicList
+            class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 rounded-md"
+            v-if="clinicList"
+            @join-clinic="joinClinic"
+            @leave-clinic="leaveClinic"
+            @new-clinic="onNewCodingClinic"
           />
         </div>
       </div>
@@ -39,6 +54,8 @@ import Explorer from "@/views/Explorer.vue"
 import VideoCall from "@/views/VideoCall.vue"
 import Header from "@/components/Header.vue"
 import SearchResults from "@/components/SearchResults.vue"
+import ClinicList from '@/components/ClinicList.vue'
+import NekoRoom from '@/components/NekoRoom.vue'
 export default {
   components: {
     SideBar,
@@ -48,10 +65,13 @@ export default {
     Explorer,
     VideoCall,
     Header,
-    SearchResults
+    SearchResults,
+    ClinicList,
+    NekoRoom
   },
   data() {
     return {
+      clinicList: false,
       show: 1,
       list: [{}, {}],
       sideBar: 'explorer',
@@ -102,6 +122,27 @@ export default {
     async onNewChat () {
       const chat = await this.$storex.chat.newChat()
       this.onOpenChat(chat)
+    },
+    async onNewCodingClinic (settigs) {
+      const clinic = await this.$storex.clinic.newCodingClinic({ chat: this.$storex.chat.openedChat, settigs })
+      const { user: { username } } = this.$storex.user
+      this.$storex.chat.sendMessage({
+        chat: this.chat,
+        content: `@${username} started new clinic.`,
+        extra: {
+          event: 'clinic',
+          clinic
+        }
+      })
+      this.joinClinic(clinic.id)
+    },
+    joinClinic (id) {
+      this.clinicList = false
+      this.$storex.clinic.setCurrentClinic(id)
+    },
+    leaveClinic () {
+      this.clinicList = false
+      this.$storex.clinic.setCurrentClinic()
     }
   }
 };

@@ -24,6 +24,19 @@
           />
         </a>
       </li>
+      <li>
+        <a
+          href="#"
+          @click="showAbout = true"
+        >
+          About
+          <LogoutIcon
+            class="ml-3 h-4 w-4 group-hover:"
+            aria-hidden="true"
+          />
+          <AboutDialog v-if="showAbout" @cancel="showAbout = false" />
+        </a>
+      </li>
     </ul>
   </div>
 </template>
@@ -32,6 +45,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue"
 import { PencilAltIcon, LogoutIcon } from "@heroicons/vue/solid"
 import Avatar from './Avatar.vue'
+import AboutDialog from './AboutDialog.vue'
 
 export default {
   components: {
@@ -41,12 +55,18 @@ export default {
     MenuItems,
     PencilAltIcon,
     LogoutIcon,
-    Avatar
+    Avatar,
+    AboutDialog
   },
   props: {
     imgClass: { type: String, default: "h-8 w-8 rounded-full" },
     src: { type: String, default: "../../assets/dots.svg" },
     menuItemClass: { type: String, default: "" },
+  },
+  data () {
+    return {
+      showAbout: false
+    }
   },
   computed: {
     online () {

@@ -44,6 +44,16 @@ class Strapi {
     const { headers } = this
     return useFetch.put("api/chats/" + chat.id, { guest: user }, { headers })
   }
+
+  async createClinic ({ chat }) {
+    const { headers } = this
+    return useFetch.post("api/neko-rooms", { chat }, { headers })
+  }
+
+  async findClinics () {
+    const { headers } = this
+    return useFetch.get("api/neko-rooms", { headers })
+  }
 }
 
 export default new Strapi()

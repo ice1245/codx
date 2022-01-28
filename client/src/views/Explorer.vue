@@ -3,7 +3,7 @@
     <div class="mt-2 mb-6 w-full">
       <label class="input-group input-group-sm w-full">
         <input type="text" placeholder="Search..." class="input input-bordered input-sm w-full"> 
-        <span class="cursor-pointer">Go</span>
+        <span class="cursor-pointer text-base-content">Go</span>
       </label>
     </div>
 

@@ -5,6 +5,5 @@
  */
 
 const { createCoreController } = require('@strapi/strapi').factories;
-const { NETWORK_SERVICE } = require('../../constants')
 
-module.exports = createCoreController(NETWORK_SERVICE);
+module.exports = createCoreController('api::network.network');

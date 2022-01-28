@@ -1,16 +1,11 @@
 <template>
   <div class="flex flex-col items-center">
-    <div class="prose text-primary">
-      <h3 class="m-5">
-        {{ call.callee.username }}
-      </h3>
-    </div>
     <video
       autoplay
       :muted="calleeVideo.type === 'local'"
       :src-object.prop.camel="calleeVideo.stream"
       v-if="calleeVideo"
-      class="rounded-md object-fill"
+      class="rounded-md object-fill z-0"
     ></video>
     <Avatar
       class="animate-pulse"
@@ -19,12 +14,7 @@
       :ring="100"
       v-else
     />
-    <div class="prose text-primary">
-      <h6 class="m-5">
-        {{ call.rtc.roomId }}
-      </h6>
-    </div>
-    <div class="flex flex-row px-10 w-full justify-between items-center">
+    <div class="flex flex-row px-10 w-full mt-2 z-3 justify-between items-center">
       <div class="rounded-full border p-2">
         <MicrophoneIcon
           :class="['hidden md:block cursor-pointer w-10 h-10', micOff ? 'fill-error' : '' ] "
@@ -57,20 +47,24 @@
   </div>
 </template>
 <script>
-import Avatar from '@/components/Avatar.vue'
 import {
   MicrophoneIcon,
   VideoCameraIcon,
   PhoneMissedCallIcon
 } from '@heroicons/vue/solid'
+import Avatar from '@/components/Avatar.vue'
 export default {
   components: {
-    Avatar,
     MicrophoneIcon,
     VideoCameraIcon,
-    PhoneMissedCallIcon
+    PhoneMissedCallIcon,
+    Avatar
   },
   props: ["call"],
+  data () {
+    return {
+    }
+  },
   computed: {
     calleeVideo () {
       return this.call.streams[this.call.callee.id]

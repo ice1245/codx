@@ -1,4 +1,3 @@
-const { NETWORK_SERVICE, CHAT_SERVICE } = require('../../../api/constants')
 
 module.exports = ({ controllers }) => {
   const { user } = controllers
@@ -8,17 +7,34 @@ module.exports = ({ controllers }) => {
   user.me = async ctx => {
     await orgMe(ctx)
     const sme = ctx.body
-    const networks = await strapi.entityService.findMany(NETWORK_SERVICE, { 
+    const networks = await strapi.$query('network').findMany({ 
       filters: { user: sme.id },
       populate: { friends: true, following: true, followed: true }
     })
-    const guestChats = await strapi.entityService.findMany(CHAT_SERVICE, { 
+    const guestChats = await strapi.$query('chat').findMany({ 
       filters: { guests: [sme.id] },
       populate: { admins: true, guests: true }
     })
-    const adminChats = await strapi.entityService.findMany(CHAT_SERVICE, { 
+    const adminChats = await strapi.$query('chat').findMany({ 
       filters: { admins: [sme.id] },
       populate: { admins: true, guests: true }
+    })
+    const clinics = await strapi.$query('neko-room').findMany({ 
+      where: {
+        chat: {
+          $null: false
+        }
+      },
+      populate: {
+        chat: {
+          where: {
+            $or: [
+              { admins: [sme.id] },
+              { guests: [sme.id] }
+            ]
+          }
+        }
+      }
     })
     const ds = new Date().getTime()
     ctx.body = {
@@ -74,9 +90,7 @@ module.exports = ({ controllers }) => {
         { id: 2, name: "svelt-training" },
         { id: 3, name: "company-support" },
       ],
-      clinics: [
-        { id: 1, name: "c# fix observable", room: {} }
-      ]
+      clinics
     }
   }
   return controllers

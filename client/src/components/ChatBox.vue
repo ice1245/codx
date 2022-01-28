@@ -8,7 +8,7 @@
         <div class="chat-date"
           v-for="(dayMessages, dix) in dayMessages" :key="dix"
         >
-          <div class="divider mb-6"><span class="text-accent border rounded-lg px-3 py-1">{{ dayMessages.displayDate }}</span></div>
+          <div class="divider mb-6"><span class="bg-neutral text-accent border rounded-lg px-3 py-1">{{ dayMessages.displayDate }}</span></div>
           <div
             class="mb-4"
             v-for="(message, ix) in groupedMessages(dayMessages.messages)" :key="ix"
@@ -41,7 +41,7 @@
         <PaperClipIcon class="cursor-pointer md:w-5 w-7 text-primary" />
         <div>
           <button
-            class="bg-primary text-primary-content md:w-14 w-10 md:h-12 h-10 flex items-center justify-center rounded-lg"
+            class="bg-primary text-neutral-content md:w-14 w-10 md:h-12 h-10 flex items-center justify-center rounded-lg"
           >
             <ChatAltIcon class="cursor-pointer md:w-6 w-5 t" @click="sendMessage" />
           </button>
@@ -149,9 +149,12 @@ export default {
     onCancelEvent (message) {
     },
     async onConfirmEvent (message) {
-      const { event, roomId, type } = message.event
+      const { event } = message.event
       if (event === 'call') {
-        await this.$storex.call.joinCall({ type, roomId })
+        await this.$storex.call.joinCall(message)
+      }
+      if (event === 'clinic') {
+        await this.$storex.clinic.joinClinic(message)
       }
     },
     scrollToBottom () {
