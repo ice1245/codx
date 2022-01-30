@@ -1,4 +1,5 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
+
 import { $storex } from '@/store'
 import api from '@/api'
 
@@ -32,7 +33,17 @@ export const actions = actionTree(
     async newCodingClinic({ state }, clinicSettings) {
       const { data: clinic } = await api.createClinic(clinicSettings)
       $storex.clinic.addClinic(clinic)
-      $storex.clinic.setCurrentClinic(clinic.id)
+      const { id } = clinic
+      $storex.clinic.setCurrentClinic(id)
+      return clinic
+    },
+    async disconnect({ state: { rooms } }, id) {
+      nekoClient.disconnect()
+    },
+    requestControl ({ state: { rooms } }, id = "main") {
+      if (!neko.remote.hosting) {
+        neko.remote.request()
+      }
     }
   },
 )

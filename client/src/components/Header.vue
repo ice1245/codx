@@ -34,8 +34,11 @@
         v-if="!$storex.call.currentCall"
       />
       <UserAdd @user="user => addUser(user)" />
-      <div :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : '']">
-        <TerminalIcon class="inline-block w-5 mr-2 stroke-current cursor-pointer online" @click="liveClinic ? $emit('leave-clinic') : $emit('coding-clinic')" />
+      <div
+        :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : '']"
+         @click="liveClinic ? $emit('leave-clinic') : $emit('coding-clinic')"
+      >
+        <TerminalIcon class="inline-block w-5 mr-2 stroke-current cursor-pointer online" />
       </div>
       <div class="form-control">
         <div class="relative">

@@ -10,51 +10,33 @@
           @click="template && onOk()">Create</button>
         <button class="btn shadow-sm px-4 py-2 mr-3" @click="$emit('cancel')">Cancel</button>
       </template>
-      <div>
+      <div class="">
         <label class="label">
           Choose a clinic template:
         </label>
-        <select
-          v-model="template"
-          class="select select-bordered select-sm w-full max-w-xs text-primary"
-        >
-          <option v-for="(tpl, key, tix) in templates" :key="tix">{{ key }}</option>
-        </select>
-        <div v-if="template">
-          <label class="label">
-            Select APPS to install
-          </label>
-          <small><strong>You can add them later</strong></small>
-          <div class="grid grid-cols-3 gap-4">
-            <div v-for="(app, name, ix) in templates[template].apps" :key="ix">
-              <div class="form-control">
-                <label class="cursor-pointer label">
-                  <span class="mr-2">{{ name }}</span> 
-                  <input type="checkbox" :checked="app.install" @change="app.install = !app.install" class="toggle">
-                </label>
-              </div>
-              <div v-if="app.install && false">
-                <div v-for="(value, key, aix) in app" :key="aix">
-                  <div class="form-control" v-if="key !== 'install'">
-                    <label class="label">
-                      <span class="label-text">{{ `${name}: ${key}` }}</span>
-                    </label> 
-                    <input type="text" :placeholder="value" class="input input-sm input-bordered">
-                  </div> 
-                </div>
-              </div>
+        <div class="flex flex-row gap-2">
+          <div class="place-content-center text-center w-32 p-2 cursor-pointer"
+            v-for="(card, ix) in templates" :key="ix"
+            @click="template = ix"
+          >
+            <div class="w-32 h-24 border-dashed border-2 border-sky-500 rounded-lg">
+              <div class="indicator-item badge badge-primary" v-if="template === ix">Selected</div> 
+              <PlusIcon class="w-12 ml-10 mt-7" v-if="false" />
             </div>
+            <h4 class="mt-1 text-info text-center"><strong>{{ card.title }}</strong></h4>
+            <small>{{ card.description }}</small>
           </div>
         </div>
       </div>
     </Dialog>
 </template>
 <script>
-import { CogIcon } from '@heroicons/vue/outline'
+import { CogIcon, PlusIcon } from '@heroicons/vue/outline'
 import Dialog from '@/components/Dialog.vue'
 export default {
   components: {
     CogIcon,
+    PlusIcon,
     Dialog
   },
   data () {
@@ -62,17 +44,26 @@ export default {
       loading: false,
       template: 0,
       templates: {
-        "code-server basic": {
-          image: "m1k1o/neko:firefox",
-          apps: {
-            git: { repo: "" },
-            nodejs: { version: "" },
-            python: { version: "" },
-            jupyter: { version: "" },
-            ".NetCore": { version: "" },
-            java: { version: "" },
-            rust: { version: "" }
-          }
+        "blank": {
+          nekoImage: "m1k1o/neko:firefox",
+          image: "",
+          title: "Blank",
+          description: "Empty project...",
+          tags: ['nodejs', 'python', 'java']
+        },
+        "web": {
+          nekoImage: "m1k1o/neko:firefox",
+          image: "",
+          title: "Web",
+          description: "Web APP project.",
+          tags: ['js', 'vue', 'react']
+        },
+        "data": {
+          nekoImage: "m1k1o/neko:firefox",
+          image: "",
+          title: "Data ML/AI",
+          description: "Data anlysis project.",
+          tags: ['jupyter-lab', 'tensorflow', 'conda', 'pytorch']
         }
       }
     }

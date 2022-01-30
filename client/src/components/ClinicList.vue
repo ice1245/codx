@@ -1,6 +1,7 @@
 <template>
-  <div class="flex flex-col p-5 justify-between prose">
-    <h2 class="flex-none">Clinics</h2>
+  <div class="flex flex-col p-5 justify-between prose relative">
+    <h2 class="flex-none float-left">Clinics</h2>
+    <XCircleIcon class="w-14 btn absolute top-4 right-2" @click="$emit('close')" />
     <div class="grow flex flex-col gap-1">
       <div class=""
         v-for="(clinic, ix) in $storex.clinic.clinics" :key="ix"
@@ -16,12 +17,13 @@
       </div>
     </div>
     <button class="flex-none btn btn-info w-full" @click="newCodingClinic = true">
-      <PlusIcon class="w-10 mr-2" /> Create clinic
+      <PlusIcon class="w-12 mr-2" /> Create clinic
     </button> 
     <CodingClinicDialog
       v-if="newCodingClinic"
       @ok="onNewCodingClinic"
       @cancel="newCodingClinic = false"
+      @close="newCodingClinic = false"
     />
   </div>
 </template>
@@ -29,7 +31,8 @@
 import {
   TerminalIcon,
   StopIcon,
-  PlusIcon
+  PlusIcon,
+  XCircleIcon
 } from '@heroicons/vue/outline'
 import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
 export default {
@@ -37,6 +40,7 @@ export default {
     TerminalIcon,
     StopIcon,
     PlusIcon,
+    XCircleIcon,
     CodingClinicDialog
   },
   data () {

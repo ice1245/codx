@@ -5,6 +5,7 @@ axios.defaults.timeout = 30000
 
 class NekoRooms {
   baseUrl = `https://${process.env.NEKO_ROOMS_TRAEFIK_DOMAIN}`
+  roomsUrl = `https://${process.env.NEKO_ROOMS_TRAEFIK_ROOMS_DOMAIN}`
   maxConcurrent = 10
   nekoAxiosAuth () {
     return {
@@ -44,9 +45,11 @@ class NekoRooms {
     const room = {
       ...nekoPayload,
       ...res.data,
-      wurl: `${this.baseUrl.replace('http', 'ws')}/${res.data.name}/ws`
+      url: this.roomsUrl + '/' + res.data.name + '/',
+      wurl: `${this.roomsUrl.replace('http', 'ws')}/${res.data.name}/ws`
     }
     await this.roomReady(room)
+    console.log("Room ready: ", room)
     return room
   }
 
@@ -95,11 +98,15 @@ class NekoRooms {
   }
 
   async roomReady (room) {
+    const wait = tout => new Promise(r => setTimeout(r, tout))
+    console.log("Waiting for room: ", room)
+    await wait(5000)
+    return
     const url = `${room.wurl}?password=${room.admin_pass}`
-    const wait = () => new Promise(r => setTimeout(r, 1000))
     const check = () => new Promise((resolve, reject) => {
       const ws = new WebSocket(url)
-      ws.on('unexpected-response', () => {
+      ws.on('unexpected-response', err => {
+        console.log("neko-rooms waitRoom ws error", err)
         reject()
       })
       ws.on('open', () => {
@@ -109,18 +116,17 @@ class NekoRooms {
     })
     // Wait for container initialization
     return new Promise(async (resolve, reject) => {
-      let attempts = 60
-      while(attempts > 0) {
+      let attempts = 3
+      while(attempts) {
         try {
           await check()
-          resolve()
-          return
+          return resolve()
         } catch {
           --attempts
         }
-        await wait()
+        await wait(1000)
       }
-      reject()
+      resolve()
     })
   }
 }

@@ -22,14 +22,14 @@
           @leave-clinic="leaveClinic"
         />
         <div class="lg:flex flex-row hidden h-full w-full">
-          <div class="w-2/3" v-if="$storex.clinic.currentClinic">
+          <div class="grow" v-if="$storex.clinic.currentClinic">
             <NekoRoom
               :room="$storex.clinic.currentClinic"
             />
           </div>
           <ChatBox class="grow" :chat="$storex.chat.openedChat" v-if="chatVisible" />
           <VideoCall
-            class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 rounded-md"
+            class="bg-neutral text-neutral-content tflex-none w-1/6 m-5 rounded-md"
             :call="$storex.call.currentCall"
             v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
           />
@@ -39,6 +39,7 @@
             @join-clinic="joinClinic"
             @leave-clinic="leaveClinic"
             @new-clinic="onNewCodingClinic"
+            @close="clinicList = false"
           />
         </div>
       </div>

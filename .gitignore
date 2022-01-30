@@ -60,3 +60,6 @@ dist
 .env.local
 
 docker/.env
+
+neko-rooms
+neko
