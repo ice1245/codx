@@ -1,0 +1,9 @@
+version: "2"
+services:
+  api:
+    ports:
+      - "${CODX_API_PORT:-1337}:1337"
+
+  web:
+    ports:
+      - "${CODX_WEB_PORT:-8080}:8080"
