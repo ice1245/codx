@@ -5,6 +5,10 @@
     >
       Sign up
     </h1>
+    <h1
+      class="md:pt-1 text-center px-3 md:px-0 md:text-xl text-lg font-medium">
+      <img src="logo.png" class="" width="80" style="margin:auto" />
+    </h1>
     <h3
       class="md:pt-1 text-center px-3 md:px-0 md:text-xl text-lg font-medium "
     >
@@ -15,7 +19,7 @@
       class="flex flex-col justify-center sm:px-6 lg:px-8 pt-6 sm:mx-auto w-full max-w-xl"
     >
       <div
-        class="w-full md:py-10 py-6 px-3 shadow sm:rounded sm:px-8"
+        class="w-full md:py-10 py-6 px-3 shadow sm:rounded sm:px-8  border border-gray-300"
       >
         <form
           @submit="onSubmit"
@@ -73,31 +77,34 @@
           <span v-if="email.error" class="pt-1 block text-sm text-red-400">{{
             email.error.message
           }}</span>
-          <label
-            class="pt-1.5 block md:text-lg text-md font-medium "
-          >
-            Password
-          </label>
-
-          <div
-            class="flex items-center w-full rounded-lg overflow-hidden border border-gray-300"
-          >
-            <div
-              class="md:w-14 w-10 md:h-12 h-10 px-3 flex items-center justify-center"
+          <div v-if="false">
+            <label
+              class="pt-1.5 block md:text-lg text-md font-medium "
             >
-              <LockClosedIcon class="cursor-pointer w-5 " />
+              Password
+            </label>
+
+            <div
+              class="flex items-center w-full rounded-lg overflow-hidden border border-gray-300"
+            >
+              <div
+                class="md:w-14 w-10 md:h-12 h-10 px-3 flex items-center justify-center"
+              >
+                <LockClosedIcon class="cursor-pointer w-5 " />
+              </div>
+              <input
+                :ref="password.ref"
+                v-model="password.value"
+                type="password"
+                class="block w-full md:px-4 px-3 md:py-3 py-2.5 placeholder-gray-200 focus:outline-none sm:text-base text-sm border-gray-300 bg-transparent font-medium"
+                placeholder="Enter your password"
+              />
             </div>
-            <input
-              :ref="password.ref"
-              v-model="password.value"
-              type="password"
-              class="block w-full md:px-4 px-3 md:py-3 py-2.5 placeholder-gray-200 focus:outline-none sm:text-base text-sm border-gray-300 bg-transparent font-medium"
-              placeholder="Enter your password"
-            />
+            <span v-if="password.error" class="pt-1 block text-sm text-red-400">{{
+              password.error.message
+            }}</span>
           </div>
-          <span v-if="password.error" class="pt-1 block text-sm text-red-400">{{
-            password.error.message
-          }}</span>
+          <div>Join codx now and help us building the best coding platform!</div>
           <div class="pt-5">
             <button
               type="submit"
