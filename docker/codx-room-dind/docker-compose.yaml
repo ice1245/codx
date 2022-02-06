@@ -6,21 +6,27 @@ services:
     shm_size: "2gb"
     ports:
       - "8080:8080"
-      - "53000-53003:53000-53003/udp"
+      - "$NEKO_EPR:$NEKO_EPR/udp"
     environment:
-      NEKO_SCREEN: 1920x1080@30
-      NEKO_PASSWORD: neko
-      NEKO_PASSWORD_ADMIN: admin
-      NEKO_EPR: 53000-53003
-      NEKO_ICELITE: 1
-      NEKO_NAT1TO1: 65.108.52.230
+      - "NEKO_BIND=$NEKO_BIND"
+      - "NEKO_EPR=$NEKO_EPR"
+      - "NEKO_ICELITE=$NEKO_ICELITE"
+      - "NEKO_NAT1TO1=$NEKO_NAT1TO1"
+      - "NEKO_PASSWORD=$NEKO_PASSWORD"
+      - "NEKO_PASSWORD_ADMIN=$NEKO_PASSWORD_ADMIN"
+      - "NEKO_SCREEN=$NEKO_SCREEN"
+      - "NEKO_MAX_FPS=$NEKO_MAX_FPS"
+      - "NEKO_VP8=$NEKO_VP8"
+      - "NEKO_VIDEO_BITRATE=$NEKO_VIDEO_BITRATE"
+      - "NEKO_OPUS=$NEKO_OPUS"
+      - "NEKO_AUDIO_BITRATE=$NEKO_AUDIO_BITRATE"
     restart: unless-stopped
   
   codx-coder:
     image: codercom/code-server:latest
     user: root
     environment:
-      - "PASSWORD=coder"
+      - "PASSWORD=$NEKO_PASSWORD"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     restart: unless-stopped

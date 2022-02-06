@@ -17,6 +17,7 @@
         <Avatar
           v-for="(user, ix) in chatUsers" :key="ix"
           :url="user.avatar" :video="user.video"
+          class="mr-2"
         />
       </div>
     </div>

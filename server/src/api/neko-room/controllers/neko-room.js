@@ -25,7 +25,7 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       max_connections: 10,
       mounts: [],
       name: "",
-      neko_image: "codx/room:latest",
+      neko_image: "codx/room:dind",
       screen: "1280x720@30",
       video_bitrate: 3072,
       video_codec: "VP8",
