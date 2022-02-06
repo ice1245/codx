@@ -4,7 +4,7 @@ services:
     image: node:16
     container_name: codx-api
     working_dir: /src
-    command: bash -c "yarn build && yarn develop"
+    command: bash -c "yarn && yarn build && yarn develop"
     volumes:
       - "$CODX_PATH/server:/src"
     restart: unless-stopped
@@ -34,6 +34,7 @@ services:
       - "NODE_ENV=$NODE_ENV"
       - "BASE_URL=$WEB_BASE_URL"
       - "VUE_APP_API=$API_BASE_URL"
+      - "CODX_WEB_PORT=${CODX_WEB_PORT:-8080}"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codx-web.rule=Host(`$WEB_DOMAIN`)"

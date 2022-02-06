@@ -13,7 +13,7 @@ export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
-  setChats ({}, chats) {
+  setChats ({}, chats = []) {
     chats.forEach(c => $storex.chat.addChat(c))
   },
   addChat (state, chat) {
@@ -38,7 +38,7 @@ export const mutations = mutationTree(state, {
       const { data: chat } = await api.loadChat(id)
       $storex.chat.addChat(chat)
     }
-    state.openedChat = state.chats[id]
+    state.chats && (state.openedChat = state.chats[id])
   },
   async addMessage (state, { chat: { id }, from, content, createdAt, extra }) {
     if (!state.chats[id]) {
