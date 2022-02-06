@@ -7,17 +7,23 @@
       <Explorer v-if="explorerVisible"
         @coding-clinics="onCodingClinics"
         @open-chat="chat => onOpenChat(chat)"
+        @open-channel="onOpenChannel"
         @new-chat="onNewChat"
       />
       <Profile v-if="profileVisible" :user="$storex.user.user"/>
     </div>
     <div class="lg:flex w-full h-full grow">
-      <SearchResults
-        v-if="showCodingClinics"
-        class="grow h-full w-full"
-        @new-clinic="onResultsNewCodingClinic"
-      />
-      <div class="lg:flex flex-col h-full w-full" v-else>
+      <div class="lg:flex flex-col h-full w-full">
+        <SearchResults
+          v-if="showCodingClinics"
+          class="h-full w-full"
+          @new-clinic="onResultsNewCodingClinic"
+        />
+        <Channel
+          v-if="showChannel"
+          class="h-full w-full"
+          :channel="$storex.channel.currentChannel"
+        />  
         <Header
           :chat="$storex.chat.openedChat"
           :explorerVisible="explorerVisible"
@@ -27,7 +33,7 @@
           @close-explorer="sideBar = ''"
           @open-explorer="sideBar = 'explorer'"
           @toggle-chat="toggleChatHidden"
-
+          v-if="showHeader"
         />
         <div class="lg:flex flex-row hidden h-full w-full">
           <div class="grow" v-if="currentClinic">
@@ -67,6 +73,7 @@ import SearchResults from "@/components/SearchResults.vue"
 import ClinicList from '@/components/ClinicList.vue'
 import NekoRoom from '@/components/NekoRoom.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
+import Channel from '@/components/channel/Channel.vue'
 
 export default {
   components: {
@@ -80,7 +87,8 @@ export default {
     SearchResults,
     ClinicList,
     NekoRoom,
-    LoadingDialog
+    LoadingDialog,
+    Channel
   },
   data() {
     return {
@@ -112,6 +120,12 @@ export default {
     },
     showLeftBar () {
       return this.sideBar !== ''
+    },
+    showChannel () {
+      return this.$storex.channel.currentChannel
+    },
+    showHeader () {
+      return !this.showCodingClinics && !this.showChannel
     }
   },
   methods: {
@@ -124,6 +138,11 @@ export default {
     onOpenChat (chat) {
       this.showCodingClinics = false
       this.$storex.user.setOpenedChat(chat.id)
+      this.$storex.channel.setCurrentChannel(null)
+    },
+    async onOpenChannel (channel) {
+      this.showCodingClinics = false
+      this.$storex.channel.openChannel(channel)
     },
     async onCodingClinics () {
       if (this.showCodingClinics) {

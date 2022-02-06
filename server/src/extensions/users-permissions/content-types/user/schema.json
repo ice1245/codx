@@ -71,6 +71,12 @@
       "relation": "oneToMany",
       "target": "api::clinic-template.clinic-template",
       "mappedBy": "user"
+    },
+    "companies": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::company.company",
+      "inversedBy": "users"
     }
   }
 }

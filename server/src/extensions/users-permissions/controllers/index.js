@@ -36,6 +36,9 @@ module.exports = ({ controllers }) => {
         }
       }
     })
+    const companies = await strapi.$query('company').findMany({ 
+      filters: { users: [sme.id] }
+    })
     const ds = new Date().getTime()
     ctx.body = {
       ...sme,
@@ -90,7 +93,8 @@ module.exports = ({ controllers }) => {
         { id: 2, name: "svelt-training" },
         { id: 3, name: "company-support" },
       ],
-      clinics
+      clinics,
+      companies
     }
   }
   return controllers

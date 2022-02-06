@@ -1,6 +1,6 @@
 <template>
   <div class="dropdown dropdown-right dropdown-end text-primary">
-    <Avatar tabindex="0" class="cursor-pointer" :url="src" :online="online" />
+    <Avatar tabindex="0" class="cursor-pointer" :url="user.avatar" :online="online" />
     <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-40">
       <li>
         <a
@@ -69,6 +69,9 @@ export default {
     }
   },
   computed: {
+    user () {
+      return this.$storex.user.user
+    },
     online () {
       return this.$storex.session.isOnline
     }

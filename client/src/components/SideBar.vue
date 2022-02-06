@@ -4,41 +4,25 @@
   >
     <img
       :src="logos[logoIx]"
-      class="w-10 cursor-pointer hidden lg:block"
+      class="w-10 cursor-pointer mb-4"
       alt=""
       @click="logoClick"
     />
-    <div
-      id="nav"
-      class="lg:space-y-4 flex lg:flex-col items-center lg:justify-center justify-between w-full lg:w-auto"
-      v-if="false"
-    >
-      <a
-        class="router-link-exact-active group hover:text-primary lg:w-14 w-11 lg:h-14 h-11 flex items-center justify-center rounded-lg"
-        @click="$emit('sideBar', 'chats')"
+    <div class="flex flex-col grow justify-start">
+      <div
+        v-for="(company, cix) in companies" :key="cix"
       >
-        <ChatAltIcon
-          class="cursor-pointer lg:w-6 w-5 group-hover:text-primary"
-        />
-      </a>
-      <router-link
-        to="/s"
-        class="group hover:text-primary lg:w-14 w-11 lg:h-14 h-11 flex items-center justify-center rounded-lg"
-      >
-        <UsersIcon class="cursor-pointer lg:w-6 w-5 group-hover:text-primary" />
-      </router-link>
-      <router-link
-        to="/d"
-        class="group hover:text-primary lg:w-14 w-11 lg:h-14 h-11 flex items-center justify-center rounded-lg"
-      >
-        <UsersIcon class="cursor-pointer lg:w-6 w-5 group-hover:text-primary" />
-      </router-link>
-      <router-link
-        to="/about"
-        class="group hover:text-primary lg:w-14 w-11 lg:h-14 h-11 flex items-center justify-center rounded-lg"
-      >
-        <CogIcon class="cursor-pointer lg:w-6 w-5 group-hover:text-primary" />
-      </router-link>
+        <div class="avatar ring ring-neutral-content rounded-btn cursor-pointer"
+        @click="$emit('switch-company', company)">
+          <div class="rounded-btn w-12 h-12">
+            <img :src="company.avatar">
+          </div>
+      </div>
+      </div>
+      <div class="avatar ring ring-accent rounded-full cursor-pointer mt-3 w-8 ml-2"
+        @click="$emit('add-company')">
+        <PlusIcon class="h-8 w-8" />
+      </div>
     </div>
     <div
       class="lg:space-y-8 lg:flex hidden lg:flex-col justify-center items-center"
@@ -46,7 +30,6 @@
       <UserMenu
         menuItemClass="-left-3.5 bottom-12"
         imgClass="h-8 w-8 rounded-full"
-        :src="$storex.user.user.avatar"
         @option="opt => $emit('sideBar', opt)"
       />
     </div>
@@ -55,16 +38,12 @@
 
 <script>
 import {
-  CogIcon,
-  UsersIcon,
-  ChatAltIcon,
+  PlusIcon
 } from "@heroicons/vue/outline";
 import UserMenu from "./UserMenu.vue";
 export default {
   components: {
-    CogIcon,
-    UsersIcon,
-    ChatAltIcon,
+    PlusIcon,
     UserMenu,
   },
   data () {
@@ -78,6 +57,14 @@ export default {
         'codx-D_logo.png',
       ],
       logoIx: 0
+    }
+  },
+  computed: {
+    user () {
+      return this.$storex.user.user
+    },
+    companies () {
+      return this.user.companies
     }
   },
   methods: {

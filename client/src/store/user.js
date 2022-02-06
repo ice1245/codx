@@ -89,6 +89,10 @@ export const actions = actionTree(
     },
     async login({}, loginload) {
       try {
+        this.app.$notify({
+          text: "loging...",
+          group: "generic"
+        }, 2000);
         const { data: { jwt: token }} = await api.login(loginload)
         const { data: user } = await api.me(token)
         const payload = {
