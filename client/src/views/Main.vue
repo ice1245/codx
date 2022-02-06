@@ -1,30 +1,38 @@
 <template>
   <div class="lg:flex h-screen overflow-hidden">
     <SideBar @sideBar="toggleSideBar" class="bg-neutral-focus text-neutral-content" />
-    <div class="bg-neutral text-neutral-content tmd:p-3 p-2 py-5 h-full lg:w-96 w-full">
-      <Explorer v-if="sideBar === 'explorer'"
+    <div class="bg-neutral text-neutral-content tmd:p-3 p-2 py-5 h-full lg:w-96 w-full"
+      v-if="showLeftBar"
+    >
+      <Explorer v-if="explorerVisible"
         @coding-clinics="onCodingClinics"
         @open-chat="chat => onOpenChat(chat)"
         @new-chat="onNewChat"
       />
-      <Profile v-if="sideBar === 'profile'" :user="$storex.user.user"/>
+      <Profile v-if="profileVisible" :user="$storex.user.user"/>
     </div>
-    <div class="container w-full h-full">
+    <div class="lg:flex w-full h-full grow">
       <SearchResults
         v-if="showCodingClinics"
         class="grow h-full w-full"
-        :search="currentSearch"
+        @new-clinic="onResultsNewCodingClinic"
       />
       <div class="lg:flex flex-col h-full w-full" v-else>
         <Header
           :chat="$storex.chat.openedChat"
+          :explorerVisible="explorerVisible"
+          :chatVisible="chatVisible"
           @coding-clinic="clinicList = true"
           @leave-clinic="leaveClinic"
+          @close-explorer="sideBar = ''"
+          @open-explorer="sideBar = 'explorer'"
+          @toggle-chat="toggleChatHidden"
+
         />
         <div class="lg:flex flex-row hidden h-full w-full">
-          <div class="grow" v-if="$storex.clinic.currentClinic">
+          <div class="grow" v-if="currentClinic">
             <NekoRoom
-              :room="$storex.clinic.currentClinic"
+              :room="currentClinic"
             />
           </div>
           <ChatBox class="grow" :chat="$storex.chat.openedChat" v-if="chatVisible" />
@@ -44,6 +52,7 @@
         </div>
       </div>
     </div>
+    <LoadingDialog v-if="loading" />
   </div>
 </template>
 <script>
@@ -57,6 +66,8 @@ import Header from "@/components/Header.vue"
 import SearchResults from "@/components/SearchResults.vue"
 import ClinicList from '@/components/ClinicList.vue'
 import NekoRoom from '@/components/NekoRoom.vue'
+import LoadingDialog from '@/components/LoadingDialog.vue'
+
 export default {
   components: {
     SideBar,
@@ -68,7 +79,8 @@ export default {
     Header,
     SearchResults,
     ClinicList,
-    NekoRoom
+    NekoRoom,
+    LoadingDialog
   },
   data() {
     return {
@@ -77,29 +89,29 @@ export default {
       list: [{}, {}],
       sideBar: 'explorer',
       showCodingClinics: !this.$storex.chat.openedChat,
-      currentSearch: {
-        topic: '#coding-clinic',
-        description: 'Find developers to connect and work together in an online development environment. A coding clinic is a timeboxed session where two or more participants will collaborate to solve a problem',
-        banner: {
-          bgImage: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZ3JhbW1pbmd8ZW58MHx8MHx8&w=1000&q=80',
-          image: 'https://careertraining.ed2go.com/common/images/2/22516/GES375-agnesscott-Full-Stack-Software-Developer-935x572.jpg'
-        },
-        showWelcome: true,
-        tags: [{ label: 'nodejs', count: 300 },{ label: 'vuejs', count: 230 },{ label: 'tailwind', count: 150 },{ label: 'daisyui', count: 100 }],
-        results: [1,2,3,4,5,6,7,8,9,1,2,3,4,5,6]
-      }
+      chatHidden: false,
+      loading: false
     };
   },
   computed: {
     openChat () {
-      const { chats, openedChat } = this.$storex.chat
-      return chats.filter(c => c.id === openedChat)[0]
+      const { openedChat } = this.$storex.chat
+      return openedChat
+    },
+    currentClinic () {
+      return this.$storex.clinic.currentClinic
     },
     chatVisible () {
-      return !this.showCodingClinics
-        && this.$storex.chat.openedChat
-        && (!this.$storex.call.currentCall ||
-        !this.$storex.clinic.currentClinic)
+      return this.openChat && (!this.currentClinic || !this.chatHidden)
+    },
+    explorerVisible () {
+      return this.sideBar === 'explorer'
+    },
+    profileVisible () {
+      return this.sideBar === 'profile'
+    },
+    showLeftBar () {
+      return this.sideBar !== ''
     }
   },
   methods: {
@@ -113,29 +125,40 @@ export default {
       this.showCodingClinics = false
       this.$storex.user.setOpenedChat(chat.id)
     },
-    onCodingClinics () {
+    async onCodingClinics () {
       if (this.showCodingClinics) {
         return
       }
+      await this.$storex.search.doSearch()
       this.showCodingClinics = true
-      this.$storex.user.setOpenedChat()
     },
     async onNewChat () {
       const chat = await this.$storex.chat.newChat()
       this.onOpenChat(chat)
     },
-    async onNewCodingClinic (settigs) {
-      const clinic = await this.$storex.clinic.newCodingClinic({ chat: this.$storex.chat.openedChat, settigs })
-      const { user: { username } } = this.$storex.user
-      this.$storex.chat.sendMessage({
-        chat: this.chat,
-        content: `@${username} started new clinic.`,
-        extra: {
-          event: 'clinic',
-          clinic
+    async onResultsNewCodingClinic (settings) {
+      await this.onNewCodingClinic(settings)
+      this.showCodingClinics = false
+    },
+    async onNewCodingClinic (settings) {
+      this.loading = true
+      try {
+        const chat = this.$storex.chat.openedChat
+        const clinic = await this.$storex.clinic.newCodingClinic({ chat, settings })
+        const { user: { username } } = this.$storex.user
+        if (chat) {
+          this.$storex.chat.sendMessage({
+            chat: this.chat,
+            content: `@${username} started new clinic.`,
+            extra: {
+              event: 'clinic',
+              clinic
+            }
+          })
         }
-      })
-      this.joinClinic(clinic.id)
+        this.joinClinic(clinic.id)
+      } catch{}
+      this.loading = false
     },
     joinClinic (id) {
       this.clinicList = false
@@ -144,6 +167,9 @@ export default {
     leaveClinic () {
       this.clinicList = false
       this.$storex.clinic.setCurrentClinic()
+    },
+    toggleChatHidden () {
+      this.chatHidden = !this.chatHidden
     }
   }
 };

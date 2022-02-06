@@ -1,44 +1,52 @@
 <template>
   <div
-      class="text-primary md:p-6 p-4 flex justify-between items-center space-x-5 border-b border-slate-600/50 w-full"
+      class="text-primary md:p-6 p-4 flex flex-row space-x-5 border-b border-slate-600/50 w-full"
     >
-    <div class="flex items-center -space-x-6">
-      <div class="flex justify-left items-center"
-        v-for="(user, ix) in (chat||{}).users" :key="ix"
-      >
-        <ChevronLeftIcon
-          class="cursor-pointer w-7 ml-2 mr-5 lg:hidden"
+    <div class="flex flex-row grow">
+      <MenuIcon 
+        :class="['cursor-pointer w-7 ml-2 mr-5', liveClinic ? 'lg:hidde' : '']"
+        v-if="!explorerVisible && liveClinic"
+        @click="$emit('open-explorer')"
+      />
+      <ChevronLeftIcon
+        :class="['cursor-pointer w-7 ml-2 mr-5', liveClinic ? '' : 'lg:hidde']"
+        v-if="explorerVisible && liveClinic"
+        @click="$emit('close-explorer')"
+      />
+      <div class="flex flex-row">
+        <Avatar
+          v-for="(user, ix) in chatUsers" :key="ix"
+          :url="user.avatar" :video="user.video"
         />
-        <div class="h-9 w-14 relative">
-          <Avatar :url="user.avatar" />
-        </div>
-        <div class="ml-3 w-full space-x-2 flex items-center" v-if="false">
-          <p class="md:text-md text-sm font-semibold ">
-            {{ user.username }}
-          </p>
-          <p
-            class="h-0.5 w-0.5 rounded-full ring-4 ring-green-400 "
-          />
-        </div>
       </div>
     </div>
     <div class="flex items-center space-x-6">
+      <div
+        :class="['avatar', micOn ? 'online btn btn-sm btn-accent rounded-md' : '']"
+         @click="onMic"
+      >
+        <MicrophoneIcon class="hidden md:block cursor-pointer w-5 "/>
+      </div>
       
-      <PhoneIcon class="hidden md:block cursor-pointer w-5 "
-        @click="newCall('voice')"
-        v-if="!$storex.call.currentCall"
-      />
-      <VideoCameraIcon
-        class="hidden md:block cursor-pointer w-5 "
-        @click="newCall('video')"
-        v-if="!$storex.call.currentCall"
-      />
-      <UserAdd @user="user => addUser(user)" />
+      <div
+        :class="['avatar', camOn ? 'online btn btn-sm btn-accent rounded-md' : '']"
+         @click="onMic"
+      >
+        <VideoCameraIcon class="hidden md:block cursor-pointer w-5 "/>
+      </div>
+      <UserAdd @user="user => addUser(user)" v-if="false" />
       <div
         :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : '']"
          @click="liveClinic ? $emit('leave-clinic') : $emit('coding-clinic')"
       >
         <TerminalIcon class="inline-block w-5 mr-2 stroke-current cursor-pointer online" />
+      </div>
+      <div
+        :class="['avatar', chatVisible ? 'btn btn-sm btn-accent rounded-md' : '']"
+         @click="$emit('toggle-chat')"
+         v-if="showChatToggle"
+      >
+        <ChatAltIcon class="inline-block w-5 mr-2 stroke-current cursor-pointer online" />
       </div>
       <div class="form-control">
         <div class="relative">
@@ -53,9 +61,11 @@
 import {
   SearchIcon,
   VideoCameraIcon,
-  PhoneIcon,
+  MicrophoneIcon,
   ChevronLeftIcon,
-  TerminalIcon
+  TerminalIcon,
+  MenuIcon,
+  ChatAltIcon
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import Avatar from '@/components/Avatar.vue'
@@ -63,13 +73,15 @@ export default {
   components: {
     SearchIcon,
     VideoCameraIcon,
-    PhoneIcon,
+    MicrophoneIcon,
     ChevronLeftIcon,
     UserAdd,
     Avatar,
-    TerminalIcon
+    TerminalIcon,
+    MenuIcon,
+    ChatAltIcon
   },
-  props: ['chat'],
+  props: ['chat', 'explorerVisible', 'chatVisible'],
   data () {
     return {
       newCodingClinic: false
@@ -78,12 +90,43 @@ export default {
   computed: {
     liveClinic () {
       return !!this.$storex.clinic.currentClinic
+    },
+    call () {
+      return this.$storex.call.currentCall
+    },
+    calleeVideo () {
+      return this.call ? this.call.streams[this.call.callee.id] : null
+    },
+    micOn () {
+      return this.call && !this.calleeVideo.muted
+    },
+    camOn () {
+      return this.call && !this.calleeVideo.paused
+    },
+    chatUsers () {
+      return (this.chat||{ users: []}).users.map(u => ({
+        ...u,
+        video: this.call ? this.call.streams[u.id] : null
+      }))
+    },
+    showChatToggle () {
+      return this.liveClinic
     }
   },
   methods: {
     addUser (user) {
       const { chat } = this
       this.$storex.chat.addUser({ chat, user })
+    },
+    onMic () {
+      if (!this.call) {
+        return this.newCall('voice')
+      }
+    },
+    onCam () {
+      if (!this.call) {
+        return this.newCall('video')
+      }
     },
     async newCall (type) {
       const { chat: { roomId, users }} = this
@@ -99,6 +142,11 @@ export default {
           roomId
         }
       })
+    }
+  },
+  beforeUnmount () {
+    if (this.call) {
+      this.$storex.call.endCurrentCall()
     }
   }
 }

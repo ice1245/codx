@@ -13,11 +13,11 @@
           <div class="bg-neutral text-neutral-content inline-block align-bottom  rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
             <div class=" px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
               <div class="sm:flex sm:items-start">
-                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-accent-focus sm:mx-0 sm:h-10 sm:w-10">
-                  <slot name="icon">
+                <slot name="icon">
+                  <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-accent-focus sm:mx-0 sm:h-10 sm:w-10">
                     <ExclamationIcon class="h-6 w-6 text-neutral-600" aria-hidden="true" />
-                  </slot>
-                </div>
+                  </div>
+                </slot>
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                   <DialogTitle as="h3" class="text-lg leading-6 font-medium text-accent-900">
                     {{ title }}
@@ -33,8 +33,12 @@
             </div>
             <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
               <slot name="actions">
-                <button class="btn shadow-sm px-4 py-2" @click="open = false">Ok</button> 
-                <button class="btn btn-error shadow-sm px-4 py-2" @click="open = false">Cancel</button>
+                <button class="btn btn-accent shadow-sm px-4 py-2"
+                  @click="onClose(true)"
+                  v-if="!btns || btns.indexOf('ok') !== -1">Ok</button> 
+                <button class="btn btn-error shadow-sm px-4 py-2"
+                  @click="onClose(false)"
+                  v-if="!btns || btns.indexOf('cancel') !== -1">Cancel</button>
               </slot>
             </div>
           </div>
@@ -57,16 +61,15 @@ export default {
     TransitionRoot,
     ExclamationIcon,
   },
-  props: ['title'],
+  props: ['title', 'btns'],
   data () {
     return {
       open: true,
     }
   },
   methods: {
-    onClose () {
-      this.open = false
-      this.$emit('close')
+    onClose (ok) {
+      this.$emit('close', ok)
     }
   }
 }

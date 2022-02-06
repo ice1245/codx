@@ -9,7 +9,9 @@ const nekoRooms = require('../../../neko-rooms')
 
 module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) => ({
   async create ({ request: { body }, state: { user } }) {
-    const chat = await strapi.$api('chat').findOne(body.chat.id)
+    let { chat = {}, settings: roomSettings } = body
+    chat = chat.id ? await strapi.$api('chat').findOne(chat.id) : null
+    const { repository, folder } = roomSettings
     const settings = {
       admin_pass: "td9o3",
       user_pass: "w2gzu",
@@ -19,16 +21,21 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       broadcast_pipeline: "",
       control_protection: false,
       envs: {},
-      implicit_control: false,
+      implicit_control: true,
       max_connections: 10,
       mounts: [],
       name: "",
-      neko_image: "m1k1o/neko:firefox",
+      neko_image: "codx/room:latest",
       screen: "1280x720@30",
       video_bitrate: 3072,
       video_codec: "VP8",
       video_max_fps: 25,
-      video_pipeline: ""
+      video_pipeline: "",
+      envs: {
+        GIT_REPO_PROJECT: repository,
+        GIT_REPO_FOLDER: folder,
+        ...user.envs
+      }
     }
     const room = await nekoRooms.create(settings)
     return await strapi.$api('neko-room').create({ data: {

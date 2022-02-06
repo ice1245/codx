@@ -82,8 +82,6 @@ export default {
   },
   methods: {
     logoClick () {
-      const { logos, logoIx } = this
-      this.logoIx = (logoIx + 1 >= logos.length ? 0 : logoIx + 1)
       this.$emit('sideBar', 'explorer')
     }
   }

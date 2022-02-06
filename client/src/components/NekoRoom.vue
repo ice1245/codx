@@ -29,11 +29,16 @@ export default {
   },
   methods: {
     onLoad () {
+      if (!this.overlay) {
+        setTimeout(() => this.onLoad(), 1000)
+        return
+      }
       const style = `
         <style>
           .room-container,
           .header-container,
-          .video-menu.bottom {
+          .video-menu.bottom,
+          .video-menu.top .fa-expand {
             display: none !important;
           }
         </style>`

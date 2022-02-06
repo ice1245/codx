@@ -1,0 +1,9 @@
+version: "3.4"
+services:
+  codx-room:
+    depends_on:
+      - codx-neko
+    image: "codx/room:latest"
+    build:
+      context: .
+    command: bash

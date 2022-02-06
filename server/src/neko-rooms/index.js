@@ -100,7 +100,7 @@ class NekoRooms {
   async roomReady (room) {
     const wait = tout => new Promise(r => setTimeout(r, tout))
     console.log("Waiting for room: ", room)
-    await wait(5000)
+    await wait(15000)
     return
     const url = `${room.wurl}?password=${room.admin_pass}`
     const check = () => new Promise((resolve, reject) => {

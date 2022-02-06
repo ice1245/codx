@@ -45,14 +45,20 @@ class Strapi {
     return useFetch.put("api/chats/" + chat.id, { guest: user }, { headers })
   }
 
-  async createClinic ({ chat }) {
+  async createClinic ({ chat, settings }) {
     const { headers } = this
-    return useFetch.post("api/neko-rooms", { chat }, { headers })
+    return useFetch.post("api/neko-rooms", { chat, settings }, { headers })
   }
 
   async findClinics () {
     const { headers } = this
     return useFetch.get("api/neko-rooms", { headers })
+  }
+
+  async search (query = { name: "*" }) {
+    const { headers } = this
+    const search = Object.keys(query).map(k => `${k}=${query[k]}`).join("&")
+    return useFetch.get(`api/clinic-templates?${search}`, { headers })
   }
 }
 

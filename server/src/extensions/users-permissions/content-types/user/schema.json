@@ -65,6 +65,12 @@
     },
     "avatar": {
       "type": "string"
+    },
+    "clinic_templates": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::clinic-template.clinic-template",
+      "mappedBy": "user"
     }
   }
 }

@@ -43,7 +43,9 @@ services:
       - "traefik.http.services.codx-web.loadbalancer.server.port=8080"
 
   neko-rooms:
-    image: "m1k1o/neko-rooms:latest"
+    image: "codx/neko-rooms:latest"
+    build:
+      context: ../neko-rooms
     restart: "unless-stopped"
     environment:
       - "TZ"
@@ -55,6 +57,8 @@ services:
       - "NEKO_ROOMS_TRAEFIK_NETWORK"
       - "NEKO_ROOMS_TRAEFIK_CORS"
       - "NEKO_ROOMS_LOGS=true"
+      - "NEKO_ROOMS_NEKO_IMAGES=$NEKO_ROOMS_NEKO_IMAGES"
+      - "NEKO_ROOMS_DEBUG"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     labels:

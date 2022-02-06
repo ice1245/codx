@@ -1,7 +1,6 @@
 <template>
-  <div class="flex flex-col">
-
-    <div class="navbar mb-2 shadow-lg" v-if="!search.showWelcome">
+  <div class="flex flex-col" v-if="search">
+    <div class="navbar mb-2 shadow-lg" v-if="!showWelcome">
       <div class="flex-1 px-2 mx-2">
         <span class="text-lg font-bold">{{ search.topic }}</span>
       </div>
@@ -53,7 +52,7 @@
           <h2 class="card-title">{{ search.topic }}</h2> 
           <p>{{ search.description }}</p> 
           <div class="card-actions">
-            <button class="btn glass rounded-full" @click="search.showWelcome = false" >Get Started</button>
+            <button class="btn glass rounded-full" @click="showWelcome = false" >Get Started</button>
           </div>
         </div>
       </div>
@@ -63,25 +62,30 @@
       <button
         v-for="(tag, ix) in search.tags" :key="ix"
         :class="`mr-2 btn btn-${labelColors[ix]}`">
-        {{ tag.label }} 
-        <div class="badge ml-2 badge-outline">{{ tag.count }}</div>
+        {{ tag }} 
       </button> 
     </div>
 
     <div class="p-2 grid grid-cols-4 gap-5 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
-      <div class="bg-base-100 text-base-content card rounded h-64 mr-4"
+      <div class="bg-base-100 text-base-content card rounded h-80 mr-4"
         v-for="(result, ix) in search.results" :key="ix"
       >
-        <img :src="images[ix]" class="h-1/2 drop-shadow-md">
-        <div class="p-2 w-full h-full text-base-content">
+        <div class="h-40 carousel rounded-box">
+          <div class="w-full carousel-item"
+            v-for="(mhtml, iix) in getResultMedia(result)" :key="iix"
+            >
+            <div v-html="mhtml" class="w-full"></div>
+          </div>
+        </div>
+        <div class="p-2 w-full text-base-content">
           <div class="flex flex-row w-full">
-            <Avatar size="12" url="https://avatars.dicebear.com/api/open-peeps/test.svg" />
+            <Avatar size="12" :url="result.user.avatar" />
             <div class="ml-4 flex flex-col w-full">
               <div class="flex flex-row justify-between w-full">
-                <strong>@username</strong>
+                <strong>{{ `@${result.user.username}` }}</strong>
                 <div class="flex flex-row mr-2">
-                  <ThumbUpIcon class="w-4" /> 100
-                  <ThumbDownIcon class="ml-2 w-4" /> 6
+                  <ThumbUpIcon class="w-4" /> {{ result.likeCount }}
+                  <ThumbDownIcon class="ml-2 w-4" /> {{ result.dislikeCount }}
                 </div>
               </div>
               <small>Category 4*</small>
@@ -89,14 +93,19 @@
           </div>
           <p class="prose">
             <span>
-              Description of the coding session
+              {{ result.description }}
             </span>
           </p>
           <div class="flex justify-end w-full gap-2 mt-1">
-            <button class="btn btn-sm bg-accent text-accent-content drop-shadow-md">
+            <button class="btn btn-sm bg-accent text-accent-content drop-shadow-md"
+              @click="runClinicTemplate(result)"
+            >
               <TerminalIcon class="w-4 mr-1" /> Run
             </button> 
-            <button class="btn btn-sm bg-info text-info-content drop-shadow-md">
+            <button class="btn btn-sm bg-info text-info-content drop-shadow-md"
+              v-if="resultHasVideo(result)"
+              @click="resultDialog = result"
+            >
               <PlayIcon class="w-4 mr-1" /> Watch
             </button> 
           </div>
@@ -108,6 +117,39 @@
       @ok="onNewCodingClinic"
       @cancel="newCodingClinic = false"
     />
+    <Dialog
+      v-if="resultDialog"
+      @close="resultDialog = null"
+      :btns="['ok']"
+    >
+      <template v-slot:icon>
+        <Avatar size="12" :url="resultDialog.user.avatar" />
+      </template>
+      <div class="max-w-lg p-4 space-x-4 carousel carousel-center bg-neutral rounded-box">
+        <div class="w-full carousel-item"
+          v-for="(mhtml, iix) in getResultMediaVideos(resultDialog)" :key="iix"
+          >
+          <div v-html="mhtml" class="w-full"></div>
+        </div>
+      </div>
+      <div class="flex flex-row w-full">
+        <div class="ml-4 flex flex-col w-full">
+          <div class="flex flex-row justify-between w-full">
+            <strong>{{ `@${resultDialog.user.username}` }}</strong>
+            <div class="flex flex-row mr-2">
+              <ThumbUpIcon class="w-4" /> {{ resultDialog.likeCount }}
+              <ThumbDownIcon class="ml-2 w-4" /> {{ resultDialog.dislikeCount }}
+            </div>
+          </div>
+          <small>Category 4*</small>
+        </div>
+      </div>
+      <p class="prose">
+        <span>
+          {{ resultDialog.description }}
+        </span>
+      </p>
+    </Dialog>
   </div>
 </template>
 <script>
@@ -121,6 +163,7 @@ import {
 } from '@heroicons/vue/outline'
 import Avatar from '@/components/Avatar.vue'
 import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
+import Dialog from '@/components/Dialog.vue'
 
 export default {
   components: {
@@ -131,9 +174,9 @@ export default {
     TerminalIcon,
     PlusCircleIcon,
     CogIcon,
-    CodingClinicDialog
+    CodingClinicDialog,
+    Dialog
   },
-  props: ['search'],
   data () {
     return {
       newCodingClinic: false,
@@ -144,7 +187,18 @@ export default {
         'warning',
         'teal'
       ],
-      images: [
+      showWelcome: true,
+      resultDialog: null
+    }
+  },
+  computed: {
+    search () {
+      const { currentSearch } = this.$storex.search
+      if (!currentSearch) {
+        return null
+      }
+      // const { results } = currentSearch
+      const results = [
         'https://i.ytimg.com/vi/rfscVS0vtbw/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLABBQtpk83-Gm8-IgPAiGlTtrLH9w',
         'https://i.ytimg.com/vi/wDIQ17T3sRk/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCUasho5kBu25lowid1F5e9pfTyNw',
         'https://i.ytimg.com/vi/esX7SFtEjHg/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCD8mvtnRms6oId-LL62pB7mRz-zw',
@@ -157,13 +211,65 @@ export default {
         'https://i.ytimg.com/vi/kbKty5ZVKMY/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLD9ig7IJeWqwDLhRpeJrlPYy0GkaQ',
         'https://i.ytimg.com/an_webp/MHPGeQD8TvI/mqdefault_6s.webp?du=3000&sqp=CLbiyo8G&rs=AOn4CLDAK5Gh3IkMPJolZ8Bpn-whYm6zVA',
         'https://i.ytimg.com/vi/hb7Q33ysCwI/hqdefault.jpg?sqp=-oaymwEcCOADEI4CSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDnhyhqR0LolwC_2pkPEcXuI4jwkw'
-      ]
+      ].map(i => {
+          return {
+            ...currentSearch.results[0],
+            media: [
+              {
+                "type": "image",
+                "url": i
+              },
+            ]
+          }
+        })
+      
+      return {
+        topic: '#coding-clinic',
+        description: 'Find developers to connect and work together in an online development environment. A coding clinic is a timeboxed session where two or more participants will collaborate to solve a problem',
+        banner: {
+          bgImage: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZ3JhbW1pbmd8ZW58MHx8MHx8&w=1000&q=80',
+          image: 'https://careertraining.ed2go.com/common/images/2/22516/GES375-agnesscott-Full-Stack-Software-Developer-935x572.jpg'
+        },
+        showWelcome: true,
+        tags: results.map(r => r.tags.split(" "))
+              .reduce((a, b) => a.concat(b), [])
+              .filter((v, ix, arr) => arr.indexOf(v) === ix),
+        results: [...currentSearch.results, ...results]
+      }
     }
+  },
+  created () {
+    this.$storex.search.doSearch()
   },
   methods: {
     onNewCodingClinic (template) {
       this.newCodingClinic = false
       console.log(template)
+    },
+    getResultMediaVideos (result) {
+      return this.getResultMedia({
+        ...result,
+        media: result.media.filter(({ type }) => type === 'youtube')
+      })
+    },
+    getResultMedia (result) {
+      return (result.media||[]).map(({ type, url }) => {
+        if (type === 'image') {
+          return `<img src="${url}" class="w-full h-full" />`
+        }
+        if (type === 'youtube') {
+          return `<iframe src="${url}"
+            class="w-full h-full"
+            title="YouTube video player"
+            frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>`
+        }
+      }).filter(r => !!r)
+    },
+    resultHasVideo (result) {
+      return result.media.some(({ type }) => type === 'youtube' )
+    },
+    runClinicTemplate (result) {
+      this.$emit('new-clinic', result)
     }
   }
 }
