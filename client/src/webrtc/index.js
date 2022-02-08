@@ -29,6 +29,17 @@ export default class WebRTCRoom {
     const { video, audio } = settings
     this.connection = RTCMulticonnection()
     this.connection.socketURL = `${process.env.VUE_APP_API}/`
+    // STUN / TURN Servers
+    this.connection.iceServers = []
+    this.connection.iceServers.push({
+      urls: 'stun:turn.meetnav.com:3478'
+    })
+    this.connection.iceServers.push({
+      urls: 'turn:turn.meetnav.com:3478',
+      credential: settings.turnPassword,
+      username: settings.turnUser
+    })
+    this.connection.iceTransportPolicy = 'relay'
     this.connection.session = {
         audio,
         video,

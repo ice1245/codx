@@ -10,7 +10,7 @@ class ioManager {
   get onlineUsers () {
     const now = new Date()
     return Object.keys(this.users)
-      .filter(k => (now - this.users[k].lastOnline) <= 10000)
+      .filter(k => (now - this.users[k].lastOnline) <= 60000)
       .map(k => this.users[k])
       .reduce((acc, u) => {
         acc[u.id] = u
@@ -21,7 +21,7 @@ class ioManager {
   get offlineUserIds () {
     const now = new Date()
     return Object.keys(this.users)
-      .filter(k => (now - this.users[k].lastOnline) > 10000)
+      .filter(k => (now - this.users[k].lastOnline) > 60000)
   }
 
   waitForServer () {
@@ -48,8 +48,13 @@ class ioManager {
 
   onConnection(socket) {
     // Say hi
-    socket.emit("welcome", {})
-    socket.on('heartbeat', user => this.onHeartBeat({ ...user, socket }))
+    try {
+      socket.emit("welcome", {})
+      socket.on('heartbeat', user => this.onHeartBeat({ ...user, socket }))
+      this.onHeartBeat({ ...user, socket })
+    } catch (ex) {
+      console.error("io", "new socket connection error", { ex })
+    }
   }
 
   onHeartBeat (user) {
@@ -63,11 +68,24 @@ class ioManager {
   }
 
   emit (event, data, userIds = null) {
-    if (!userIds) {
-      userIds = Object.keys(this.onlineUsers)
-    } 
-    const users = userIds.map(id => this.onlineUsers[id]).filter(u => !!u)
-    users.forEach(u => u.socket.emit(event, data))
+    try {
+      console.log("io", "Emmiting ", { event, data, userIds })
+      if (!userIds) {
+        userIds = Object.keys(this.onlineUsers)
+      } 
+      const users = userIds.map(id => this.onlineUsers[id]).filter(u => !!u)
+      users.forEach(u => {
+        try {
+          u.socket.emit(event, data, (response) => {
+            console.log("io", "user ack", { id: u.id, status: response });
+          })
+        } catch (ex) {
+          console.error("io", "Error emmiting to user", { id: u.id, event, ex })
+        }
+      })
+    } catch (ex) {
+      console.error("io", "Error emmiting ", { event, ex })
+    }
   }
 }
 

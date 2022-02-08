@@ -21,11 +21,8 @@
       <div
         class="w-full md:py-10 py-6 px-3 shadow sm:rounded sm:px-8  border border-gray-300"
       >
-        <form
-          @submit="onSubmit"
+        <div
           class="space-y-3 md:py-4 pb-4 px-4"
-          action="{action}"
-          method=""
         >
           <label
             htmlFor="username"
@@ -42,16 +39,12 @@
               <UserIcon class="cursor-pointer w-5 " />
             </div>
             <input
-              :ref="username.ref"
-              v-model="username.value"
+              v-model="identifier"
               type="text"
               class="block w-full md:px-4 px-3 md:py-3 py-2.5 placeholder-gray-200 focus:outline-none sm:text-base text-sm border-gray-300 bg-transparent font-medium"
               placeholder="Enter username"
             />
           </div>
-          <span v-if="username.error" class="pt-1 block text-sm text-red-400">{{
-            username.error.message
-          }}</span>
           <label
             htmlFor="email"
             class="pt-1.5 block md:text-lg text-md font-medium "
@@ -67,16 +60,12 @@
               <MailIcon class="cursor-pointer w-5 " />
             </div>
             <input
-              :ref="email.ref"
-              v-model="email.value"
+              v-model="email"
               type="email"
               class="block w-full md:px-4 px-3 md:py-3 py-2.5 placeholder-gray-200 focus:outline-none sm:text-base text-sm border-gray-300 bg-transparent font-medium"
               placeholder="Enter your email"
             />
           </div>
-          <span v-if="email.error" class="pt-1 block text-sm text-red-400">{{
-            email.error.message
-          }}</span>
           <div v-if="false">
             <label
               class="pt-1.5 block md:text-lg text-md font-medium "
@@ -98,22 +87,29 @@
                 type="password"
                 class="block w-full md:px-4 px-3 md:py-3 py-2.5 placeholder-gray-200 focus:outline-none sm:text-base text-sm border-gray-300 bg-transparent font-medium"
                 placeholder="Enter your password"
+                v-if="false"
               />
             </div>
-            <span v-if="password.error" class="pt-1 block text-sm text-red-400">{{
-              password.error.message
-            }}</span>
           </div>
           <div>Join codx now and help us building the best coding platform!</div>
-          <div class="pt-5">
+          <div class="pt-5" v-if="!thanks">
             <button
               type="submit"
+              @click="onSubmit"
               class="capitalize w-full flex justify-center md:py-3 py-2 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium bg-primary text-primary-content hover:bg-info-600/90 focus:outline-none"
             >
               Sign up
             </button>
           </div>
-        </form>
+          <div class="alert alert-info" v-else>
+            <div class="flex-1">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-6 h-6 mx-2 stroke-current">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>                          
+              </svg> 
+              <label>Thanks, will contact you soon!</label>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -121,9 +117,6 @@
 
 <script>
 import { MailIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/outline";
-import { useForm } from "vue-hooks-form";
-import { $storex } from '@/store'
-import { useRouter } from "vue-router";
 
 export default {
   components: {
@@ -131,39 +124,22 @@ export default {
     LockClosedIcon,
     UserIcon,
   },
-  setup() {
-    const router = useRouter();
-
-    const { useField, handleSubmit } = useForm({
-      defaultValues: {},
-      shouldUnregister: true,
-      validateMode: "change",
-    });
-    const username = useField("username", {
-      rule: { required: true },
-    });
-    const email = useField("email", {
-      rule: { required: true },
-    });
-    const password = useField("password", {
-      rule: {
-        required: true,
-        min: 6,
-        max: 10,
-      },
-    });
-
-    const onSubmit = async (data) => {
-      await $storex.user.signup(data)
-      return router.push("/");
-    };
+  data () {
     return {
-      username,
-      email,
-      password,
-      onSubmit: handleSubmit(onSubmit),
-    };
+      identifier: null,
+      email: null,
+      thanks: false
+    }
   },
+  methods: {
+    async onSubmit () {
+      await this.$storex.user.signup({
+        identifier: this.identifier,
+        email: this.email
+      })
+      this.thanks = true
+    }
+  }
 };
 </script>
 

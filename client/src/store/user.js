@@ -65,7 +65,7 @@ export const actions = actionTree(
     },
     async signup({}, signload) {
       try {
-        const { data: { jwt: token }} = await api.signup(signload)
+        const { data: { jwt: token }} = await api.register(signload)
         const { data: user } = await api.me(token)
         const payload = {
           token: token,
@@ -81,7 +81,7 @@ export const actions = actionTree(
           }, 2000);
         } catch (e) {
           this.app.$notify({
-              text: e.response?.data?.error?.message,
+              text: "Ops, something went wrong!",
               group: "error"
             }, 2000);
           throw e

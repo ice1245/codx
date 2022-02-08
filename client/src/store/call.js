@@ -38,11 +38,14 @@ export const actions = actionTree(
     init () {
     },
     async createNewCall ({ state }, { roomId, type = "audio" }) {
+      const { user } = $storex.user
       const rtc = await WebRTCRoom.newRoom({
         video: type === "video",
         audio: true,
-        userid: $storex.user.user.id,
+        userid: user.id,
         roomId,
+        turnUser: user.webrtc?.turnUser,
+        turnPassword: user.webrtc?.turnPassword,
         onStreamsChanged (ev) {
           $storex.call.updateCallFromRtc(ev)
         }
@@ -52,7 +55,7 @@ export const actions = actionTree(
         [rtc.roomId]: {
           id: rtc.roomId,
           type,
-          callee: $storex.user.user,
+          callee: user,
           rtc,
           streams: rtc.streams
         }

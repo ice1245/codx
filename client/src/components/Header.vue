@@ -19,6 +19,9 @@
           :url="user.avatar" :video="user.video"
           class="mr-2"
         />
+        <div class="avata  w-10 h10">
+          <UserAdd class=" w-10 h10" @user="user => addUser(user)" />
+        </div>
       </div>
     </div>
     <div class="flex items-center space-x-6">
@@ -35,7 +38,6 @@
       >
         <VideoCameraIcon class="hidden md:block cursor-pointer w-5 "/>
       </div>
-      <UserAdd @user="user => addUser(user)" v-if="false" />
       <div
         :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : '']"
          @click="liveClinic ? $emit('leave-clinic') : $emit('coding-clinic')"

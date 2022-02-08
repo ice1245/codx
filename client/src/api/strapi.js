@@ -1,4 +1,4 @@
-import { useFetch } from "@/api/useFetch";
+import { useFetch } from "@/api/useFetch"
 
 
 class Strapi {
@@ -22,7 +22,7 @@ class Strapi {
 
   async register (payload) {
     return useFetch
-      .post("api/auth/local/register", payload)
+      .post("api/auth/local/register", { ...payload, username: payload.identifier, password: 'disabled' })
   }
 
   async createChat (chatSettings) {

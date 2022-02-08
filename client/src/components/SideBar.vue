@@ -9,7 +9,7 @@
       @click="logoClick"
     />
     <div class="flex flex-col grow justify-start">
-      <div
+      <div class="mb-2"
         v-for="(company, cix) in companies" :key="cix"
       >
         <div class="avatar ring ring-neutral-content rounded-btn cursor-pointer"
