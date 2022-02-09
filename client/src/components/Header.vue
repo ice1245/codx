@@ -14,9 +14,9 @@
         @click="$emit('close-explorer')"
       />
       <div class="flex flex-row">
-        <Avatar
+        <UserAvatar
           v-for="(user, ix) in chatUsers" :key="ix"
-          :url="user.avatar" :video="user.video"
+          :user="user"
           class="mr-2"
         />
         <div class="avata  w-10 h10">
@@ -26,30 +26,30 @@
     </div>
     <div class="flex items-center space-x-6">
       <div
-        :class="['avatar', micOn ? 'online btn btn-sm btn-accent rounded-md' : '']"
+        :class="['avatar', micOn ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
          @click="onMic"
       >
         <MicrophoneIcon class="hidden md:block cursor-pointer w-5 "/>
       </div>
       
       <div
-        :class="['avatar', camOn ? 'online btn btn-sm btn-accent rounded-md' : '']"
-         @click="onMic"
+        :class="['avatar', camOn ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
+         @click="onCam"
       >
         <VideoCameraIcon class="hidden md:block cursor-pointer w-5 "/>
       </div>
       <div
-        :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : '']"
+        :class="['avatar', 'btn btn-sm btn-error rounded-md text-white']"
+          v-if="call"
+         @click="onEndCall"
+      >
+        <PhoneMissedCallIcon class="hidden md:block cursor-pointer w-5 "/>
+      </div>
+      <div
+        :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
          @click="liveClinic ? $emit('leave-clinic') : $emit('coding-clinic')"
       >
         <TerminalIcon class="inline-block w-5 mr-2 stroke-current cursor-pointer online" />
-      </div>
-      <div
-        :class="['avatar', chatVisible ? 'btn btn-sm btn-accent rounded-md' : '']"
-         @click="$emit('toggle-chat')"
-         v-if="showChatToggle"
-      >
-        <ChatAltIcon class="inline-block w-5 mr-2 stroke-current cursor-pointer online" />
       </div>
       <div class="form-control">
         <div class="relative">
@@ -68,10 +68,11 @@ import {
   ChevronLeftIcon,
   TerminalIcon,
   MenuIcon,
-  ChatAltIcon
+  ChatAltIcon,
+  PhoneMissedCallIcon
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
-import Avatar from '@/components/Avatar.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 export default {
   components: {
     SearchIcon,
@@ -79,10 +80,11 @@ export default {
     MicrophoneIcon,
     ChevronLeftIcon,
     UserAdd,
-    Avatar,
+    UserAvatar,
     TerminalIcon,
     MenuIcon,
-    ChatAltIcon
+    ChatAltIcon,
+    PhoneMissedCallIcon
   },
   props: ['chat', 'explorerVisible', 'chatVisible'],
   data () {
@@ -123,13 +125,20 @@ export default {
     },
     onMic () {
       if (!this.call) {
-        return this.newCall('voice')
+        this.newCall('voice')
+      } else {
+        this.$storex.call.toggleAudio(this.call)
       }
     },
     onCam () {
       if (!this.call) {
-        return this.newCall('video')
+        this.newCall('video')
+      } else {
+        this.$storex.call.toggleVideo(this.call)
       }
+    },
+    onEndCall () {
+      this.$storex.call.endCurrentCall()
     },
     async newCall (type) {
       const { chat: { roomId, users }} = this

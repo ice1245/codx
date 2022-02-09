@@ -5,7 +5,7 @@ function injectApi (params) {
   const { strapi } = params
   strapi.$api = id => {
     const strapiServices = Object.keys(strapi.services)
-    const sid = strapiServices.filter(s => s.startsWith(`api::${id}.`))[0]
+    const sid = strapiServices.filter(s => s.endsWith(id))[0]
     const service = strapi.services[sid]
     if (!service) {
       throw new Error("STRAPIX: Service not found " + id)
@@ -14,7 +14,8 @@ function injectApi (params) {
   }
   strapi.$query = id => {
     const strapiServices = Object.keys(strapi.services)
-    const sid = strapiServices.filter(s => s.startsWith(`api::${id}.`))[0]
+    // console.log("strapiServices", strapiServices)
+    const sid = strapiServices.filter(s => s.endsWith(id))[0]
     return {
       findMany: (...params) => strapi.entityService.findMany(...[sid, ...params]),
       findOne: (...params) => strapi.entityService.findOne(...[sid, ...params]),

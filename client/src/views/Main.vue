@@ -41,9 +41,14 @@
               :room="currentClinic"
             />
           </div>
-          <ChatBox class="grow" :chat="$storex.chat.openedChat" v-if="chatVisible" />
+          <ChatBox class="grow"
+            :chat="$storex.chat.openedChat" v-if="chatVisible"
+            :closeMe="!!currentClinic"
+            @on-event-click="onEventClick"
+            @hide-chat="toggleChatHidden"
+          />
           <VideoCall
-            class="bg-neutral text-neutral-content tflex-none w-1/6 m-5 rounded-md"
+            class="tflex-none w-1/6 m-5 rounded-md"
             :call="$storex.call.currentCall"
             v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
           />
@@ -59,6 +64,14 @@
       </div>
     </div>
     <LoadingDialog v-if="loading" />
+    <div class="avatar absolute bottom-2 right-4 cursor-pointer"
+      v-if="chatHidden"
+      @click="toggleChatHidden"
+    >
+      <div class="mb-8 rounded-full w-12 h-12 ring ring-primary ring-offset-base-100 ring-offset-2 p-2">
+        <ChatAltIcon class="" />
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -74,7 +87,7 @@ import ClinicList from '@/components/ClinicList.vue'
 import NekoRoom from '@/components/NekoRoom.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
 import Channel from '@/components/channel/Channel.vue'
-
+import { ChatAltIcon } from "@heroicons/vue/outline"
 export default {
   components: {
     SideBar,
@@ -88,7 +101,8 @@ export default {
     ClinicList,
     NekoRoom,
     LoadingDialog,
-    Channel
+    Channel,
+    ChatAltIcon
   },
   data() {
     return {
@@ -167,7 +181,7 @@ export default {
         const { user: { username } } = this.$storex.user
         if (chat) {
           this.$storex.chat.sendMessage({
-            chat: this.chat,
+            chat,
             content: `@${username} started new clinic.`,
             extra: {
               event: 'clinic',
@@ -179,9 +193,23 @@ export default {
       } catch{}
       this.loading = false
     },
-    joinClinic (id) {
+    joinClinic (id, alreadyNotified) {
       this.clinicList = false
       this.$storex.clinic.setCurrentClinic(id)
+      if (!alreadyNotified) {
+        const chat = this.$storex.chat.openedChat
+        const { user: { username } } = this.$storex.user
+        if (chat) {
+          this.$storex.chat.sendMessage({
+            chat,
+            content: `@${username} joined clinic.`,
+            extra: {
+              event: 'clinic',
+              clinic: this.$storex.clinic.currentClinic
+            }
+          })
+        }
+      }
     },
     leaveClinic () {
       this.clinicList = false
@@ -189,6 +217,15 @@ export default {
     },
     toggleChatHidden () {
       this.chatHidden = !this.chatHidden
+    },
+    onEventClick ({ event: eventSettings }) {
+      const { event, clinic, type, roomId } = eventSettings
+      if (event === 'call') {
+        this.$storex.call.joinCall({ type, roomId })
+      }
+      if (event === 'clinic') {
+        this.joinClinic(clinic.id, true)
+      }
     }
   }
 };

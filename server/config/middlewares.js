@@ -1,5 +1,6 @@
 module.exports = [
   'strapi::errors',
+  'global::log-errors',
   'strapi::security',
   'strapi::cors',
   'strapi::poweredBy',

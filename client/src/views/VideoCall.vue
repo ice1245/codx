@@ -14,26 +14,6 @@
       :ring="100"
       v-else
     />
-    <div class="flex flex-row px-10 w-full mt-2 z-3 justify-between items-center">
-      <div class="rounded-full border p-2">
-        <MicrophoneIcon
-          :class="['hidden md:block cursor-pointer w-10 h-10', micOff ? 'fill-error' : '' ] "
-          @click="toggleAudio"
-        />
-      </div>
-      <div :class="['rounded-full border p-2']">
-        <VideoCameraIcon
-          :class="['hidden md:block cursor-pointer w-10 h-10', camOff ? 'fill-error' : '' ] "
-          @click="toggleVideo"
-        />
-      </div>
-      <div class="rounded-full border p-2 bg-error">
-        <PhoneMissedCallIcon
-          class="rounded-full hidden md:block cursor-pointer w-10 fill-white"
-          @click="$storex.call.endCurrentCall()"
-        />
-      </div>
-    </div>
     <div class="mt-10 fex flex-row">
       <div v-for="(stream, six) in call.streams" :key="six">
         <video
@@ -47,17 +27,9 @@
   </div>
 </template>
 <script>
-import {
-  MicrophoneIcon,
-  VideoCameraIcon,
-  PhoneMissedCallIcon
-} from '@heroicons/vue/solid'
 import Avatar from '@/components/Avatar.vue'
 export default {
   components: {
-    MicrophoneIcon,
-    VideoCameraIcon,
-    PhoneMissedCallIcon,
     Avatar
   },
   props: ["call"],

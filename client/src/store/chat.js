@@ -26,6 +26,7 @@ export const mutations = mutationTree(state, {
         guests,
         get users () {
           return this.admins.concat(this.guests)
+            .map(u => $storex.network.allUsers[u.id] || u)
         }
       }
     }
@@ -38,7 +39,9 @@ export const mutations = mutationTree(state, {
       const { data: chat } = await api.loadChat(id)
       $storex.chat.addChat(chat)
     }
-    state.chats && (state.openedChat = state.chats[id])
+    if (state.chats) {
+      state.openedChat = state.chats[id]
+    }
   },
   async addMessage (state, { chat: { id }, from, content, createdAt, extra }) {
     if (!state.chats[id]) {

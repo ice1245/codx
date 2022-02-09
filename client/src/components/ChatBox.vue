@@ -41,11 +41,15 @@
         <PaperClipIcon class="cursor-pointer md:w-5 w-7 text-primary" />
         <div>
           <button
-            class="bg-primary text-neutral-content md:w-14 w-10 md:h-12 h-10 flex items-center justify-center rounded-lg"
+            class="bg-accent text-accent-content md:w-14 w-10 md:h-12 h-10 flex items-center justify-center rounded-lg"
           >
             <ChatAltIcon class="cursor-pointer md:w-6 w-5 t" @click="sendMessage" />
           </button>
         </div>
+        <EyeOffIcon class="cursor-pointer md:w-14 text-error btn btn-outline"
+          v-if="closeMe"
+          @click="$emit('hide-chat')" />
+        
       </div>
     </div>
   </div>
@@ -56,7 +60,8 @@ import moment from 'moment'
 import {
   ChatAltIcon,
   EmojiHappyIcon,
-  PaperClipIcon
+  PaperClipIcon,
+  EyeOffIcon
 } from "@heroicons/vue/outline";
 import ChatEntry from './ChatEntry.vue'
 import ChatEvent from './ChatEvent.vue'
@@ -66,9 +71,10 @@ export default {
     EmojiHappyIcon,
     PaperClipIcon,
     ChatEntry,
-    ChatEvent
+    ChatEvent,
+    EyeOffIcon
   },
-  props: ['show', 'chat'],
+  props: ['show', 'chat', 'closeMe'],
   data() {
     return {
       message: '',
@@ -149,13 +155,7 @@ export default {
     onCancelEvent (message) {
     },
     async onConfirmEvent (message) {
-      const { event } = message.event
-      if (event === 'call') {
-        await this.$storex.call.joinCall(message)
-      }
-      if (event === 'clinic') {
-        await this.$storex.clinic.joinClinic(message)
-      }
+      this.$emit('on-event-click', message)
     },
     scrollToBottom () {
       const element = this.$refs.messageWindow

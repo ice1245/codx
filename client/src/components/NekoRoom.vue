@@ -7,7 +7,7 @@ export default {
   props: ['room'],
   computed: {
     url () {
-      const { url, user_pass } = this.room.room
+      const { url, admin_pass: user_pass } = this.room.room
       const { user: { username } } = this.$storex.user
       return `${url}?pwd=${user_pass}&displayName=${username}`
     },
@@ -38,7 +38,9 @@ export default {
           .room-container,
           .header-container,
           .video-menu.bottom,
-          .video-menu.top .fa-expand {
+          .video-menu.top .fa-expand,
+          .neko-menu
+          {
             display: none !important;
           }
         </style>`
@@ -46,6 +48,7 @@ export default {
       this.overlay.addEventListener('click', ev => {
         this.neko.remote.request()
       })
+      this.room.neko = this.neko
     }
   }
 }

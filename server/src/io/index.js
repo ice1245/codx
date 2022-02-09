@@ -1,10 +1,15 @@
 const rtcmulticonnectionServer = require('rtcmulticonnection-server')
 const socketIo = require('socket.io')
+const session = require('./session')
+const codx = require('../codx')
+
 class ioManager {
   users = {}
   constructor(strapi) {
     this.strapi = strapi
+    this.codx = codx(strapi)
     this.waitForServer()
+    this.session = session(strapi)
   }
 
   get onlineUsers () {
@@ -51,7 +56,7 @@ class ioManager {
     try {
       socket.emit("welcome", {})
       socket.on('heartbeat', user => this.onHeartBeat({ ...user, socket }))
-      this.onHeartBeat({ ...user, socket })
+      console.log("new socket", socket.handshake)
     } catch (ex) {
       console.error("io", "new socket connection error", { ex })
     }
@@ -63,7 +68,7 @@ class ioManager {
       ...user,
       lastOnline: new Date()
     }
-    socket.emit('heartbeat', new Date())
+    this.refreshUsers([user])
     this.offlineUserIds.forEach(id => delete this.users[id])
   }
 
@@ -86,6 +91,18 @@ class ioManager {
     } catch (ex) {
       console.error("io", "Error emmiting ", { event, ex })
     }
+  }
+
+  refreshUsers (users) {
+    users.forEach(async user => {
+      try {
+        const { socket } = user
+        const data = await this.session.status(user)
+        socket.emit('heartbeat', data)
+      } catch (ex) {
+        console.error("heartbeat", ex)
+      }
+    })
   }
 }
 

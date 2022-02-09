@@ -29,7 +29,8 @@ export const mutations = mutationTree(state, {
           console.error("session", "user offline")
           state.isOnline = false
         }
-        socket.emit('heartbeat', $storex.user.user)
+        const { user } = $storex.user
+        socket.emit('heartbeat', user)
       }
       state.heartbeat = setInterval(heartbeat, 20000)
       heartbeat()
@@ -43,9 +44,11 @@ export const mutations = mutationTree(state, {
           callbackFn(ex)
         }
       })
-      socket.on('heartbeat', ts => {
-        state.lastHeartBeat = Date.parse(ts)
+      socket.on('heartbeat', data => {
+        const { network: { friends } } = data
+        state.lastHeartBeat = new Date()
         state.isOnline = true
+        $storex.network.updateFriendStatus(friends)
       })
     }
   }

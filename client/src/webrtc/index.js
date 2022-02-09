@@ -149,14 +149,14 @@ export default class WebRTCRoom {
   }
 
   onUnMute (event) {
-    const { streamid, muteType } = event
+    const { streamid, unmuteType } = event
     const stream = this.allStreams.filter(s => s.streamid === streamid)[0]
-    if (muteType === 'video') {
+    if (unmuteType === 'video') {
       if (!stream.paused)
         return
       stream.paused = false
     }
-    if (muteType === 'audio') {
+    if (unmuteType === 'audio') {
       if (!stream.muted)
         return
       stream.muted = false
@@ -166,7 +166,19 @@ export default class WebRTCRoom {
   }
 
   toggleVideo () {
-    this.myStreams.forEach(s => s.paused ? s.stream.unmute('video') : s.stream.mute('video'))
+    const isAudioMuted = this.myStreams[0].muted
+    this.myStreams.forEach(s => {
+      if (s.paused) {
+        s.stream.unmute('video')
+      } else {
+        s.stream.mute('video')
+      }
+      if (isAudioMuted) {
+        s.stream.mute('audio')
+      } else {
+        s.stream.unmute('audio')
+      }
+    })
   }
 
   toggleAudio () {

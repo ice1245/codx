@@ -23,16 +23,18 @@ export const mutations = mutationTree(state, {
     state.token = token
     state.user = user
     state.lastLogin = new Date()
-    const { chats, channels, clinics, session = {} } = user || {}
+    const { username, chats, channels, clinics, session = {} } = user || {}
+    // TODO: pass to neko
+    localStorage.setItem("displayname", username)
     state.session = session
+    $storex.network.init()
+    $storex.session.init()
     $storex.chat.setChats(chats)
     $storex.chat.setChannels(channels)
     $storex.clinic.setClinics(clinics)
     try {
       $storex.chat.setOpenedChat(session.lastOpenChat)
     } catch {}
-    $storex.session.init()
-    $storex.network.init()
   },
   setOpenedChat ({ session }, id) {
     session.lastOpenChat = id
