@@ -30,6 +30,11 @@ class Strapi {
     return useFetch.post("api/chats", chatSettings, { headers })
   }
 
+  async deleteChat (chat) {
+    const { headers } = this
+    return useFetch.delete("api/chats/" + chat.id, { headers })
+  }
+
   async loadChat (id) {
     const { headers } = this
     return useFetch.get(`api/chats/${id}?populate=admins,guests`, { headers })
@@ -50,6 +55,11 @@ class Strapi {
     return useFetch.post("api/neko-rooms", { chat, settings }, { headers })
   }
 
+  async deleteClinic({ id }) {
+    const { headers } = this
+    return useFetch.delete("api/neko-rooms/" + id, { headers })
+  }
+
   async findClinics () {
     const { headers } = this
     return useFetch.get("api/neko-rooms", { headers })
@@ -59,6 +69,11 @@ class Strapi {
     const { headers } = this
     const search = Object.keys(query).map(k => `${k}=${query[k]}`).join("&")
     return useFetch.get(`api/clinic-templates?${search}`, { headers })
+  }
+
+  async createChanne (channel) {
+    const { headers } = this
+    return useFetch.post("api/channels", channel, { headers })
   }
 }
 

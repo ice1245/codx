@@ -22,11 +22,11 @@ module.exports = strapi => ({
     const network = await this.network(sme)
     const guestChats = await strapi.$query('chat').findMany({ 
       filters: { guests: [sme.id] },
-      populate: { admins: true, guests: true }
+      populate: { admins: true, guests: true, channel: { entries: true } }
     })
     const adminChats = await strapi.$query('chat').findMany({ 
       filters: { admins: [sme.id] },
-      populate: { admins: true, guests: true }
+      populate: { admins: true, guests: true, channel: { entries: true } }
     })
     const clinics = await strapi.$query('neko-room').findMany({ 
       where: {
@@ -49,14 +49,15 @@ module.exports = strapi => ({
       filters: { users: [sme.id] }
     })
     const ds = new Date().getTime()
+    const chats = [...guestChats, ...adminChats]
+    const channels = chats.filter(c => c.channel).map(({ channel }) => ({ channel }))
     return {
       ...this.filteredUser(sme),
       roomId: `@${sme.username}`,
       session: {},
       network,
       chats: [
-        ...guestChats,
-        ...adminChats,
+        ...chats,
         {
           id: 1,
           starred: true,
@@ -101,6 +102,7 @@ module.exports = strapi => ({
         { id: 1, name: "c-sharp-devs" },
         { id: 2, name: "svelt-training" },
         { id: 3, name: "company-support" },
+        ...channels
       ],
       clinics,
       companies

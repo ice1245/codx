@@ -6,6 +6,7 @@ import api from '@/api'
 export const namespaced = true
 
 export const state = () => ({
+  channels: [],
   currentChannel: null
 })
 
@@ -13,6 +14,9 @@ export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
+  setChannels (state, channels = []) {
+    state.channles = channels.reduce((acc, v) => [acc, (acc[v.id] = v)][0], {})
+  },
   setCurrentChannel (state, channel) {
     state.currentChannel = channel ? {
       ...channel,
@@ -124,6 +128,15 @@ export const actions = actionTree(
     },
     async openChannel (ctx, channel = {}) {
       $storex.channel.setCurrentChannel(channel)
+    },
+    async createChannel (ctx, channelSettings) {
+      const { user: { id } } = $storex.user
+      const { data: channel } = await api.createChanne({
+        ...channelSettings,
+        users: [id],
+        user: id,
+        entries: []
+      })
     }
   },
 )

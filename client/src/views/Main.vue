@@ -23,7 +23,8 @@
           v-if="showChannel"
           class="h-full w-full"
           :channel="$storex.channel.currentChannel"
-        />  
+        />
+        <Sprint v-if="false"/>
         <Header
           :chat="$storex.chat.openedChat"
           :explorerVisible="explorerVisible"
@@ -87,6 +88,7 @@ import ClinicList from '@/components/ClinicList.vue'
 import NekoRoom from '@/components/NekoRoom.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
 import Channel from '@/components/channel/Channel.vue'
+import Sprint from '@/components/Sprint.vue'
 import { ChatAltIcon } from "@heroicons/vue/outline"
 export default {
   components: {
@@ -102,6 +104,7 @@ export default {
     NekoRoom,
     LoadingDialog,
     Channel,
+    Sprint,
     ChatAltIcon
   },
   data() {

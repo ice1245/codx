@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_components_tasks",
+  "info": {
+    "displayName": "Task",
+    "icon": "edit"
+  },
+  "options": {},
+  "attributes": {
+    "chat": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::chat.chat"
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}

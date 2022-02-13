@@ -3,7 +3,7 @@
 /**
  *  chat controller
  */
- const { uuid } = require('uuidv4');
+ const uuid = require('uuid').v4;
  const { createCoreController } = require('../../strapix')
 
 module.exports = createCoreController('api::chat.chat', ({ strapi }) => ({

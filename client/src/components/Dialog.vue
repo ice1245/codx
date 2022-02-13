@@ -18,20 +18,20 @@
                     <ExclamationIcon class="h-6 w-6 text-neutral-600" aria-hidden="true" />
                   </div>
                 </slot>
-                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
                   <DialogTitle as="h3" class="text-lg leading-6 font-medium text-accent-900">
                     {{ title }}
                   </DialogTitle>
-                  <div class="mt-2">
-                    <p class="text-sm text-primary-500">
+                  <div class="mt-2 w-full">
+                    <div class="text-sm text-primary-500 w-full">
                       <slot>
                       </slot>
-                    </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-4">
               <slot name="actions">
                 <button class="btn btn-accent shadow-sm px-4 py-2"
                   @click="onClose(true)"
@@ -69,7 +69,11 @@ export default {
   },
   methods: {
     onClose (ok) {
-      this.$emit('close', ok)
+      if (ok) {
+        this.$emit('ok')
+      } else {
+        this.$emit('close')
+      }
     }
   }
 }

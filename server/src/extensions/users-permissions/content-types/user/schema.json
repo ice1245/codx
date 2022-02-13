@@ -80,6 +80,12 @@
     },
     "webrtc": {
       "type": "json"
+    },
+    "channel": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::channel.channel",
+      "inversedBy": "users"
     }
   }
 }

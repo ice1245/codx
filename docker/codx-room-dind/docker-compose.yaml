@@ -1,15 +1,15 @@
 version: "3.4"
 services:
   neko:
-    image: "m1k1o/neko:firefox"
+    image: "codx/neko:latest"
     restart: "unless-stopped"
     shm_size: "2gb"
     ports:
       - "8080:8080"
-      - "$NEKO_EPR:$NEKO_EPR/udp"
+      - "${NEKO_EPR:-52000-52001}:${NEKO_EPR:-52000-52001}/udp"
     environment:
       - "NEKO_BIND=$NEKO_BIND"
-      - "NEKO_EPR=$NEKO_EPR"
+      - "NEKO_EPR=${NEKO_EPR:-52000-52001}"
       - "NEKO_ICELITE=$NEKO_ICELITE"
       - "NEKO_NAT1TO1=$NEKO_NAT1TO1"
       - "NEKO_PASSWORD=$NEKO_PASSWORD"
@@ -23,7 +23,7 @@ services:
     restart: unless-stopped
   
   codx-coder:
-    image: codercom/code-server:latest
+    image: codx/coder:latest
     user: root
     environment:
       - "PASSWORD=$NEKO_PASSWORD"

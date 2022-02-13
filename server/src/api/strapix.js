@@ -8,7 +8,7 @@ function injectApi (params) {
     const sid = strapiServices.filter(s => s.endsWith(id))[0]
     const service = strapi.services[sid]
     if (!service) {
-      throw new Error("STRAPIX: Service not found " + id)
+      throw new Error("STRAPIX: Service not found <" + id + "> " + " sid < " + sid + "> " + strapiServices)
     }
     return service
   }

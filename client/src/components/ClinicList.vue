@@ -6,12 +6,15 @@
       <div class=""
         v-for="(clinic, ix) in $storex.clinic.clinics" :key="ix"
       >
-        <div class="alert bg-accent text-accent-content cursor-pointer"
+        <div class="alert bg-accent text-accent-content cursor-pointer group"
           @click="$emit(`${currentId === clinic.id ? 'leave' : 'join'}-clinic`, clinic.id)">
           <StopIcon class="w-8 mr-2" v-if="currentId === clinic.id"/>
           <TerminalIcon class="w-8 mr-2" v-else/>
           <div class="flex-1">
             <div>{{ clinic.room.name }}</div>
+          </div>
+          <div class="group-hover:visible invisible ml-4 pt-1">
+            <TrashIcon class="w-5" @click.stop="confirmDeleteClinic = clinic" />
           </div>
         </div>
       </div>
@@ -25,6 +28,15 @@
       @cancel="newCodingClinic = false"
       @close="newCodingClinic = false"
     />
+    <Dialog
+      v-if="confirmDeleteClinic"
+      @close="confirmDeleteClinic = null"
+      @ok="deleteConfirmClinic"
+    >
+      <div class="prose">
+        <h3>Delete {{ confirmDeleteClinic.room.name }}</h3>
+      </div>
+    </Dialog>
   </div>
 </template>
 <script>
@@ -32,20 +44,25 @@ import {
   TerminalIcon,
   StopIcon,
   PlusIcon,
-  XCircleIcon
+  XCircleIcon,
+  TrashIcon
 } from '@heroicons/vue/outline'
 import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
+import Dialog from '@/components/Dialog.vue'
 export default {
   components: {
     TerminalIcon,
     StopIcon,
     PlusIcon,
     XCircleIcon,
-    CodingClinicDialog
+    TrashIcon,
+    CodingClinicDialog,
+    Dialog
   },
   data () {
     return {
-      newCodingClinic: false
+      newCodingClinic: false,
+      confirmDeleteClinic: null
     }
   },
   computed: {
@@ -57,6 +74,9 @@ export default {
   methods: {
     async onNewCodingClinic (settigs) {
       this.$emit('new-clinic', settigs)
+    },
+    deleteConfirmClinic () {
+      this.$storex.clinic.deleteClinic(this.confirmDeleteClinic)
     }
   }
 }

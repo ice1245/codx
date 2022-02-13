@@ -1,18 +1,31 @@
 <template>
   <Dialog :title="'New coding clininc'">
       <template v-slot:icon>
-        <CogIcon class="h-6 w-6 text-neutral-600" aria-hidden="true" />
+        <TerminalIcon class="h-10 w-10 text-neutral-600" aria-hidden="true" />
       </template>
       <template v-slot:actions>
         <button :class="['btn shadow-sm px-4 py-2',
           loading ? 'loading' : '',
-          template ? '' : 'opacity-20 cursor-not-allowed']"
+          (name && template) ? '' : 'opacity-20 cursor-not-allowed']"
           @click="template && onOk()">Create</button>
         <button class="btn shadow-sm px-4 py-2 mr-3" @click="$emit('cancel')">Cancel</button>
       </template>
       <div class="">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Name *</span>
+          </label> 
+          <input v-model="name" placeholder="name" class="input input-bordered" type="text">
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Description</span>
+          </label> 
+          <input v-model="description" placeholder="brief description" class="input input-bordered" type="text">
+        </div>
+
         <label class="label">
-          Choose a clinic template:
+          Choose a clinic template: *
         </label>
         <div class="flex flex-row gap-2">
           <div class="place-content-center text-center w-32 p-2 cursor-pointer"
@@ -31,11 +44,11 @@
     </Dialog>
 </template>
 <script>
-import { CogIcon, PlusIcon } from '@heroicons/vue/outline'
+import { TerminalIcon, PlusIcon } from '@heroicons/vue/outline'
 import Dialog from '@/components/Dialog.vue'
 export default {
   components: {
-    CogIcon,
+    TerminalIcon,
     PlusIcon,
     Dialog
   },
@@ -43,6 +56,8 @@ export default {
     return {
       loading: false,
       template: 0,
+      name: null,
+      description: null,
       templates: {
         "blank": {
           nekoImage: "m1k1o/neko:firefox",
@@ -72,7 +87,8 @@ export default {
     onOk () {
       this.loading = true
       this.$emit('ok', {
-        name: this.template,
+        name: this.name,
+        description: this.description,
         ...this.templates[this.template]
       })
     }

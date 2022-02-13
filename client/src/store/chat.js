@@ -62,6 +62,14 @@ export const mutations = mutationTree(state, {
     if (state.openedChat && id === state.openedChat.id) {
       state.openedChat = state.chats[id]
     }
+  },
+  async deleteChat (state, chat) {
+    await api.deleteChat(chat)
+    const { chats } = state
+    delete chats[chat.id]
+    state.chats = {
+      ...chats,
+    }
   }
 })
 

@@ -30,7 +30,7 @@ export const mutations = mutationTree(state, {
     $storex.network.init()
     $storex.session.init()
     $storex.chat.setChats(chats)
-    $storex.chat.setChannels(channels)
+    $storex.channel.setChannels(channels)
     $storex.clinic.setClinics(clinics)
     try {
       $storex.chat.setOpenedChat(session.lastOpenChat)

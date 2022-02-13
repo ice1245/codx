@@ -67,8 +67,9 @@
     </div>
 
     <div class="p-2 grid grid-cols-4 gap-5 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
-      <div class="bg-base-100 text-base-content card rounded h-80 mr-4"
+      <div class="bg-base-100 text-base-content card rounded h-80 mr-4 cursor-pointer"
         v-for="(result, ix) in search.results" :key="ix"
+        @click="resultDialog = result"
       >
         <div class="h-40 carousel rounded-box">
           <div class="w-full carousel-item"
@@ -101,13 +102,7 @@
               @click="runClinicTemplate(result)"
             >
               <TerminalIcon class="w-4 mr-1" /> Run
-            </button> 
-            <button class="btn btn-sm bg-info text-info-content drop-shadow-md"
-              v-if="resultHasVideo(result)"
-              @click="resultDialog = result"
-            >
-              <PlayIcon class="w-4 mr-1" /> Watch
-            </button> 
+            </button>
           </div>
         </div>
       </div> 
@@ -120,6 +115,7 @@
     <Dialog
       v-if="resultDialog"
       @close="resultDialog = null"
+      @ok="resultDialog = null"
       :btns="['ok']"
     >
       <template v-slot:icon>
@@ -127,7 +123,7 @@
       </template>
       <div class="max-w-lg p-4 space-x-4 carousel carousel-center bg-neutral rounded-box">
         <div class="w-full carousel-item"
-          v-for="(mhtml, iix) in getResultMediaVideos(resultDialog)" :key="iix"
+          v-for="(mhtml, iix) in getResultMedia(resultDialog)" :key="iix"
           >
           <div v-html="mhtml" class="w-full"></div>
         </div>

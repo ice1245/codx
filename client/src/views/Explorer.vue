@@ -11,10 +11,10 @@
       :class="['text-base pl-3 cursor-pointer mb-2', liveClinics.length ? 'font-bold' : '']"
       @click="$emit('coding-clinics')"
     >
-      <FireIcon class="h-5 w-5 float-left mr-2" v-if="false"/>
-      <img src="https://www.meetnav.com/logo.png" class="w-6 h-6 float-left mr-1" />
+      <TerminalIcon class="h-5 w-5 float-left mr-2" />
       Coding clinics
     </div>
+    <div class="text-base pl-3 cursor-pointer mb-2"><MapIcon class="h-5 w-5 float-left mr-2" />Tasks assigned <strong>(10)</strong></div>
     <div class="text-base pl-3 cursor-pointer mb-2"><ChatAltIcon class="h-5 w-5 float-left mr-2" />Recent</div>
     <div class="text-base pl-3 cursor-pointer mb-2"><StarIcon class="h-5 w-5 float-left mr-2" />Starred messaged</div>
 
@@ -38,7 +38,9 @@
       >
         <HashtagIcon class="h-5 w-5 float-left mr-2" />{{ channel.name }}
       </div>
-      <div class="text-base pl-3 cursor-pointer ml-3 mt-2">
+      <div class="text-base pl-3 cursor-pointer ml-3 mt-2"
+        @click="createNewChannel = true"
+      >
         <PlusIcon class="h-5 w-5 float-left mr-2" /> New channel
       </div>
     </div>
@@ -57,29 +59,74 @@
     >
       <div
         v-for="(chat, ix) in $storex.chat.chats" :key="ix"
-        :class="['text-base pl-3 cursor-pointer ml-3 mt-2', chat.id === session.lastOpenChat ? 'font-bold' : '']"
+        :class="['text-base pl-3 cursor-pointer ml-3 mt-2 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
         @click="$emit('open-chat', chat)"
       >
-        <AtSymbolIcon :class="['h-5 w-5 float-left mr-2']" />
-          <span :data-id="chat.id">{{ chat.users.map(u => u.username).join(" - ") }}</span>
+          <div class="grow">
+            <AtSymbolIcon :class="['h-5 w-5 float-left mr-2']" />
+            <span :data-id="chat.id">{{ chatName(chat)}}</span>
+          </div>
+          <div class="group-hover:visible invisible ml-4 pt-1">
+            <TrashIcon class="w-5" @click.stop="confirmDeleteChat = chat" />
+          </div>
       </div>
       <div class="text-base pl-3 cursor-pointer ml-3 mt-2" @click="$emit('new-chat')">
         <PlusIcon class="h-5 w-5 float-left mr-2" /> New chat
       </div>
     </div>
+    <Dialog
+      v-if="confirmDeleteChat"
+      @close="confirmDeleteChat = null"
+      @ok="deleteConfirmChat"
+    >
+      <div class="prose">
+        <h3>Delete chat {{ chatName(confirmDeleteChat) }}</h3>
+      </div>
+    </Dialog>
+    <LoadingDialog v-if="loading" />
+    <ChannelCreateDialog v-if="createNewChannel" @close="createNewChannel = false" />
   </div>
 </template>
 
 <script>
-import * as Heroicons from '@heroicons/vue/outline'
+import {
+  TerminalIcon,
+  AtSymbolIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  PlusIcon,
+  HashtagIcon,
+  ChatAltIcon,
+  StarIcon,
+  MapIcon,
+  TrashIcon
+} from '@heroicons/vue/outline'
+import Dialog from '@/components/Dialog.vue'
+import LoadingDialog from '@/components/LoadingDialog.vue'
+import ChannelCreateDialog from '@/components/channel/ChannelCreateDialog.vue'
 export default {
   components: {
-    ...Heroicons
+    TerminalIcon,
+    AtSymbolIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    PlusIcon,
+    HashtagIcon,
+    ChatAltIcon,
+    StarIcon,
+    MapIcon,
+    TrashIcon,
+    Dialog,
+    LoadingDialog,
+    ChannelCreateDialog
   },
   data() {
     return {
       channelsOpen: true,
-      directMessagesOpen: true
+      directMessagesOpen: true,
+      confirmDeleteChat: null,
+      loading: false,
+      createNewChannel: false
     }
   },
   computed: {
@@ -89,6 +136,20 @@ export default {
     },
     session () {
       return this.$storex.user.session
+    }
+  },
+  methods: {
+    async deleteConfirmChat () {
+      this.loading = true
+      if (this.$storex.chat.openedChat === this.confirmDeleteChat) {
+        this.$emit('coding-clinics')
+      }
+      await this.$storex.chat.deleteChat(this.confirmDeleteChat)
+      this.confirmDeleteChat = null
+      this.loading = false
+    },
+    chatName (chat) {
+      return chat.users.map(u => u.username).join(" - ") 
     }
   }
 };

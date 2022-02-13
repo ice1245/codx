@@ -44,6 +44,9 @@ export const actions = actionTree(
       if (!neko.remote.hosting) {
         neko.remote.request()
       }
+    },
+    async deleteClinic (ctx, clinic) {
+      await api.deleteClinic(clinic)
     }
   },
 )

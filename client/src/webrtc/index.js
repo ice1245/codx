@@ -22,34 +22,44 @@ function makeid (slots) {
 
 export default class WebRTCRoom {
   connection = null
+  screenConnection = null
   roomId = null
   streams = {}
   onStreamsChanged = () => {}
+
   constructor (settings) {
-    const { video, audio } = settings
-    this.connection = RTCMulticonnection()
-    this.connection.socketURL = `${process.env.VUE_APP_API}/`
+    this.roomSettings = settings
+    this.connection = this.createConnection(settings)
+  }
+
+  createConnection (settings) {
+    const { video, audio, screen } = settings
+    const connection = RTCMulticonnection()
+    connection.socketURL = `${process.env.VUE_APP_API}/`
     // STUN / TURN Servers
-    this.connection.iceServers = []
-    this.connection.iceServers.push({
+    connection.iceServers = []
+    connection.iceServers.push({
       urls: 'stun:turn.meetnav.com:3478'
     })
-    this.connection.iceServers.push({
+    connection.iceServers.push({
       urls: 'turn:turn.meetnav.com:3478',
       credential: settings.turnPassword,
       username: settings.turnUser
     })
-    this.connection.iceTransportPolicy = 'relay'
-    this.connection.session = {
+    connection.iceTransportPolicy = 'relay'
+    connection.session = {
         audio,
         video,
+        screen,
         data: true
     }
-    this.connection.extra = this.encodeExtra(settings)
-    this.connection.onstream = this.onStream.bind(this)
-    this.connection.onstreamended = this.onStreamEnded.bind(this)
-    this.connection.onmute = this.onMute.bind(this)
-    this.connection.onunmute = this.onUnMute.bind(this)
+    connection.extra = this.encodeExtra(settings)
+    connection.onstream = this.onStream.bind(this)
+    connection.onstreamended = this.onStreamEnded.bind(this)
+    connection.onmute = this.onMute.bind(this)
+    connection.onunmute = this.onUnMute.bind(this)
+
+    return connection
   }
 
   static async newRoom (settings) {
@@ -60,6 +70,9 @@ export default class WebRTCRoom {
     }
     await room.connect(settings)
     return room
+  }
+
+  shareScreen () {
   }
 
   async connect ({ roomId: name }) {

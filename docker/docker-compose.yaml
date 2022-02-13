@@ -14,6 +14,8 @@ services:
       - "STRAPI_ADMIN_BACKEND_URL=$API_BASE_URL"
       - "NEKO_ROOMS_TRAEFIK_DOMAIN"
       - "NEKO_ROOMS_TRAEFIK_ROOMS_DOMAIN"
+      - "PROXY_TLS_RESOLVER"
+      - "API_TOKEN"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codx-api.rule=Host(`$API_DOMAIN`)"
@@ -34,7 +36,7 @@ services:
       - "NODE_ENV=$NODE_ENV"
       - "BASE_URL=$WEB_BASE_URL"
       - "VUE_APP_API=$API_BASE_URL"
-      - "CODX_WEB_PORT=${CODX_WEB_PORT:-8080}"
+      - "CODX_WEB_PORT"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codx-web.rule=Host(`$WEB_DOMAIN`)"
