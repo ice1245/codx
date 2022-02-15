@@ -177,7 +177,6 @@ export default {
       this.showCodingClinics = false
     },
     async onNewCodingClinic (settings) {
-      this.loading = true
       try {
         const chat = this.$storex.chat.openedChat
         const clinic = await this.$storex.clinic.newCodingClinic({ chat, settings })
@@ -194,7 +193,6 @@ export default {
         }
         this.joinClinic(clinic.id)
       } catch{}
-      this.loading = false
     },
     joinClinic (id, alreadyNotified) {
       this.clinicList = false

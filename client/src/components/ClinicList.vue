@@ -10,8 +10,8 @@
           @click="$emit(`${currentId === clinic.id ? 'leave' : 'join'}-clinic`, clinic.id)">
           <StopIcon class="w-8 mr-2" v-if="currentId === clinic.id"/>
           <TerminalIcon class="w-8 mr-2" v-else/>
-          <div class="flex-1">
-            <div>{{ clinic.room.name }}</div>
+          <div class="flex flex-col">
+            <div>{{ clinic.name }}</div>
           </div>
           <div class="group-hover:visible invisible ml-4 pt-1">
             <TrashIcon class="w-5" @click.stop="confirmDeleteClinic = clinic" />
@@ -34,7 +34,7 @@
       @ok="deleteConfirmClinic"
     >
       <div class="prose">
-        <h3>Delete {{ confirmDeleteClinic.room.name }}</h3>
+        <h3>Delete {{ confirmDeleteClinic.name }}</h3>
       </div>
     </Dialog>
   </div>
@@ -75,8 +75,9 @@ export default {
     async onNewCodingClinic (settigs) {
       this.$emit('new-clinic', settigs)
     },
-    deleteConfirmClinic () {
-      this.$storex.clinic.deleteClinic(this.confirmDeleteClinic)
+    async deleteConfirmClinic () {
+      await this.$storex.clinic.deleteClinic(this.confirmDeleteClinic)
+      this.confirmDeleteClinic = null
     }
   }
 }

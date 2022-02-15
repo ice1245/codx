@@ -16,6 +16,8 @@ services:
       - "NEKO_ROOMS_TRAEFIK_ROOMS_DOMAIN"
       - "PROXY_TLS_RESOLVER"
       - "API_TOKEN"
+      - "API_DOMAIN"
+      - "WEB_DOMAIN"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codx-api.rule=Host(`$API_DOMAIN`)"
@@ -43,39 +45,7 @@ services:
       - "traefik.http.routers.codx-web.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
       - "traefik.http.routers.codx-web.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
       - "traefik.http.routers.codx-web.service=codx-web"
-      - "traefik.http.services.codx-web.loadbalancer.server.port=8080"
-
-  neko-rooms:
-    image: "codx/neko-rooms:latest"
-    build:
-      context: ../neko-rooms
-    restart: "unless-stopped"
-    environment:
-      - "TZ"
-      - "NEKO_ROOMS_EPR"
-      - "NEKO_ROOMS_NAT1TO1"
-      - "NEKO_ROOMS_TRAEFIK_DOMAIN=$NEKO_ROOMS_TRAEFIK_ROOMS_DOMAIN"
-      - "NEKO_ROOMS_TRAEFIK_ENTRYPOINT"
-      - "NEKO_ROOMS_TRAEFIK_CERTRESOLVER"
-      - "NEKO_ROOMS_TRAEFIK_NETWORK"
-      - "NEKO_ROOMS_TRAEFIK_CORS"
-      - "NEKO_ROOMS_LOGS=true"
-      - "NEKO_ROOMS_NEKO_IMAGES=$NEKO_ROOMS_NEKO_IMAGES"
-      - "NEKO_ROOMS_DEBUG"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.services.neko-rooms-frontend.loadbalancer.server.port=8080"
-      - "traefik.http.routers.neko-rooms.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
-      - "traefik.http.routers.neko-rooms.rule=Host(`${NEKO_ROOMS_TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.neko-rooms.tls=true"
-      - "traefik.http.routers.neko-rooms.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
-      # IPWHITELIST
-      - "traefik.http.middlewares.neko-rooms-ipwhitelist.ipwhitelist.sourcerange=${NEKO_ROOMS_IP_WHITELIST}"
-      # MIDDLEWARES
-      - "traefik.http.routers.neko-rooms.middlewares=neko-rooms-ipwhitelist"     
-      
+      - "traefik.http.services.codx-web.loadbalancer.server.port=8080"      
 
 networks:
   default:

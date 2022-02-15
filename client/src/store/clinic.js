@@ -45,8 +45,13 @@ export const actions = actionTree(
         neko.remote.request()
       }
     },
-    async deleteClinic (ctx, clinic) {
+    async deleteClinic ({ state: { clinics, currentClinic } }, clinic) {
+      const { id } = clinic
       await api.deleteClinic(clinic)
+      if (currentClinic && id === setCurrentClinic.id) {
+        $stotex.clinic.setCurrentClinic()
+      }
+      $storex.clinic.setClinics(clinics.filter(c => c.id !== id))
     }
   },
 )

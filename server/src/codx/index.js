@@ -1,7 +1,9 @@
 const user = require('./user')
 const room = require('./codx-room')
 
-module.exports = strapi => ({
-  user: user(strapi),
-  room: room(strapi)
-})
+const codx = {}
+module.exports = strapi => {
+  codx.user = user(strapi, codx),
+  codx.room = room(strapi, codx)
+  return codx
+}

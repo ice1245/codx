@@ -14,26 +14,18 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       let { chat = {}, settings } = body
       chat = chat.id ? await strapi.$api('chat').findOne(chat.id) : null
       user.token = authorization.split(" ")[1]
-      const room = await codx.room.createRoom({ user, provider: 'hetzner' })
-      return await strapi.$api('neko-room').create({ data: {
+      const room = await codx.room.createRoom({ user, provider: 'hetzner', settings })
+      const nekoRoom = await strapi.$api('neko-room').create({ data: {
         chat,
         settings,
         room,
         name: settings.name,
         description: settings.description
       }})
+      return codx.room.getRoomPublicInfo(nekoRoom)
     },
     async find ({ state: { user }}) {
-      return await strapi.$query('neko-room').findMany({
-        filters: {
-          chat: {
-            $or: [
-              { admins: user },
-              { guests: user }
-            ]
-          }
-        }
-      })
+      return codx.room.listRooms(user)
     },
     async delete ({ state: { user }, params: { id } }) {
       const { room } = await strapi.$api('neko-room').findOne(id)
@@ -46,63 +38,8 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       if (!isValid) {
         return { isValid }
       }
-      const nekoRooms = await strapi.$query('neko-room').findMany({
-        populate: { user: true }
-      })
-      const routers = nekoRooms.map(({ name: roomName, user: { username }, room: { config: { name: serviceId }, data: { server: { id, public_net: { ipv4 } } }}}) => {
-        const pathPrefix = `/@${username}/clinic/${roomName}`
-        return {
-          username,
-          roomName,
-          ip: ipv4.ip,
-          id,
-          middlewares: {
-            [`codx-room-${serviceId}prf`]: {
-              stripPrefix: {
-                prefixes: [
-                  pathPrefix + "/"
-                ],
-                forceSlash: true
-              }
-            },
-            [`codx-room-${serviceId}rdr`]: {
-              "redirectRegex": {
-                "regex": pathPrefix + "$",
-                "replacement": pathPrefix + "/"
-              }
-            }
-          },
-          services: {
-            [`codx-room-${serviceId}`]: {
-              loadBalancer: {
-                servers: [
-                  {
-                    url:  `http://${ipv4.ip}:8080`
-                  }
-                ],
-                passHostHeader: true
-              }
-            }
-          },
-          routers: {
-            [`codx-room-${serviceId}`]: {
-              entryPoints: [
-                "websecure"
-              ],
-              middlewares: [
-                `codx-room-${serviceId}rdr`,
-                `codx-room-${serviceId}prf`
-              ],
-              service: `codx-room-${serviceId}`,
-              rule: "Host(`codx.meetnav.com`) && PathPrefix(`" + pathPrefix + "`)",
-              tls: {
-                "certResolver": process.env.PROXY_TLS_RESOLVER || "myresolver"
-              }
-            }
-          }
-        }
-      })
-      const http = routers.reduce((conf, { middlewares, services, routers}) => {
+      const nekoRooms = await strapi.$query('neko-room').findMany()
+      const http = nekoRooms.reduce((conf, { room: { proxy: { middlewares, services, routers} } }) => {
         conf.middlewares = {
           ...conf.middlewares,
           ...middlewares

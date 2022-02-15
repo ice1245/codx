@@ -1,6 +1,6 @@
 const guest10 = { id: 10, username: 'Marc-D', avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" }
 const guest20 = { id: 20, username: 'JoeyRM10', avatar: "https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraightStrand&accessoriesType=Sunglasses&hairColor=Blonde&facialHairType=MoustacheMagnum&facialHairColor=BrownDark&clotheType=CollarSweater&clotheColor=Gray01&eyeType=Side&eyebrowType=Default&mouthType=Serious&skinColor=Black" }
-module.exports = strapi => ({
+module.exports = (strapi, codx) => ({
   filteredUser ({ avatar, blocked, email, id, username }) {
      return { avatar, blocked, email, id, username }
   },
@@ -16,6 +16,25 @@ module.exports = strapi => ({
       followed: network.followed.map(this.filteredUser),
     }
   },
+  async subscriptions ({ id }) {
+    const subs = await strapi.$query('user-subscription').findMany({
+      filter: { user: id, active: true },
+      populate: { company: true, subscription: true }
+    })
+    const freeSubs = await strapi.$query('subscription').findMany({
+      filters: { free: true }
+    })
+    return [
+      freeSubs.map(({ settings:subscription }) => ({
+        personal: true,
+        subscription
+      }))[0],
+      ...subs.map(({company, subscription}) => ({
+        company: company?.id,
+        subscription: subscription.settings
+      }))
+    ]
+  },
   async me (params) {
     const { id } = params
     const sme = await strapi.$query("users-permissions.user").findOne(id)
@@ -28,26 +47,11 @@ module.exports = strapi => ({
       filters: { admins: [sme.id] },
       populate: { admins: true, guests: true, channel: { entries: true } }
     })
-    const clinics = await strapi.$query('neko-room').findMany({ 
-      where: {
-        chat: {
-          $null: false
-        }
-      },
-      populate: {
-        chat: {
-          where: {
-            $or: [
-              { admins: [sme.id] },
-              { guests: [sme.id] }
-            ]
-          }
-        }
-      }
-    })
+    const clinics = await codx.room.listRooms()
     const companies = await strapi.$query('company').findMany({ 
       filters: { users: [sme.id] }
     })
+    const subscriptions = await this.subscriptions(sme)
     const ds = new Date().getTime()
     const chats = [...guestChats, ...adminChats]
     const channels = chats.filter(c => c.channel).map(({ channel }) => ({ channel }))
@@ -56,6 +60,7 @@ module.exports = strapi => ({
       roomId: `@${sme.username}`,
       session: {},
       network,
+      subscriptions,
       chats: [
         ...chats,
         {

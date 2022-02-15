@@ -70,13 +70,16 @@
       <div class="bg-base-100 text-base-content card rounded h-80 mr-4 cursor-pointer"
         v-for="(result, ix) in search.results" :key="ix"
         @click="resultDialog = result"
+        @mouseover="carrouselMe(result)"
+        @mouseout="carrouselMe(null)"
       >
-        <div class="h-40 carousel rounded-box">
+        <div class="h-40 carousel rounded-box relative">
           <div class="w-full carousel-item"
             v-for="(mhtml, iix) in getResultMedia(result)" :key="iix"
             >
             <div v-html="mhtml" class="w-full"></div>
           </div>
+          <div class="absolute w-full h-full"></div>
         </div>
         <div class="p-2 w-full text-base-content">
           <div class="flex flex-row w-full">
@@ -184,8 +187,16 @@ export default {
         'teal'
       ],
       showWelcome: true,
-      resultDialog: null
+      resultDialog: null,
+      carrouselMeTarget: null,
+      slidInterval: null
     }
+  },
+  mounted () {
+    this.slidInterval = setInterval(() => this.slideResultMedia(), 4000)
+  },
+  unmounted () {
+    clearInterval(this.slidInterval)
   },
   computed: {
     search () {
@@ -266,6 +277,18 @@ export default {
     },
     runClinicTemplate (result) {
       this.$emit('new-clinic', result)
+    },
+    carrouselMe(result) {
+      if (this.carrouselMeTarget !== result) {
+        this.carrouselMeTarget = result
+      }
+    },
+    slideResultMedia () {
+      const { media } = this.carrouselMeTarget || {}
+      if (!media || media.length === 1) {
+        return
+      }
+      media.push(media.shift())
     }
   }
 }

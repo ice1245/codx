@@ -1,7 +1,12 @@
 <template>
   <Dialog :title="'New coding clininc'">
       <template v-slot:icon>
-        <TerminalIcon class="h-10 w-10 text-neutral-600" aria-hidden="true" />
+        <AvatarSelect
+          class="w-32"
+          selectedSize="12"
+          :avatars="companies"
+          :selected="companySelected"
+          @change="ix => companySelected = ix"/>
       </template>
       <template v-slot:actions>
         <button :class="['btn shadow-sm px-4 py-2',
@@ -40,17 +45,43 @@
             <small>{{ card.description }}</small>
           </div>
         </div>
+
+        <label class="label cursor-pointer" @click="powerSizeShown = !powerSizeShown">
+          <u>Power size...</u>
+        </label>
+        <div class="border rounded-md p-2 h-40 flex flex-col" v-if="powerSizeShown">
+          <ul class="w-full steps">
+            <li v-for="(size, six) in powerSizes" :key="six"
+              :data-content="size.id" :class="['step cursor-pointer', powerSize >= six ? 'step-' + powerStepColor : '']" @click="powerSize = six">{{ size.name }}</li> 
+          </ul>
+          <div :class="'grow flex flex-col justify-between prose text-center text-' + powerStepColor">
+            <div><small>{{ powerSizes[powerSize].description }}</small></div>
+            <div class="flex flex-row gap-2 justify-end">
+              <div class="flex flex-row gap-2">
+                <CogIcon class="w-6" />
+                <small>{{ powerSizes[powerSize].type }}</small>
+              </div>
+              <div class="flex flex-row gap-2">
+                <ClockIcon class="w-6" />
+                <small>{{ powerSizes[powerSize].timeout }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </Dialog>
 </template>
 <script>
-import { TerminalIcon, PlusIcon } from '@heroicons/vue/outline'
+import { PlusIcon, CogIcon, ClockIcon } from '@heroicons/vue/outline'
 import Dialog from '@/components/Dialog.vue'
+import AvatarSelect from '@/components/AvatarSelect.vue'
 export default {
   components: {
-    TerminalIcon,
     PlusIcon,
-    Dialog
+    AvatarSelect,
+    Dialog,
+    CogIcon,
+    ClockIcon
   },
   data () {
     return {
@@ -58,6 +89,9 @@ export default {
       template: 0,
       name: null,
       description: null,
+      companySelected: 0,
+      powerSize: 0,
+      powerSizeShown: false,
       templates: {
         "blank": {
           nekoImage: "m1k1o/neko:firefox",
@@ -83,13 +117,53 @@ export default {
       }
     }
   },
+  computed: {
+    powerStepColor () {
+      if (this.powerSize >= 3) {
+        return 'error'
+      }
+      if (this.powerSize >= 2) {
+        return 'accent'
+      }
+      if (this.powerSize >= 1) {
+        return 'success'
+      }
+      return 'primary'
+    },
+    user () {
+      return this.$storex.user.user
+    },
+    companies () {
+      const { avatar, username } = this.user
+      const { subscriptions } = this.user
+      const validIds = subscriptions.map(({ company }) => company)
+      return [
+        { avatar, name: `@${username}` },
+        ...this.user.companies.filter(c => validIds.indexOf(c.id) !== -1)
+      ]
+    },
+    subscription () {
+      const { companySelected } = this
+      const { subscriptions } = this.user
+      if (companySelected === 0) {
+        return subscriptions.filter(({ personal }) => personal)[0].subscription
+      }
+      const companyInfo = this.companies[companySelected]
+      const res = subscriptions.filter(({ company }) => company === companyInfo.id)[0]
+      return res.subscription
+    },
+    powerSizes () {
+      return this.subscription.powerSizes
+    }
+  },
   methods: {
     onOk () {
       this.loading = true
       this.$emit('ok', {
         name: this.name,
         description: this.description,
-        ...this.templates[this.template]
+        ...this.templates[this.template],
+        powerSize: this.powerSizes[this.powerSize]
       })
     }
   }

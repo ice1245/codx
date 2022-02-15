@@ -38,6 +38,11 @@
     },
     "dislikeCount": {
       "type": "integer"
+    },
+    "sponsor": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
     }
   }
 }
