@@ -18,4 +18,7 @@ codx has come to help developers to connect with other developers and solve prob
 
 ## Prototype
 
+![image](https://user-images.githubusercontent.com/767180/154649090-0f949467-c10c-43e6-9e6c-d82f6cf32f4c.png)
+
+
 ![image](https://user-images.githubusercontent.com/767180/151044544-247e071d-7cb9-4322-84b1-15fb90bc802e.png)
