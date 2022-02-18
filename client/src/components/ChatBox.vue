@@ -22,6 +22,7 @@
             <ChatEntry
               :isMe="me.id === message.from.id"
               :message="message"
+              @edit-message="onEditMessage"
               v-else/>
           </div>
         </div>
@@ -29,14 +30,18 @@
       <div
         class="md:p-6 p-4 flex items-center md:space-x-5 space-x-3 border-t border-slate-600/50 w-full"
       >
-        <input
-          type="text"
-          id="search"
-          class="input block w-full md:px-4 px-3 md:py-3 py-2 focus:outline-none sm:text-base text-sm border-gray-300 rounded "
-          placeholder="Type messages"
-          v-model="message"
-          @keydown.enter="sendMessage"
-        />
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text" v-if="editing">Editing, press Esc. to cancel</span>
+          </label>
+          <input type="text" placeholder="Type messages"
+            :class="['input block w-full md:px-4 px-3 md:py-3 py-2 focus:outline-none sm:text-base text-sm border-gray-300 rounded',
+              editing ? 'border-error' : '']"
+            v-model="message"
+            @keydown.enter="sendMessage"
+            @keydown.esc="abortEditing"
+          >
+        </div>
         <EmojiHappyIcon class="cursor-pointer md:w-5 w-7 text-primary" />
         <PaperClipIcon class="cursor-pointer md:w-5 w-7 text-primary" />
         <div>
@@ -78,7 +83,8 @@ export default {
   data() {
     return {
       message: '',
-      hasScrolled: false
+      hasScrolled: false,
+      editing: null
     }
   },
   computed: {
@@ -126,7 +132,7 @@ export default {
       const { users } = this.chat
       const grouped = messages
         .reduce((acc, m) => {
-          const { from, content, createdAt: ts } = m
+          const { id, from, content, createdAt: ts, edited } = m
           const extra = m.extra || {}
           const { event } = extra
           const createdAt = moment(ts)
@@ -136,8 +142,11 @@ export default {
             if (lid === mid) {
               const nots = createdAt.diff(lcatf, 'minutes') < 2
               entries.push({
+                id,
                 content,
-                createdAt: nots ? null : m.createdAt
+                createdAt: nots ? null : m.createdAt,
+                edited,
+                from: { id: from.id }
               })
               return acc
             }
@@ -145,7 +154,7 @@ export default {
           acc.push({
             createdAt,
             from: users.filter(u => u.id === from.id)[0],
-            entries: [{ content, createdAt, extra }],
+            entries: [{ id, content, createdAt, extra, from: { id: from.id }, edited }],
             event: event ? extra : null
           })
           return acc
@@ -165,6 +174,14 @@ export default {
       const element = this.$refs.messageWindow
       this.hasScrolled =
         Math.abs(element.scrollTop + element.clientHeight - element.scrollHeight) > 10
+    },
+    onEditMessage (message) {
+      this.message = message.content
+      this.editing = message
+    },
+    abortEditing () {
+      this.message = null
+      this.editing = null
     }
   }
 };

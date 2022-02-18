@@ -43,19 +43,25 @@ export const mutations = mutationTree(state, {
       state.openedChat = state.chats[id]
     }
   },
-  async addMessage (state, { chat: { id }, from, content, createdAt, extra }) {
-    if (!state.chats[id]) {
-      const { data: chat } = await api.loadChat(id)
+  async addMessage (state, { id, chat: { id: chatId }, from, content, createdAt, extra, edited }) {
+    if (!state.chats[chatId]) {
+      const { data: chat } = await api.loadChat(chatId)
       $storex.chat.addChat(chat)
     }
-    const { messages = [] } = state.chats[id]
-    messages.push({
-      from, content, createdAt, extra
-    })
+    const { messages = [] } = state.chats[chatId]
+    const messageIx = messages.findIndex(m => m.id === id)
+    const newMessage = {
+      id, from, content, createdAt, extra, edited
+    }
+    if (messageIx !== -1) {
+      messages.splice(messageIx, 1, newMessage)
+    } else {
+      messages.push(newMessage)  
+    }
     state.chats = {
       ...state.chats,
       [id]: {
-        ...state.chats[id],
+        ...state.chats[chatId],
         messages
       }
     }
@@ -90,6 +96,9 @@ export const actions = actionTree(
     async addUser (ctx, chatAddUser) {
       await api.chatAddUser(chatAddUser)
       $storex.chat.setOpenedChat(chatAddUser.chat.id)
+    },
+    async onEditMessage (ctx, { chat, message }) {
+      await api.sendMessage({ chat, ...message })
     }
   },
 )

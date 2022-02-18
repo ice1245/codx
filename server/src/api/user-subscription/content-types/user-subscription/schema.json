@@ -29,6 +29,11 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::subscription.subscription"
+    },
+    "cloud_provider": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::cloud-provider.cloud-provider"
     }
   }
 }

@@ -69,9 +69,8 @@ class NekoRooms {
     return settings.data
   }
 
-  async delete (name) {
-    const room = await this.find(name)
-    const res = await axios.delete(`${this.baseUrl}/api/rooms/${room.id}`, this.nekoAxiosAuth())
+  async delete (id) {
+    const res = await axios.delete(`${this.baseUrl}/api/rooms/${id}`, this.nekoAxiosAuth())
     return res.data
   }
 

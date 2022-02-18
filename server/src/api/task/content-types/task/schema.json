@@ -4,7 +4,8 @@
   "info": {
     "singularName": "task",
     "pluralName": "tasks",
-    "displayName": "Task"
+    "displayName": "Task",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -16,7 +17,7 @@
       "relation": "oneToOne",
       "target": "api::chat.chat"
     },
-    "status": {
+    "category": {
       "type": "string"
     },
     "owner": {
@@ -28,6 +29,20 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "budget": {
+      "type": "decimal"
+    },
+    "deadLine": {
+      "type": "date"
+    },
+    "tags": {
+      "type": "json"
     }
   }
 }

@@ -1,31 +1,36 @@
 <template>
-  <div class="lg:flex h-screen overflow-hidden">
-    <SideBar @sideBar="toggleSideBar" class="bg-neutral-focus text-neutral-content" />
-    <div class="bg-neutral text-neutral-content tmd:p-3 p-2 py-5 h-full lg:w-96 w-full"
-      v-if="showLeftBar"
-    >
-      <Explorer v-if="explorerVisible"
+  <div class="flex flex-row h-screen overflow-hidden w-full">
+    <SideBar
+      @sideBar="toggleSideBar"
+      @switch-company="onSwitchCompany"
+      class="bg-neutral-focus text-neutral-content" />
+    <div class="detail-bar w-80 px-4 border-r">
+      <Explorer class="explorer"
+        v-if="explorerVisible"
         @coding-clinics="onCodingClinics"
         @open-chat="chat => onOpenChat(chat)"
         @open-channel="onOpenChannel"
         @new-chat="onNewChat"
+        @task-manager="onTaskManager"
       />
       <Profile v-if="profileVisible" :user="$storex.user.user"/>
     </div>
-    <div class="lg:flex w-full h-full grow">
-      <div class="lg:flex flex-col h-full w-full">
-        <SearchResults
-          v-if="showCodingClinics"
-          class="h-full w-full"
-          @new-clinic="onResultsNewCodingClinic"
-        />
-        <Channel
-          v-if="showChannel"
-          class="h-full w-full"
-          :channel="$storex.channel.currentChannel"
-        />
-        <Sprint v-if="false"/>
-        <Header
+    <TaskManager class="w-1/3"
+      v-if="taskManager"
+      @task-chat="onOpenChat"
+    />
+    <SearchResults
+      v-if="showCodingClinics"
+      class="h-full w-full"
+      @new-clinic="onResultsNewCodingClinic"
+    />
+    <Channel
+      v-if="showChannel"
+      class="h-full w-full"
+      :channel="$storex.channel.currentChannel"
+    />
+    <div class="lg:flex flex-col w-full" v-if="splittedView">
+      <Header
           :chat="$storex.chat.openedChat"
           :explorerVisible="explorerVisible"
           :chatVisible="chatVisible"
@@ -36,32 +41,31 @@
           @toggle-chat="toggleChatHidden"
           v-if="showHeader"
         />
-        <div class="lg:flex flex-row hidden h-full w-full">
-          <div class="grow" v-if="currentClinic">
-            <NekoRoom
-              :room="currentClinic"
-            />
-          </div>
-          <ChatBox class="grow"
-            :chat="$storex.chat.openedChat" v-if="chatVisible"
-            :closeMe="!!currentClinic"
-            @on-event-click="onEventClick"
-            @hide-chat="toggleChatHidden"
-          />
-          <VideoCall
-            class="tflex-none w-1/6 m-5 rounded-md"
-            :call="$storex.call.currentCall"
-            v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
-          />
-          <ClinicList
-            class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 rounded-md"
-            v-if="clinicList"
-            @join-clinic="joinClinic"
-            @leave-clinic="leaveClinic"
-            @new-clinic="onNewCodingClinic"
-            @close="clinicList = false"
+      <div class="lg:flex flex-row hidden h-full w-full">
+        <div class="w-2/3" v-if="currentClinic">
+          <NekoRoom
+            :room="currentClinic"
           />
         </div>
+        <ChatBox class="chat-box grow"
+          :chat="$storex.chat.openedChat" v-if="chatVisible"
+          :closeMe="!!currentClinic"
+          @on-event-click="onEventClick"
+          @hide-chat="toggleChatHidden"
+        />
+        <VideoCall
+          class="tflex-none w-1/6 m-5 rounded-md"
+          :call="$storex.call.currentCall"
+          v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
+        />
+        <ClinicList
+          class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 rounded-md"
+          v-if="clinicList"
+          @join-clinic="joinClinic"
+          @leave-clinic="leaveClinic"
+          @new-clinic="onNewCodingClinic"
+          @close="clinicList = false"
+        />
       </div>
     </div>
     <LoadingDialog v-if="loading" />
@@ -90,6 +94,7 @@ import LoadingDialog from '@/components/LoadingDialog.vue'
 import Channel from '@/components/channel/Channel.vue'
 import Sprint from '@/components/Sprint.vue'
 import { ChatAltIcon } from "@heroicons/vue/outline"
+import TaskManager from '@/components/TaskManager.vue'
 export default {
   components: {
     SideBar,
@@ -105,7 +110,8 @@ export default {
     LoadingDialog,
     Channel,
     Sprint,
-    ChatAltIcon
+    ChatAltIcon,
+    TaskManager
   },
   data() {
     return {
@@ -115,7 +121,8 @@ export default {
       sideBar: 'explorer',
       showCodingClinics: !this.$storex.chat.openedChat,
       chatHidden: false,
-      loading: false
+      loading: false,
+      taskManager: null
     };
   },
   computed: {
@@ -142,7 +149,13 @@ export default {
       return this.$storex.channel.currentChannel
     },
     showHeader () {
-      return !this.showCodingClinics && !this.showChannel
+      return !this.showCodingClinics && !this.showChannel && (!this.taskManager || this.chatVisible) 
+    },
+    currentCompnay () {
+      return this.$storex.company.currentCompnay
+    },
+    splittedView () {
+      return !this.showCodingClinics && !this.showChannel && (!this.taskManager || this.chatVisible) 
     }
   },
   methods: {
@@ -227,6 +240,22 @@ export default {
       if (event === 'clinic') {
         this.joinClinic(clinic.id, true)
       }
+    },
+    onSwitchCompany (company) {
+      this.$storex.company.setCurrentCompany(company)
+      if (this.taskManager && this.taskManager !== company) {
+        this.taskManager = null
+        this.$storex.chat.setOpenedChat()
+        this.clinicList = true
+      }
+    },
+    onTaskManager () {
+      this.clinicList = false
+      this.showHeader = false
+      this.showCodingClinics = false
+      this.$storex.clinic.setCurrentClinic()
+      this.$storex.chat.setOpenedChat()
+      this.taskManager = this.currentCompnay
     }
   }
 };

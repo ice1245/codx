@@ -14,7 +14,9 @@
       <TerminalIcon class="h-5 w-5 float-left mr-2" />
       Coding clinics
     </div>
-    <div class="text-base pl-3 cursor-pointer mb-2"><MapIcon class="h-5 w-5 float-left mr-2" />Tasks assigned <strong>(10)</strong></div>
+    <div class="text-base pl-3 cursor-pointer mb-2 flex flex-row group" v-if="showTasks" @click="$emit('task-manager')">
+      <MapIcon class="h-5 w-5 float-left mr-2" />Tasks assigned <strong>(10)</strong>
+    </div>
     <div class="text-base pl-3 cursor-pointer mb-2"><ChatAltIcon class="h-5 w-5 float-left mr-2" />Recent</div>
     <div class="text-base pl-3 cursor-pointer mb-2"><StarIcon class="h-5 w-5 float-left mr-2" />Starred messaged</div>
 
@@ -136,6 +138,13 @@ export default {
     },
     session () {
       return this.$storex.user.session
+    },
+    currentCompany () {
+      return this.$storex.company.currentCompany || { settings: {} }
+    },
+    showTasks () {
+      const { settings } = this.currentCompany
+      return settings?.tasks
     }
   },
   methods: {

@@ -64,3 +64,6 @@ docker/.env
 
 neko-rooms
 neko
+
+# traefic certs
+acme.json

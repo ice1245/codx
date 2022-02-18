@@ -1,9 +1,9 @@
 version: "3.4"
 services:
   neko:
-    image: "codx/neko:latest"
-    restart: "unless-stopped"
-    shm_size: "2gb"
+    image: gbrian/neko
+    restart: unless-stopped
+    shm_size: 2gb
     ports:
       - "8080:8080"
       - "${NEKO_EPR:-52000-52001}:${NEKO_EPR:-52000-52001}/udp"
@@ -23,7 +23,9 @@ services:
     restart: unless-stopped
   
   codx-coder:
-    image: codx/coder:latest
+    depends_on:
+      - neko
+    image: gbrian/coder
     user: root
     environment:
       - "PASSWORD=$NEKO_PASSWORD"

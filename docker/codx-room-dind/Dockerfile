@@ -16,6 +16,4 @@ RUN chmod +x /entrypoint.sh
 COPY codx-coder /codx-coder
 COPY docker-compose.yaml /docker-compose.yaml
 
-COPY images.tar /images.tar
-
 ENTRYPOINT [ "/entrypoint.sh" ]

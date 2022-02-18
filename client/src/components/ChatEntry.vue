@@ -31,6 +31,7 @@
             <MessageOptions
               menuItemClass="-left-2 -mt-1"
               imgClass="w-6 transform rotate-90"
+              @edit-message="$emit('edit-message', message)"
             />
           </div>
           <EmojiHappyIcon
@@ -44,12 +45,6 @@
           <EmojiHappyIcon
             class="cursor-pointer md:w-6 w-4 mt-1.5 text-primary emojiicon"
           />
-          <div class="hidden md:block mt-2">
-            <MessageOptions
-              menuItemClass="-left-2 -mt-1"
-              imgClass="w-5 transform rotate-90"
-            />
-          </div>
           <div class="w-full flex flex-col items-end">
             <div
               class="bg-secondary text-secondary-content rounded-lg rounded-br-none text-left p-3 px-5 space-y-1"
@@ -61,9 +56,13 @@
                   <ClockIcon class="w-3 mr-0.5" />
                   {{ formatTime(entry) }}
                 </p>
-                <h3 class="ttext-md md:text-base">
+                <MessageOptions
+                  menuItemClass="-left-2 -mt-1"
+                  imgClass="w-5 transform rotate-90"
+                  @edit-message="$emit('edit-message', entry)"
+                >
                   <div v-html="formatMessage(entry)" class="prose"></div>
-                </h3>
+                </MessageOptions>
               </div>
             </div>
             <div class="arrow_icon_right w-3 h-3"></div>
@@ -97,7 +96,7 @@ export default {
   props: ['isMe', 'message'],
   methods: {
     formatMessage (message) {
-      return message.content
+      return `${message.content}${message.edited ? ' *' : ''}`
     },
     formatTime (message) {
       return moment(message.createdAt).format("hh:mm")

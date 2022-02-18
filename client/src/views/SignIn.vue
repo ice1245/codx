@@ -101,6 +101,17 @@
             Register...
           </router-link>
         </label>
+        <br/>
+        <label class="block md:text-lg text-md font-medium ">
+          Login with...
+        </label>
+        <div class="flex flew-row mt-2">
+          <div class="avatar cursor-pointer w-16 h-16"
+            @click="loginWithGithub"
+          >
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="rounded-lg" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -127,6 +138,9 @@ export default {
       const { identifier, password } = this
       await this.$storex.user.login({ identifier, password })
       return this.$router.push("/")
+    },
+    loginWithGithub () {
+      window.location = "https://api-codx.meetnav.com/api/connect/github"
     }
   }
 };

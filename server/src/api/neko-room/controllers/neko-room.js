@@ -11,8 +11,8 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
   const codx = require('../../../codx')(strapi)
   return {
     async create ({ request: { body, header: { authorization } }, state: { user } }) {
-      let { chat = {}, settings } = body
-      chat = chat.id ? await strapi.$api('chat').findOne(chat.id) : null
+      let { chat, settings } = body
+      chat = chat?.id ? await strapi.$api('chat').findOne(chat.id) : null
       user.token = authorization.split(" ")[1]
       const room = await codx.room.createRoom({ user, provider: 'hetzner', settings })
       const nekoRoom = await strapi.$api('neko-room').create({ data: {
@@ -30,7 +30,7 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
     async delete ({ state: { user }, params: { id } }) {
       const { room } = await strapi.$api('neko-room').findOne(id)
       console.log("neko-rooms", "delete", { user, room })
-      await codx.room.deleteRoom({ room, provider: room['cloud-provider'] })
+      await codx.room.deleteRoom(room)
       return strapi.$api('neko-room').delete(id)
     },
     async proxy ({ query: { token }}) {

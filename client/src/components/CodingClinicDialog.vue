@@ -11,8 +11,8 @@
       <template v-slot:actions>
         <button :class="['btn shadow-sm px-4 py-2',
           loading ? 'loading' : '',
-          (name && template) ? '' : 'opacity-20 cursor-not-allowed']"
-          @click="template && onOk()">Create</button>
+          canCreate ? '' : 'opacity-20 cursor-not-allowed']"
+          @click="canCreate && onOk()">Create</button>
         <button class="btn shadow-sm px-4 py-2 mr-3" @click="$emit('cancel')">Cancel</button>
       </template>
       <div class="">
@@ -32,16 +32,17 @@
         <label class="label">
           Choose a clinic template: *
         </label>
-        <div class="flex flex-row gap-2">
-          <div class="place-content-center text-center w-32 p-2 cursor-pointer"
+        <div class="flex flex-row gap-1 justify-center">
+          <div class="m-auto cursor-pointer grow text-center"
             v-for="(card, ix) in templates" :key="ix"
             @click="template = ix"
           >
-            <div class="w-32 h-24 border-dashed border-2 border-sky-500 rounded-lg">
-              <div class="indicator-item badge badge-primary" v-if="template === ix">Selected</div> 
-              <PlusIcon class="w-12 ml-10 mt-7" v-if="false" />
+            <div :class="['w-40 h-32 border-dashed border-2 rounded-lg relative m-auto',
+              template === ix ? 'border-sky-500' : 'border-gray-500 opacity-60']">
+              <div class="indicator-item badge badge-primary absolute top-0 left-10" v-if="template === ix + 100">Selected</div> 
+              <img :src="cardImage(card)" class="w-full h-full" />
             </div>
-            <h4 class="mt-1 text-info text-center"><strong>{{ card.title }}</strong></h4>
+            <h4 :class="['mt-1 text-center', template === ix ? 'text-info' : 'text-focus']"><strong>{{ card.title }}</strong></h4>
             <small>{{ card.description }}</small>
           </div>
         </div>
@@ -83,6 +84,7 @@ export default {
     CogIcon,
     ClockIcon
   },
+  props: ['clinicTemplates'],
   data () {
     return {
       loading: false,
@@ -92,27 +94,33 @@ export default {
       companySelected: 0,
       powerSize: 0,
       powerSizeShown: false,
-      templates: {
+      templates: this.$props.clinicTemplates || {
         "blank": {
-          nekoImage: "m1k1o/neko:firefox",
           image: "",
           title: "Blank",
           description: "Empty project...",
-          tags: ['nodejs', 'python', 'java']
+          tags: ['nodejs', 'python', 'java'],
+          media: [
+            { type: 'image', url: '/logo.png' }
+          ]
         },
         "web": {
-          nekoImage: "m1k1o/neko:firefox",
           image: "",
           title: "Web",
           description: "Web APP project.",
-          tags: ['js', 'vue', 'react']
+          tags: ['js', 'vue', 'react'],
+          media: [
+            { type: 'image', url: '/logo.png' }
+          ]
         },
         "data": {
-          nekoImage: "m1k1o/neko:firefox",
           image: "",
           title: "Data ML/AI",
           description: "Data anlysis project.",
-          tags: ['jupyter-lab', 'tensorflow', 'conda', 'pytorch']
+          tags: ['jupyter-lab', 'tensorflow', 'conda', 'pytorch'],
+          media: [
+            { type: 'image', url: '/logo.png' }
+          ]
         }
       }
     }
@@ -154,17 +162,24 @@ export default {
     },
     powerSizes () {
       return this.subscription.powerSizes
+    },
+    canCreate () {
+      return this.name
     }
   },
   methods: {
     onOk () {
       this.loading = true
-      this.$emit('ok', {
+      const settings = {
         name: this.name,
         description: this.description,
         ...this.templates[this.template],
         powerSize: this.powerSizes[this.powerSize]
-      })
+      }
+      this.$emit('ok', settings)
+    },
+    cardImage (card) {
+      return card.media.filter(({ type }) => type === 'image')[0].url
     }
   }
 }

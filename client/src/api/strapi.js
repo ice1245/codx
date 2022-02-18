@@ -75,6 +75,20 @@ class Strapi {
     const { headers } = this
     return useFetch.post("api/channels", channel, { headers })
   }
+
+  async createTask (taskSettings) {
+    const { headers } = this
+    return useFetch.post("api/tasks", taskSettings, { headers })
+  }
+
+  async getCompany (id) {
+    const { headers } = this
+    return useFetch.get("api/companies/" + id, { headers }) 
+  }
+
+  async loginWithProvider ({ provider, access_token }) {
+    return useFetch.get(`/api/auth/${provider}/callback?access_token=${access_token}`) 
+  }
 }
 
 export default new Strapi()

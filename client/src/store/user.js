@@ -121,6 +121,11 @@ export const actions = actionTree(
       localStorage.removeItem("user")
       localStorage.removeItem("token")
       $storex.user.onSignup({ authenticated: false })
+    },
+    async loginWithProvider (ctx, { provider, access_token }) {
+      const { data: { jwt: token } } = await api.loginWithProvider({ provider, access_token })
+      localStorage.setItem("token", token)
+      $storex.user.fetchAccessToken()
     }
   }
 )

@@ -43,6 +43,9 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::company.company"
+    },
+    "image": {
+      "type": "string"
     }
   }
 }

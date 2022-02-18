@@ -27,6 +27,9 @@
     },
     "extra": {
       "type": "json"
+    },
+    "edited": {
+      "type": "datetime"
     }
   }
 }

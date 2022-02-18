@@ -54,7 +54,8 @@ RUN chown -R coder /home/linuxbrew
 ## homebrew
 
 ## APPS
-COPY --chown=coder apps /home/coder/apps
+ENV CODX_APPS=/home/coder/apps
+COPY --chown=coder apps $CODX_APPS
 ##
 
 ## github

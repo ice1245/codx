@@ -1,6 +1,6 @@
 <template>
   <div
-    class="lg:py-4 py-3 lg:h-full lg:px-2 flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50"
+    class="lg:py-4 py-3 lg:h-full lg:px-2 flex lg:flex-col lg:justify-between items-center fixed lg:relative bottom-0 z-50 bg-gray-300"
   >
     <img
       :src="logos[logoIx]"
@@ -9,17 +9,18 @@
       @click="logoClick"
     />
     <div class="flex flex-col grow justify-start">
-      <div class="mb-2"
+      <div :class="['mb-2', isCurrentCompany(company) ? 'drop-shadow-lg' : '']"
         v-for="(company, cix) in companies" :key="cix"
       >
-        <div class="avatar ring ring-neutral-content rounded-btn cursor-pointer"
-        @click="$emit('switch-company', company)">
-          <div class="rounded-btn w-12 h-12">
+        <div :class="['avatar cursor-pointer p-1 border',
+          isCurrentCompany(company) ? 'border-pink-900' : '']"
+        @click="switchCompany(company)">
+          <div class="rounded-btn w-10 h-10">
             <img :src="company.avatar">
           </div>
       </div>
       </div>
-      <div class="avatar ring ring-accent rounded-full cursor-pointer mt-3 w-8 ml-2"
+      <div class="avatar ring ring-accent rounded-full cursor-pointer mt-3 w-8"
         @click="$emit('add-company')">
         <PlusIcon class="h-8 w-8" />
       </div>
@@ -29,7 +30,7 @@
     >
       <UserMenu
         menuItemClass="-left-3.5 bottom-12"
-        imgClass="h-8 w-8 rounded-full"
+        imgClass="h-10 w-10 rounded-full"
         @option="opt => $emit('sideBar', opt)"
       />
     </div>
@@ -70,6 +71,13 @@ export default {
   methods: {
     logoClick () {
       this.$emit('sideBar', 'explorer')
+      this.switchCompany()
+    },
+    switchCompany (company) {
+      this.$emit('switch-company', company)
+    },
+    isCurrentCompany ({ id }) {
+      return (this.$storex.company.currentCompany || {}).id === id
     }
   }
 };

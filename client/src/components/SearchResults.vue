@@ -7,7 +7,7 @@
       <div class="flex-none hidden px-2 mx-2 lg:flex">
         <div class="flex items-stretch">
           <a class="btn btn-ghost btn-sm rounded-btn"
-            @click="newCodingClinic = !newCodingClinic">
+            @click="newBlankClinic">
             <PlusCircleIcon class="inline-block w-5 mr-2 stroke-current" />
                 New...
           </a> 
@@ -69,49 +69,51 @@
     <div class="p-2 grid grid-cols-4 gap-5 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
       <div class="bg-base-100 text-base-content card rounded h-80 mr-4 cursor-pointer"
         v-for="(result, ix) in search.results" :key="ix"
-        @click="resultDialog = result"
         @mouseover="carrouselMe(result)"
         @mouseout="carrouselMe(null)"
       >
-        <div class="h-40 carousel rounded-box relative">
-          <div class="w-full carousel-item"
-            v-for="(mhtml, iix) in getResultMedia(result)" :key="iix"
-            >
-            <div v-html="mhtml" class="w-full"></div>
-          </div>
-          <div class="absolute w-full h-full"></div>
-        </div>
-        <div class="p-2 w-full text-base-content">
-          <div class="flex flex-row w-full">
-            <Avatar size="12" :url="result.user.avatar" />
-            <div class="ml-4 flex flex-col w-full">
-              <div class="flex flex-row justify-between w-full">
-                <strong>{{ `@${result.user.username}` }}</strong>
-                <div class="flex flex-row mr-2">
-                  <ThumbUpIcon class="w-4" /> {{ result.likeCount }}
-                  <ThumbDownIcon class="ml-2 w-4" /> {{ result.dislikeCount }}
-                </div>
-              </div>
-              <small>Category 4*</small>
+        <div @click="resultDialog = result">
+          <div class="h-40 carousel rounded-box relative">
+            <div class="w-full carousel-item"
+              v-for="(mhtml, iix) in getResultMedia(result)" :key="iix"
+              >
+              <div v-html="mhtml" class="w-full"></div>
             </div>
+            <div class="absolute w-full h-full"></div>
           </div>
-          <p class="prose">
-            <span>
-              {{ result.description }}
-            </span>
-          </p>
-          <div class="flex justify-end w-full gap-2 mt-1">
-            <button class="btn btn-sm bg-accent text-accent-content drop-shadow-md"
-              @click="runClinicTemplate(result)"
-            >
-              <TerminalIcon class="w-4 mr-1" /> Run
-            </button>
+          <div class="p-2 w-full text-base-content">
+            <div class="flex flex-row w-full">
+              <Avatar size="12" :url="result.user.avatar" />
+              <div class="ml-4 flex flex-col w-full">
+                <div class="flex flex-row justify-between w-full">
+                  <strong>{{ `@${result.user.username}` }}</strong>
+                  <div class="flex flex-row mr-2">
+                    <ThumbUpIcon class="w-4" /> {{ result.likeCount }}
+                    <ThumbDownIcon class="ml-2 w-4" /> {{ result.dislikeCount }}
+                  </div>
+                </div>
+                <small>Category 4*</small>
+              </div>
+            </div>
+            <p class="prose">
+              <span>
+                {{ result.description }}
+              </span>
+            </p>
           </div>
+        </div>
+        <div class="flex justify-end w-full gap-2 mt-1">
+          <button class="btn btn-sm bg-accent text-accent-content drop-shadow-md"
+            @click="runClinicTemplate(result)"
+          >
+            <TerminalIcon class="w-4 mr-1" /> Run
+          </button>
         </div>
       </div> 
     </div>
     <CodingClinicDialog
       v-if="newCodingClinic"
+      :clinicTemplates="clinicTemplates"
       @ok="onNewCodingClinic"
       @cancel="newCodingClinic = false"
     />
@@ -189,14 +191,9 @@ export default {
       showWelcome: true,
       resultDialog: null,
       carrouselMeTarget: null,
-      slidInterval: null
+      slidInterval: null,
+      clinicTemplates: null
     }
-  },
-  mounted () {
-    this.slidInterval = setInterval(() => this.slideResultMedia(), 4000)
-  },
-  unmounted () {
-    clearInterval(this.slidInterval)
   },
   computed: {
     search () {
@@ -249,9 +246,8 @@ export default {
     this.$storex.search.doSearch()
   },
   methods: {
-    onNewCodingClinic (template) {
-      this.newCodingClinic = false
-      console.log(template)
+    async onNewCodingClinic (settings) {
+      this.$emit('new-clinic', settings)
     },
     getResultMediaVideos (result) {
       return this.getResultMedia({
@@ -276,19 +272,27 @@ export default {
       return result.media.some(({ type }) => type === 'youtube' )
     },
     runClinicTemplate (result) {
-      this.$emit('new-clinic', result)
+      this.clinicTemplates = [result]
+      this.newCodingClinic = true
     },
     carrouselMe(result) {
       if (this.carrouselMeTarget !== result) {
         this.carrouselMeTarget = result
+        this.slideResultMedia ()
       }
     },
     slideResultMedia () {
+      clearTimeout(this.slidInterval)
       const { media } = this.carrouselMeTarget || {}
       if (!media || media.length === 1) {
         return
       }
       media.push(media.shift())
+      this.slidInterval = setTimeout(() => this.slideResultMedia(), 4000)
+    },
+    newBlankClinic () {
+      this.clinicTemplates = null
+      this.newCodingClinic = true
     }
   }
 }
