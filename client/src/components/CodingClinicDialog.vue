@@ -161,7 +161,7 @@ export default {
       return res.subscription
     },
     powerSizes () {
-      return this.subscription.powerSizes
+      return this.subscription
     },
     canCreate () {
       return this.name
@@ -173,8 +173,8 @@ export default {
       const settings = {
         name: this.name,
         description: this.description,
-        ...this.templates[this.template],
-        powerSize: this.powerSizes[this.powerSize]
+        template: this.templates[this.template],
+        roomSettings: this.powerSizes[this.powerSize]
       }
       this.$emit('ok', settings)
     },

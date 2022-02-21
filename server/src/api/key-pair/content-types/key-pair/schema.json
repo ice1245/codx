@@ -1,33 +1,31 @@
 {
   "kind": "collectionType",
-  "collectionName": "cloud_providers",
+  "collectionName": "key_pairs",
   "info": {
-    "singularName": "cloud-provider",
-    "pluralName": "cloud-providers",
-    "displayName": "CloudProvider",
-    "description": ""
+    "singularName": "key-pair",
+    "pluralName": "key-pairs",
+    "displayName": "KeyPair"
   },
   "options": {
     "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "name": {
+    "key": {
       "type": "string"
     },
-    "settings": {
-      "type": "json"
+    "value": {
+      "type": "text"
     },
     "company": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::company.company"
     },
-    "type": {
-      "type": "string"
-    },
-    "data": {
-      "type": "json"
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
     }
   }
 }

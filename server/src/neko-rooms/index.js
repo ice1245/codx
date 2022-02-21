@@ -6,12 +6,24 @@ axios.defaults.timeout = 30000
 class NekoRooms {
   baseUrl = `https://${process.env.NEKO_ROOMS_TRAEFIK_DOMAIN}`
   roomsUrl = `https://${process.env.NEKO_ROOMS_TRAEFIK_ROOMS_DOMAIN}`
+  user = process.env.NEKO_ROOMS_USER
+  password = process.env.NEKO_ROOMS_PWD
   maxConcurrent = 10
+
+  constructor (provider) {
+    if (provider) {
+      this.baseUrl = provider.baseUrl
+      this.roomsUrl = provider.roomsUrl
+      this.user = provider.user
+      this.password = provider.pwd
+      this.maxConcurrent = provider.maxConcurrent || 10
+    }
+  }
   nekoAxiosAuth () {
     return {
       auth: {
-        username: process.env.NEKO_ROOMS_USER,
-        password: process.env.NEKO_ROOMS_PWD
+        username: this.user,
+        password: this.password
       }
     }
   }
@@ -130,5 +142,4 @@ class NekoRooms {
   }
 }
 
-const nekoRooms = new NekoRooms()
-module.exports = nekoRooms
+module.exports = NekoRooms

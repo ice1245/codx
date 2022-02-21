@@ -4,7 +4,7 @@
       @sideBar="toggleSideBar"
       @switch-company="onSwitchCompany"
       class="bg-neutral-focus text-neutral-content" />
-    <div class="detail-bar w-80 px-4 border-r">
+    <div class="detail-bar w-80 px-4 border-r" v-if="explorerVisible || profileVisible">
       <Explorer class="explorer"
         v-if="explorerVisible"
         @coding-clinics="onCodingClinics"
@@ -42,7 +42,7 @@
           v-if="showHeader"
         />
       <div class="lg:flex flex-row hidden h-full w-full">
-        <div class="w-2/3" v-if="currentClinic">
+        <div :class="[chatVisible ? 'w-2/3' : 'grow']" v-if="currentClinic">
           <NekoRoom
             :room="currentClinic"
           />

@@ -1,6 +1,6 @@
 <template>
   <div class="neko-room w-full h-full relative">
-    <iframe :class="['w-full h-full', loading ? 'opacity-0' : '']" :src="pageReady ? `${url}&ts=${ts}` : ''" frameborder="0" ref="nekoFrame" @load="onLoad" v-if="pageReady">
+    <iframe :class="['w-full h-full', loading ? 'opacity-0' : '']" :src="pageReady ? `${url}&ts=${ts}` : ''" frameborder="0" ref="nekoFrame" @load="onLoad()" v-if="pageReady">
     </iframe>
     <div class="absolute top-0 left-0 right-0 bottom-0 place-content-center prose" v-if="loading">
       <h2>Setting up room</h2>
@@ -31,6 +31,11 @@ export default {
       const { user: { username } } = this.$storex.user
       return `${url}/?pwd=${nekoAdminPwd}&displayName=${username}`
     },
+    testUrl () {
+      const { url, nekoAdminPwd } = this.room
+      const { user: { username } } = this.$storex.user
+      return `${url}/emoji.json?pwd=${nekoAdminPwd}&displayName=${username}`
+    },
     document () {
       const { nekoFrame: { contentWindow: { document } } } = this.$refs
       return document
@@ -57,7 +62,7 @@ export default {
     async checkPage () {
       this.checkCount = this.checkCount + 1
       try {
-        await axios.get(this.url + '/emoji.json')
+        await axios.get(this.testUrl)
         this.checkCount = 100
         setTimeout(() => this.pageReady = true, 300)
       } catch {
@@ -67,7 +72,7 @@ export default {
     onLoad () {
       if (!this.overlay) {
         this.ts = new Date().getTime()
-        this.cheakTout = setTimeout(() => this.onLoad(), 1000)
+        setTimeout(() => this.onLoad(), 1000)
         return
       }
       const style = `

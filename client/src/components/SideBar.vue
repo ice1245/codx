@@ -20,7 +20,7 @@
           </div>
       </div>
       </div>
-      <div class="avatar ring ring-accent rounded-full cursor-pointer mt-3 w-8"
+      <div class="avatar ring ring-accent rounded-full cursor-pointer mt-3 mx-auto w-8"
         @click="$emit('add-company')">
         <PlusIcon class="h-8 w-8" />
       </div>

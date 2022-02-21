@@ -3,7 +3,6 @@
 /**
  *  neko-room controller
  */
-
 const { createCoreController } = require('../../strapix')
 const nekoRooms = require('../../../neko-rooms')
 
@@ -14,7 +13,7 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       let { chat, settings } = body
       chat = chat?.id ? await strapi.$api('chat').findOne(chat.id) : null
       user.token = authorization.split(" ")[1]
-      const room = await codx.room.createRoom({ user, provider: 'hetzner', settings })
+      const room = await codx.room.createRoom({ user, settings })
       const nekoRoom = await strapi.$api('neko-room').create({ data: {
         chat,
         settings,
@@ -39,7 +38,7 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
         return { isValid }
       }
       const nekoRooms = await strapi.$query('neko-room').findMany()
-      const http = nekoRooms.reduce((conf, { room: { proxy: { middlewares, services, routers} } }) => {
+      const http = nekoRooms.reduce((conf, { room: { proxy: { middlewares, services, routers } } }) => {
         conf.middlewares = {
           ...conf.middlewares,
           ...middlewares
@@ -59,6 +58,11 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
         routers: {}
       })
       return { http }
+    },
+    async installer ({ params: { id }, state: { user }, request: { ip, header: { authorization } } }) {
+      user.token = authorization.split(" ")[1]
+      const cloudProvider = await strapi.$api('cloud-provider').findOne(id, { populate: { company: true } })
+      // const userCompanies = (await codx.user.companies(user)).filter(({ id: cid, admins }) => cid === id && )
     }
   }
 });

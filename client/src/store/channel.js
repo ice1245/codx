@@ -6,7 +6,7 @@ import api from '@/api'
 export const namespaced = true
 
 export const state = () => ({
-  channels: [],
+  channels: null,
   currentChannel: null
 })
 
@@ -15,109 +15,10 @@ export const getters = getterTree(state, {
 
 export const mutations = mutationTree(state, {
   setChannels (state, channels = []) {
-    state.channles = channels.reduce((acc, v) => [acc, (acc[v.id] = v)][0], {})
+    state.channels = channels.sort((a, b) => a.name >= b.name ? -1 : 1)
   },
   setCurrentChannel (state, channel) {
-    state.currentChannel = channel ? {
-      ...channel,
-      search: {
-        topic: "",
-        results: [
-          { votes: 100, title: 'How do I undo a change on git?', tags: ['git', 'codding'],
-            answers: [
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-              { ts: new Date().getTime(), user: { username: 'gbrian', avatar: 'https://avatars.dicebear.com/api/open-peeps/test.svg' },
-                text: `#Some question text in markdown
-                * entry 1
-                * entry 2
-              
-              and more info ` },
-            ]
-          },
-          { votes: 20, title: 'Error when executing something after having done something silly', tags: ['error', 'codding', 'docker', 'data'], answers: [1,1,1,1,1,1] },
-          { votes: 0, title: 'How I can extract some data from something', tags: ['git', 'codding', 'tag-data', 'error', 'codding',], answers: [1,1,1,1,1,1] },
-          { votes: 100, title: 'How do I undo a change on git?', tags: ['git', 'codding'], answers: [1,1,1,1,1,1] },
-          { votes: 20, title: 'Error when executing something after having done something silly', tags: ['error', 'codding', 'docker', 'data'], answers: [1,1,1,1,1,1] },
-          { votes: 0, title: 'How I can extract some data from something', tags: ['git', 'codding', 'tag-data', 'error', 'codding',], answers: [1,1,1,1,1,1] },
-          { votes: 100, title: 'How do I undo a change on git?', tags: ['git', 'codding'], answers: [1,1,1,1,1,1] },
-          { votes: 20, title: 'Error when executing something after having done something silly', tags: ['error', 'codding', 'docker', 'data'], answers: [1,1,1,1,1,1] },
-          { votes: 0, title: 'How I can extract some data from something', tags: ['git', 'codding', 'tag-data', 'error', 'codding',], answers: [1,1,1,1,1,1] },
-          { votes: 20, title: 'Error when executing something after having done something silly', tags: ['error', 'codding', 'docker', 'data'], answers: [1,1,1,1,1,1] },
-          { votes: 0, title: 'How I can extract some data from something', tags: ['git', 'codding', 'tag-data', 'error', 'codding',], answers: [1,1,1,1,1,1] },
-          { votes: 100, title: 'How do I undo a change on git?', tags: ['git', 'codding'], answers: [1,1,1,1,1,1] },
-          { votes: 20, title: 'Error when executing something after having done something silly', tags: ['error', 'codding', 'docker', 'data'], answers: [1,1,1,1,1,1] },
-          { votes: 0, title: 'How I can extract some data from something', tags: ['git', 'codding', 'tag-data', 'error', 'codding',], answers: [1,1,1,1,1,1] },
-          { votes: 100, title: 'How do I undo a change on git?', tags: ['git', 'codding'], answers: [1,1,1,1,1,1] },
-          { votes: 20, title: 'Error when executing something after having done something silly', tags: ['error', 'codding', 'docker', 'data'], answers: [1,1,1,1,1,1] },
-          { votes: 0, title: 'How I can extract some data from something', tags: ['git', 'codding', 'tag-data', 'error', 'codding',], answers: [1,1,1,1,1,1] },
-        ]
-      }
-    } : null
+    state.currentChannel = channel
   }
 })
 
@@ -129,7 +30,7 @@ export const actions = actionTree(
     async openChannel (ctx, channel = {}) {
       $storex.channel.setCurrentChannel(channel)
     },
-    async createChannel (ctx, channelSettings) {
+    async createChannel ({ state: { channels }}, channelSettings) {
       const { user: { id } } = $storex.user
       const { data: channel } = await api.createChanne({
         ...channelSettings,
@@ -137,6 +38,7 @@ export const actions = actionTree(
         user: id,
         entries: []
       })
+      $storex.channel.setChannels([...channels, channel])
     }
   },
 )

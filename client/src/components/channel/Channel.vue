@@ -44,7 +44,7 @@
       <div class="channel-results ml-2 mr-4">
           <QAList
             class="w-full h-full"
-            :results="channel.search.results"
+            :results="channel.entries"
             @show-qa="qa => currentQA = qa"
           />
       </div>

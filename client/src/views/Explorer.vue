@@ -35,7 +35,7 @@
       v-if="channelsOpen"
     >
       <div class="text-base pl-3 cursor-pointer ml-3 mt-2"
-        v-for="(channel, ix) in $storex.chat.channels" :key="ix"
+        v-for="(channel, ix) in $storex.channel.channels" :key="ix"
         @click="$emit('open-channel', channel)"
       >
         <HashtagIcon class="h-5 w-5 float-left mr-2" />{{ channel.name }}
