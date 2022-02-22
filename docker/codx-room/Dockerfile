@@ -59,7 +59,7 @@ COPY --chown=coder apps $CODX_APPS
 ##
 
 ## github
-RUN mkdir /home/coder/codx
+RUN --chown=coder mkdir /home/coder/codx
 ##
 
 ENV PATH=$PATH:/usr/share/code

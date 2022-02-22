@@ -46,6 +46,12 @@
     },
     "image": {
       "type": "string"
+    },
+    "config": {
+      "type": "json"
+    },
+    "readme": {
+      "type": "string"
     }
   }
 }

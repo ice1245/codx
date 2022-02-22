@@ -117,40 +117,13 @@
       @ok="onNewCodingClinic"
       @cancel="newCodingClinic = false"
     />
-    <Dialog
-      v-if="resultDialog"
+    <CodingClinicTemplate
       @close="resultDialog = null"
       @ok="resultDialog = null"
-      :btns="['ok']"
-    >
-      <template v-slot:icon>
-        <Avatar size="12" :url="resultDialog.user.avatar" />
-      </template>
-      <div class="max-w-lg p-4 space-x-4 carousel carousel-center bg-neutral rounded-box">
-        <div class="w-full carousel-item"
-          v-for="(mhtml, iix) in getResultMedia(resultDialog)" :key="iix"
-          >
-          <div v-html="mhtml" class="w-full"></div>
-        </div>
-      </div>
-      <div class="flex flex-row w-full">
-        <div class="ml-4 flex flex-col w-full">
-          <div class="flex flex-row justify-between w-full">
-            <strong>{{ `@${resultDialog.user.username}` }}</strong>
-            <div class="flex flex-row mr-2">
-              <ThumbUpIcon class="w-4" /> {{ resultDialog.likeCount }}
-              <ThumbDownIcon class="ml-2 w-4" /> {{ resultDialog.dislikeCount }}
-            </div>
-          </div>
-          <small>Category 4*</small>
-        </div>
-      </div>
-      <p class="prose">
-        <span>
-          {{ resultDialog.description }}
-        </span>
-      </p>
-    </Dialog>
+      v-if="resultDialog"
+      :template="resultDialog"
+      :media="getResultMedia(resultDialog)"
+    />
   </div>
 </template>
 <script>
@@ -164,8 +137,7 @@ import {
 } from '@heroicons/vue/outline'
 import Avatar from '@/components/Avatar.vue'
 import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
-import Dialog from '@/components/Dialog.vue'
-
+import CodingClinicTemplate from '@/components/CodingClinicTemplate.vue'
 export default {
   components: {
     Avatar,
@@ -176,7 +148,7 @@ export default {
     PlusCircleIcon,
     CogIcon,
     CodingClinicDialog,
-    Dialog
+    CodingClinicTemplate
   },
   data () {
     return {
