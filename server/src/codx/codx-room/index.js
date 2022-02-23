@@ -95,6 +95,7 @@ module.exports = strapi => {
       } = settings
       const [nekoRoomsProvider = {}] = await strapi.$query('cloud-provider').findMany({ filters: { name: provider }})
       console.log("create container", { provider, nekoRoomsProvider })
+      const { mounts = [] } = nekoRoomsProvider.settings || {}
       const nekoRooms = new NekoRooms(nekoRoomsProvider.settings)
 
       const nekoPwd = `${uuid()}`.slice(0, 5)
@@ -122,7 +123,8 @@ module.exports = strapi => {
           GIT_REPO_PROJECT: repository,
           GIT_REPO_FOLDER: folder,
           ...user.envs
-        }
+        },
+        mounts
       }
       const room = await nekoRooms.create(nekoSettings)
       const proxyInfo = { 

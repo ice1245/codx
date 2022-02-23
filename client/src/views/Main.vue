@@ -4,8 +4,12 @@
       @sideBar="toggleSideBar"
       @switch-company="onSwitchCompany"
       class="bg-neutral-focus text-neutral-content" />
-    <div class="detail-bar w-80 px-4 border-r" v-if="explorerVisible || profileVisible">
-      <Explorer class="explorer"
+    <div :class="[
+      'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md',
+      'lg:w-2/6 lg:px-4 lg:relative lg:ml-0',
+      'absolute w-36 ml-16 z-10 w-48']"
+      v-if="explorerVisible || profileVisible">
+      <Explorer class="explorer w-full"
         v-if="explorerVisible"
         @coding-clinics="onCodingClinics"
         @open-chat="chat => onOpenChat(chat)"

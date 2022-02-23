@@ -14,13 +14,17 @@
               <div
                 v-for="(entry, ix) in message.entries" :key="ix"
               >
-                <p class="text-2xs flex items-center justify-end" v-if="entry.createdAt">
+                <p class="text-2xs flex items-center" v-if="entry.createdAt">
                   <ClockIcon class="w-3 mr-0.5" />
                   {{ formatTime(entry) }}
                 </p>
-                <h3 class="ttext-md md:text-base prose lg:prose-lg xl:prose-xl">
-                  <div v-html="formatMessage(entry)"></div>
-                </h3>
+                <MessageOptions
+                  menuItemClass="-left-2 -mt-1"
+                  imgClass="w-5 transform rotate-90"
+                  @edit-message="$emit('edit-message', entry)"
+                >
+                  <div v-html="formatMessage(entry)" class="prose"></div>
+                </MessageOptions>
               </div>
             </div>
             <div class="arrow_icon_left bg-primary text-primary-content w-3 h-3"></div>

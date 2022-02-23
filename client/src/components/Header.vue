@@ -19,9 +19,7 @@
           :user="user"
           class="mr-2"
         />
-        <div class="avata  w-10 h10">
-          <UserAdd class=" w-10 h10" @user="user => addUser(user)" />
-        </div>
+        <UserAdd class="ml-2 w-18 h18" @user="user => addUser(user)" />
       </div>
     </div>
     <div class="flex items-center space-x-6">

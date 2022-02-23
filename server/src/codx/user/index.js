@@ -15,9 +15,9 @@ module.exports = strapi => {
         followed: network.followed.map(this.filteredUser),
       }
     },
-    async subscriptions (companies) {
+    async subscriptions (companies = []) {
       const paidSubs = companies
-                        .filter(({ settings: { rooms } }) => !!rooms)
+                        .filter(({ settings }) => !!settings?.rooms)
                         .map(({ id, settings: { rooms } }) => ({
                           company: id,
                           subscription: rooms

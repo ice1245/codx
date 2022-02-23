@@ -1,8 +1,10 @@
 <template>
   <div class="dropdown dropdown-left">
-    <div tabindex="0" class="">
-      <UserAddIcon :class="`hidden md:block cursor-pointer w-${size || 5}`" />
-    </div> 
+    <div class="avatar ring rounded-full p-2" tabindex="0">
+      <div class="w-8 h-8 rounded-full">
+        <UserAddIcon :class="`hidden md:block cursor-pointer w-${size || 8}`" />
+      </div>
+    </div>
     <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
       <li v-for="(user, ix) in onlineFriends" :key="ix"
         class="cursor-pointer"
@@ -27,7 +29,10 @@ export default {
   },
   computed: {
     onlineFriends () {
-      return this.$storex.network.onlineFriends
+      return this.$storex.network.friends
+    },
+    visible () {
+      return this.onlineFriends.length !== 0
     }
   }
 }

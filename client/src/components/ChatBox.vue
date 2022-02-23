@@ -124,9 +124,10 @@ export default {
     async sendMessage () {
       await this.$storex.chat.sendMessage({
         chat: this.chat,
+        ...this.editing,
         content: this.message
       })
-      this.message = null
+      this.abortEditing()
     },
     groupedMessages (messages) {
       const { users } = this.chat
