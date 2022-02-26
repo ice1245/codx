@@ -36,19 +36,28 @@
       >
         <VideoCameraIcon class="hidden md:block cursor-pointer w-5 "/>
       </div>
-      <div
-        :class="['avatar', 'btn btn-sm btn-error rounded-md text-white']"
-          v-if="call"
-         @click="onEndCall"
-      >
-        <PhoneMissedCallIcon class="hidden md:block cursor-pointer w-5 "/>
+
+      <div class="dropdown">
+        <label tabindex="0"
+          :class="['m-1 btn btn-sm',
+          liveClinic ? 'online  btn-accent rounded-md' : 'btn-ghost']"
+          @click="liveClinic && $emit('leave-clinic')"
+        >
+          <TerminalIcon class="w-6" />
+        </label>
+        <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52" v-if="!liveClinic">
+          <li class="group relative" v-for="(clinic, ix) in clinics" :key="ix"
+            @click="$emit('join-clinic', clinic.id)"
+          >
+            <a>{{ clinic.name }}</a>
+            <div class="group-hover:visible invisible ml-4 pt-1 absolute right-2 top-1 cursor-pointer">
+              <TrashIcon class="w-5" @click.stop="$emit('delete-clinic', clinic)" />
+            </div>
+          </li>
+          <li @click="$emit('new-clinic')"><a>New...</a></li>
+        </ul>
       </div>
-      <div
-        :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
-         @click="liveClinic ? $emit('leave-clinic') : $emit('coding-clinic')"
-      >
-        <TerminalIcon class="inline-block w-5 mr-2 stroke-current cursor-pointer online" />
-      </div>
+
       <div class="form-control">
         <div class="relative">
           <input type="text" placeholder="Search" class="w-full pr-16 input input-sm input-primary input-bordered"> 
@@ -67,7 +76,8 @@ import {
   TerminalIcon,
   MenuIcon,
   ChatAltIcon,
-  PhoneMissedCallIcon
+  PhoneMissedCallIcon,
+  TrashIcon
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -82,7 +92,8 @@ export default {
     TerminalIcon,
     MenuIcon,
     ChatAltIcon,
-    PhoneMissedCallIcon
+    PhoneMissedCallIcon,
+    TrashIcon
   },
   props: ['chat', 'explorerVisible', 'chatVisible'],
   data () {
@@ -114,6 +125,26 @@ export default {
     },
     showChatToggle () {
       return this.liveClinic
+    },
+    clinics () {
+      return this.$storex.clinic.clinics
+    }
+  },
+  watch: {
+    micOn () {
+      if (this.call && !this.micOn && !this.camOn) {
+        this.onEndCall()
+      }
+    },
+    camOn () {
+      if (this.call && !this.micOn && !this.camOn) {
+        this.onEndCall()
+      }
+    },
+    chat () {
+      if (this.call) {
+        this.onEndCall()
+      }
     }
   },
   methods: {
@@ -139,11 +170,11 @@ export default {
       this.$storex.call.endCurrentCall()
     },
     async newCall (type) {
-      const { chat: { roomId, users }} = this
+      const { chat: { id, roomId, users } = { roomId: new Date(), users: [] }} = this
       const { user: { username } } = this.$storex.user
 
       await this.$storex.call.createNewCall({ roomId, type, users })
-      this.$storex.chat.sendMessage({
+      false && id && this.$storex.chat.sendMessage({
         chat: this.chat,
         content: `@${username} started new call.`,
         extra: {

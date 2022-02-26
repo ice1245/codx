@@ -2,8 +2,10 @@
   <div>
     <div class="mt-2 mb-6 w-full">
       <label class="input-group input-group-sm w-full">
-        <input type="text" placeholder="Search..." class="input input-bordered input-sm w-full"> 
-        <span class="cursor-pointer text-base-content">Go</span>
+        <input type="text"
+          v-model="searchString"
+          placeholder="Search..." class="input input-bordered input-sm w-full" @keypress.enter="doSearch"> 
+        <span class="cursor-pointer text-base-content" @click="doSearch">Go</span>
       </label>
     </div>
 
@@ -18,7 +20,8 @@
       <MapIcon class="h-5 w-5 float-left mr-2" />Tasks assigned <strong>(10)</strong>
     </div>
     <div class="text-base pl-3 cursor-pointer mb-2"><ChatAltIcon class="h-5 w-5 float-left mr-2" />Recent</div>
-    <div class="text-base pl-3 cursor-pointer mb-2"><StarIcon class="h-5 w-5 float-left mr-2" />Starred messaged</div>
+    <div class="text-base pl-3 cursor-pointer mb-2"><StarIcon class="h-5 w-5 float-left mr-2" />Starred messages</div>
+    <div class="text-base pl-3 cursor-pointer mb-2"><CalendarIcon class="h-5 w-5 float-left mr-2" />Next events</div>
 
     <div class="text-base pl-3 mt-3 cursor-pointer"
       @click="channelsOpen = !channelsOpen"
@@ -41,7 +44,7 @@
         <HashtagIcon class="h-5 w-5 float-left mr-2" />{{ channel.name }}
       </div>
       <div class="text-base pl-3 cursor-pointer ml-3 mt-2"
-        @click="createNewChannel = true"
+        @click="onCreateNewChannel"
       >
         <PlusIcon class="h-5 w-5 float-left mr-2" /> New channel
       </div>
@@ -101,7 +104,8 @@ import {
   ChatAltIcon,
   StarIcon,
   MapIcon,
-  TrashIcon
+  TrashIcon,
+  CalendarIcon
 } from '@heroicons/vue/outline'
 import Dialog from '@/components/Dialog.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
@@ -118,6 +122,7 @@ export default {
     StarIcon,
     MapIcon,
     TrashIcon,
+    CalendarIcon,
     Dialog,
     LoadingDialog,
     ChannelCreateDialog
@@ -128,7 +133,8 @@ export default {
       directMessagesOpen: true,
       confirmDeleteChat: null,
       loading: false,
-      createNewChannel: false
+      createNewChannel: false,
+      searchString: null
     }
   },
   computed: {
@@ -159,6 +165,14 @@ export default {
     },
     chatName (chat) {
       return chat.users.map(u => u.username).join(" - ") 
+    },
+    onCreateNewChannel () {
+      if (!this.$root.login()) return
+      this.createNewChannel = true
+    },
+    doSearch () {
+      const { searchString: q } = this
+      q && this.$storex.search.doSearch({ q })
     }
   }
 };

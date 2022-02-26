@@ -11,6 +11,15 @@ export const state = () => ({
 })
 
 export const getters = getterTree(state, {
+  companies: () => $storex.user.user.companies,
+  webrtcSettings: ({ currentCompany }) => {
+    if (currentCompany?.settings.webrtc) {
+      return currentCompany.settings.webrtc
+    }
+    const company = $storex.company.companies
+            .filter(({ settings: { webrtc } }) => !!webrtc)[0]
+    return company?.settings.webrtc
+  }
 })
 
 export const mutations = mutationTree(state, {

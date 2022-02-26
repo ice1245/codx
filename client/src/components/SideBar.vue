@@ -65,7 +65,7 @@ export default {
       return this.$storex.user.user
     },
     companies () {
-      return this.user.companies
+      return this.user?.companies
     }
   },
   methods: {

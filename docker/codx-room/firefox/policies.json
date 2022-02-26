@@ -76,7 +76,7 @@
     "FlashPlugin": {},
     "HardwareAcceleration": false,
     "Homepage": {
-      "URL": "http://codx-coder:8080",
+      "URL": "http://localhost:9080/?folder=/home/neko/codx",
       "Additional": [],
       "StartPage": "home"
     },

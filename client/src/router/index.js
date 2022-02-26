@@ -40,8 +40,8 @@ router.beforeEach(async (to, from, next) => {
   } else {
     await $storex.user.fetchAccessToken()
   }
-  if (!$storex.user.authenticated) {
-    fullPath === '/' && next("/login");
+  if (!$storex.user.authenticated && fullPath !== '/login') {
+    fullPath !== '/' && next("/login");
   }
   next();
 });

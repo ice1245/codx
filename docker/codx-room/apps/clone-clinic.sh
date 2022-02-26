@@ -1,7 +1,7 @@
 echo "entrypoint $GIT_REPO_PROJECT"
 set -x
 if [ ! -z "$GIT_REPO_PROJECT" ]; then
-  cd /home/coder
+  cd $CODER_HOME
   if [ -z "$GIT_REPO_FOLDER" ]; then
     git clone --depth 1 --branch ${GIT_REPO_BRANCH:-main} $GIT_REPO_PROJECT
   else 

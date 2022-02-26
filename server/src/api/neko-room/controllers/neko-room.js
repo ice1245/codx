@@ -15,13 +15,14 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       user.token = authorization.split(" ")[1]
       const room = await codx.room.createRoom({ user, settings })
       const nekoRoom = await strapi.$api('neko-room').create({ data: {
+        user,
         chat,
         settings,
         room,
         name: settings.name,
         description: settings.description
       }})
-      return codx.room.getRoomPublicInfo(nekoRoom)
+      return codx.room.getRoomPublicInfo({ ...nekoRoom, user })
     },
     async find ({ state: { user }}) {
       return codx.room.listRooms(user)
@@ -29,7 +30,7 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
     async delete ({ state: { user }, params: { id } }) {
       const { room } = await strapi.$api('neko-room').findOne(id)
       console.log("neko-rooms", "delete", { user, room })
-      await codx.room.deleteRoom(room)
+      codx.room.deleteRoom(room)
       return strapi.$api('neko-room').delete(id)
     },
     async proxy ({ query: { token }}) {
@@ -37,8 +38,8 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       if (!isValid) {
         return { isValid }
       }
-      const nekoRooms = await strapi.$query('neko-room').findMany()
-      const http = nekoRooms.reduce((conf, { room: { proxy: { middlewares, services, routers } } }) => {
+      const nekoRooms = await codx.room.roomProxies()
+      const http = nekoRooms.reduce((conf, { middlewares, services, routers }) => {
         conf.middlewares = {
           ...conf.middlewares,
           ...middlewares

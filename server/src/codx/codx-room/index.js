@@ -4,10 +4,9 @@ const uuid = require('uuid').v4;
 
 module.exports = strapi => {
   return {
-    exposeRoomService ({ username, roomName, serviceId, serviceUrl, prefix }) {
-      const { pathPrefix, url, wurl } = this.getRoomPublicUrls({ username, roomName })
+    createTraefikConfiguration ({ pathPrefix, roomName, serviceUrl, prefix }) {
       const middlewares = {
-        [`codx-room-${serviceId}prf`]: {
+        [`codx-room-${roomName}prf`]: {
           stripPrefix: {
             prefixes: [
               pathPrefix + "/"
@@ -15,7 +14,7 @@ module.exports = strapi => {
             forceSlash: true
           }
         },
-        [`codx-room-${serviceId}rdr`]: {
+        [`codx-room-${roomName}rdr`]: {
           redirectRegex: {
             regex: pathPrefix + "$",
             replacement: pathPrefix + "/"
@@ -23,18 +22,16 @@ module.exports = strapi => {
         },
       }
       if (prefix) {
-        middlewares[`codx-room-${serviceId}add`] = {
+        middlewares[`codx-room-${roomName}add`] = {
           addprefix: {
             prefix: `/${prefix}`
           }
         }
       }
       return {
-        url,
-        wurl,
         middlewares,
         services: {
-          [`codx-room-${serviceId}`]: {
+          [`codx-room-${roomName}`]: {
             loadBalancer: {
               servers: [
                 {
@@ -46,18 +43,26 @@ module.exports = strapi => {
           }
         },
         routers: {
-          [`codx-room-${serviceId}`]: {
+          [`codx-room-${roomName}`]: {
             entryPoints: [
               "websecure"
             ],
             middlewares: Object.keys(middlewares),
-            service: `codx-room-${serviceId}`,
+            service: `codx-room-${roomName}`,
             rule: "Host(`codx.meetnav.com`) && PathPrefix(`" + pathPrefix + "`)",
             tls: {
               "certResolver": process.env.PROXY_TLS_RESOLVER || "myresolver"
             }
           }
         }
+      }
+    },
+    exposeRoomService ({ username, roomName, serviceUrl, prefix }) {
+      const { pathPrefix, url, wurl } = this.getRoomPublicUrls({ username, roomName })
+      return {
+        url,
+        wurl,
+        ...this.createTraefikConfiguration ({ pathPrefix, roomName, serviceUrl, prefix })
       }
     },
     getRoomPublicUrls ({ username, roomName}) {
@@ -68,13 +73,12 @@ module.exports = strapi => {
         pathPrefix
       }
     },
-    createRoomProxyInfo ({ id, username, roomName, ip, serviceId, serviceUrl, prefix }) {
+    createRoomProxyInfo ({ id, username, roomName, ip }) {
       return {
         username,
         roomName,
         ip,
-        id,
-        ...this.exposeRoomService({ username, roomName, serviceId, serviceUrl, prefix })
+        id
       }
     },
     async waitForRoom () {
@@ -225,11 +229,22 @@ module.exports = strapi => {
               },
             }
           ]
+        },
+        populate: {
+          user: true
         }
       })
-      return nekoRooms.map(this.getRoomPublicInfo.bind(this))
+      return nekoRooms
+        .filter(room => room.user)
+        .map(room => {
+          if(!room.user) {
+            room.user = user
+          }
+          return this.getRoomPublicInfo(room)
+        })
     },
-    getRoomPublicInfo ({ id, name, description, createdAt, room: { nekoPwd, nekoAdminPwd, proxy: { url } } }) {
+    getRoomPublicInfo ({ id, name, description, createdAt, user: { username }, room: { neko: { name: roomName }, nekoPwd, nekoAdminPwd } }) {
+      const { url } = this.getRoomPublicUrls({ username, roomName })
       return {
         id,
         name,
@@ -239,6 +254,12 @@ module.exports = strapi => {
         nekoPwd,
         nekoAdminPwd
       }
+    },
+    async roomProxies () {
+      const nekoRooms = await strapi.$query('neko-room').findMany({ populate: { user: true }})
+      return nekoRooms.map(({ user: { username }, room: { neko: { name: roomName, url: serviceUrl,  } } }) =>
+          this.exposeRoomService({ username, roomName, serviceUrl, prefix: roomName })
+      )
     }
   }
 }

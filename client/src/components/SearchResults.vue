@@ -1,10 +1,10 @@
 <template>
   <div class="flex flex-col" v-if="search">
     <div class="navbar mb-2 shadow-lg" v-if="!showWelcome">
-      <div class="flex-1 px-2 mx-2">
-        <span class="text-lg font-bold">{{ search.topic }}</span>
+      <div class="px-2 mx-2">
+        <div><span class="text-lg font-bold">{{ search.topic }}</span></div>
       </div>
-      <div class="flex-none hidden px-2 mx-2 lg:flex">
+      <div class="flex-none hidden px-2 mx-2 lg:flex" v-if="user">
         <div class="flex items-stretch">
           <a class="btn btn-ghost btn-sm rounded-btn"
             @click="newBlankClinic">
@@ -31,22 +31,14 @@
           </a>
         </div>
       </div> 
-      <div class="flex-none">
-        <button class="btn btn-square btn-ghost">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-6 h-6 stroke-current">           
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>               
-          </svg>
-        </button>
-      </div>
     </div>
-
-    <div class="flex items-center w-full px-4 py-10 bg-cover bg-base-200"
+    <div class="flex items-center w-full h-2/3 px-4 py-10 bg-cover bg-base-200"
       :style="`background-image: url('${search.banner.bgImage}');`"
       v-else
     >
-      <div class="card glass lg:card-side text-neutral-content">
-        <figure class="p-6">
-          <img :src="search.banner.image" class="shadow-lg" style="width:300px">
+      <div class="card glass lg:card-side text-neutral-content h-full">
+        <figure class="p-6 scroll-hidden">
+          <img :src="search.banner.image" class="shadow-lg h-3/6" style="width:300px">
         </figure> 
         <div class="max-w-md card-body">
           <h2 class="card-title">{{ search.topic }}</h2> 
@@ -65,6 +57,7 @@
         {{ tag }} 
       </button> 
     </div>
+    <div class="my-2" v-if="searchString"><i>results for: {{ searchString }}</i></div>
 
     <div class="p-2 grid grid-cols-4 gap-5 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
       <div class="bg-base-100 text-base-content card rounded h-80 mr-4 cursor-pointer"
@@ -168,6 +161,9 @@ export default {
     }
   },
   computed: {
+    user () {
+      return this.$storex.user.user
+    },
     search () {
       const { currentSearch } = this.$storex.search
       if (!currentSearch) {
@@ -200,6 +196,7 @@ export default {
         })
       
       return {
+        query: currentSearch.query,
         topic: '#coding-clinic',
         description: 'Find developers to connect and work together in an online development environment. A coding clinic is a timeboxed session where two or more participants will collaborate to solve a problem',
         banner: {
@@ -212,10 +209,11 @@ export default {
               .filter((v, ix, arr) => arr.indexOf(v) === ix),
         results: [...currentSearch.results, ...results]
       }
+    },
+    searchString () {
+      const { search: { query: { q } = {}} } = this
+      return q
     }
-  },
-  created () {
-    this.$storex.search.doSearch()
   },
   methods: {
     async onNewCodingClinic (settings) {
@@ -244,6 +242,7 @@ export default {
       return result.media.some(({ type }) => type === 'youtube' )
     },
     runClinicTemplate (result) {
+      if (!this.$root.login()) return
       this.clinicTemplates = [result]
       this.newCodingClinic = true
     },

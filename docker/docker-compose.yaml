@@ -105,6 +105,7 @@ services:
       - "--providers.http=true"
       - "--accesslog=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=${NEKO_ROOMS_TRAEFIK_NETWORK}"
       - "--providers.http.endpoint=https://$API_DOMAIN/api/neko-rooms/proxy?token=$API_TOKEN"
       - "--providers.http.pollInterval=15s"
       - "--entrypoints.websecure.address=:443"
@@ -113,6 +114,7 @@ services:
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     ports:
       - "443:443"
+      - "8800:8080"
     volumes:
       - "$CODX_PATH/docker/letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"

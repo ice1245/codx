@@ -19,7 +19,7 @@ export const getters = getterTree(state, {
 })
 
 export const mutations = mutationTree(state, {
-  setNetwork (state, { friends }) {
+  setNetwork (state, { friends = [] } = {}) {
     state.friends = friends.map(f => ({ ...f, isFriend: true }))
       .reduce((acc, v) => [acc, (acc[v.id] = v)][0], {})
     $storex.network.updateAllUsers()
@@ -34,12 +34,16 @@ export const mutations = mutationTree(state, {
   },
   updateAllUsers (state) {
     const { user } = $storex.user
-    state.allUsers = {
-      [user.id]: {
-        ...user,
-        isMe: true
-      },
-      ...state.friends
+    if (user) {
+      state.allUsers = {
+        [user.id]: {
+          ...user,
+          isMe: true
+        },
+        ...state.friends
+      }
+    } else {
+      state.allUsers = null
     }
   }
 })

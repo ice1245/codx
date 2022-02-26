@@ -5,6 +5,9 @@ class Strapi {
   token = null
   get headers () {
     const { token } = this
+    if (!token) {
+      return {}
+    }
     return {
       "Authorization": "Bearer " + token
     }

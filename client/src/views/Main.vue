@@ -5,9 +5,10 @@
       @switch-company="onSwitchCompany"
       class="bg-neutral-focus text-neutral-content" />
     <div :class="[
-      'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md',
-      'lg:w-2/6 lg:px-4 lg:relative lg:ml-0',
-      'absolute w-36 ml-16 z-10 w-48']"
+      'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md my-4',
+      'lg:w-2/6 lg:px-4 lg:relative lg:ml-0 lg:w-1/6',
+      'flex flex-col justify-between',
+      '']"
       v-if="explorerVisible || profileVisible">
       <Explorer class="explorer w-full"
         v-if="explorerVisible"
@@ -18,6 +19,7 @@
         @task-manager="onTaskManager"
       />
       <Profile v-if="profileVisible" :user="$storex.user.user"/>
+      <InviteBtn />
     </div>
     <TaskManager class="w-1/3"
       v-if="taskManager"
@@ -38,8 +40,10 @@
           :chat="$storex.chat.openedChat"
           :explorerVisible="explorerVisible"
           :chatVisible="chatVisible"
-          @coding-clinic="clinicList = true"
           @leave-clinic="leaveClinic"
+          @delete-clinic="deleteClinic"
+          @join-clinic="joinClinic"
+          @new-clinic="showCodingClinicDialog = true"
           @close-explorer="sideBar = ''"
           @open-explorer="sideBar = 'explorer'"
           @toggle-chat="toggleChatHidden"
@@ -51,7 +55,7 @@
             :room="currentClinic"
           />
         </div>
-        <ChatBox class="chat-box grow"
+        <ChatBox class="chat-box grow border-l border-slate-500"
           :chat="$storex.chat.openedChat" v-if="chatVisible"
           :closeMe="!!currentClinic"
           @on-event-click="onEventClick"
@@ -60,16 +64,9 @@
         <VideoCall
           class="tflex-none w-1/6 m-5 rounded-md"
           :call="$storex.call.currentCall"
-          v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
+          v-if="false && $storex.call.currentCall && $storex.call.currentCall.streams"
         />
-        <ClinicList
-          class="bg-neutral text-neutral-content tflex-none w-1/5 m-5 rounded-md"
-          v-if="clinicList"
-          @join-clinic="joinClinic"
-          @leave-clinic="leaveClinic"
-          @new-clinic="onNewCodingClinic"
-          @close="clinicList = false"
-        />
+
       </div>
     </div>
     <LoadingDialog v-if="loading" />
@@ -81,6 +78,11 @@
         <ChatAltIcon class="" />
       </div>
     </div>
+    <CodingClinicDialog
+      v-if="showCodingClinicDialog"
+      @close="showCodingClinicDialog = false"
+      @ok="onNewCodingClinic"
+      />
   </div>
 </template>
 <script>
@@ -92,13 +94,14 @@ import Explorer from "@/views/Explorer.vue"
 import VideoCall from "@/views/VideoCall.vue"
 import Header from "@/components/Header.vue"
 import SearchResults from "@/components/SearchResults.vue"
-import ClinicList from '@/components/ClinicList.vue'
+import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
 import NekoRoom from '@/components/NekoRoom.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
 import Channel from '@/components/channel/Channel.vue'
 import Sprint from '@/components/Sprint.vue'
 import { ChatAltIcon } from "@heroicons/vue/outline"
 import TaskManager from '@/components/TaskManager.vue'
+import InviteBtn from '@/components/InviteBtn.vue'
 export default {
   components: {
     SideBar,
@@ -109,13 +112,14 @@ export default {
     VideoCall,
     Header,
     SearchResults,
-    ClinicList,
+    CodingClinicDialog,
     NekoRoom,
     LoadingDialog,
     Channel,
     Sprint,
     ChatAltIcon,
-    TaskManager
+    TaskManager,
+    InviteBtn
   },
   data() {
     return {
@@ -123,11 +127,15 @@ export default {
       show: 1,
       list: [{}, {}],
       sideBar: 'explorer',
-      showCodingClinics: !this.$storex.chat.openedChat,
+      showCodingClinics: true,
+      showCodingClinicDialog: false,
       chatHidden: false,
       loading: false,
       taskManager: null
     };
+  },
+  created () {
+    this.$storex.search.doSearch()
   },
   computed: {
     openChat () {
@@ -171,6 +179,7 @@ export default {
     },
     onOpenChat (chat) {
       this.showCodingClinics = false
+      this.leaveClinic ()
       this.$storex.user.setOpenedChat(chat.id)
       this.$storex.channel.setCurrentChannel(null)
     },
@@ -179,13 +188,11 @@ export default {
       this.$storex.channel.openChannel(channel)
     },
     async onCodingClinics () {
-      if (this.showCodingClinics) {
-        return
-      }
       await this.$storex.search.doSearch()
       this.showCodingClinics = true
     },
     async onNewChat () {
+      if (!this.$root.login()) return
       const chat = await this.$storex.chat.newChat()
       this.onOpenChat(chat)
     },
@@ -209,7 +216,11 @@ export default {
           })
         }
         this.joinClinic(clinic.id)
+        this.showCodingClinicDialog = false
       } catch{}
+    },
+    deleteClinic (clinic) {
+      $storex.clinic.deleteClinic(clinic)
     },
     joinClinic (id, alreadyNotified) {
       this.clinicList = false
@@ -217,7 +228,7 @@ export default {
       if (!alreadyNotified) {
         const chat = this.$storex.chat.openedChat
         const { user: { username } } = this.$storex.user
-        if (chat) {
+        if (false && chat) {
           this.$storex.chat.sendMessage({
             chat,
             content: `@${username} joined clinic.`,

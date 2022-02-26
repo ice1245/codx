@@ -27,7 +27,7 @@
                 </MessageOptions>
               </div>
             </div>
-            <div class="arrow_icon_left bg-primary text-primary-content w-3 h-3"></div>
+            <div class="arrow_icon_left w-3 h-3 bg-primary text-primary-content"></div>
 
             <p class="text-sm font-medium ">{{ message.from.username }}</p>
           </div>
@@ -69,7 +69,7 @@
                 </MessageOptions>
               </div>
             </div>
-            <div class="arrow_icon_right w-3 h-3"></div>
+            <div class="arrow_icon_right w-3 h-3 bg-secondary text-secondary-content"></div>
             <p class="text-sm font-medium ">{{ message.from.username }}</p>
           </div>
         </div>

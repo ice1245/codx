@@ -27,9 +27,7 @@
           </div>
         </div>
       </div>
-      <div
-        class="md:p-6 p-4 flex items-center md:space-x-5 space-x-3 border-t border-slate-600/50 w-full"
-      >
+      <div class="md:p-6 p-4 flex items-center md:space-x-5 space-x-3 border-t border-slate-600/50 w-full">
         <div class="form-control w-full">
           <label class="label">
             <span class="label-text" v-if="editing">Editing, press Esc. to cancel</span>

@@ -37,22 +37,34 @@ export default class WebRTCRoom {
     const connection = RTCMulticonnection()
     connection.socketURL = `${process.env.VUE_APP_API}/`
     // STUN / TURN Servers
-    connection.iceServers = []
-    connection.iceServers.push({
-      urls: 'stun:turn.meetnav.com:3478'
-    })
-    connection.iceServers.push({
-      urls: 'turn:turn.meetnav.com:3478',
-      credential: settings.turnPassword,
-      username: settings.turnUser
-    })
-    connection.iceTransportPolicy = 'relay'
+    if (settings.webrtc) {
+      const { stunServer, turnServer, turnPassword, turnUser } = settings.webrtc
+      connection.iceServers = []
+      connection.iceServers.push({
+        urls: stunServer
+      })
+      connection.iceServers.push({
+        urls: turnServer,
+        credential: turnPassword,
+        username: turnUser
+      })
+      connection.iceTransportPolicy = 'relay'
+    }
     connection.session = {
         audio,
-        video,
+        video: video ? {
+            width: {
+                ideal: 1280
+            },
+            height: {
+                ideal: 720
+            },
+            frameRate: 30
+        } : null,
         screen,
         data: true
     }
+    this.setCodecs({ connection })
     connection.extra = this.encodeExtra(settings)
     connection.onstream = this.onStream.bind(this)
     connection.onstreamended = this.onStreamEnded.bind(this)
@@ -60,6 +72,46 @@ export default class WebRTCRoom {
     connection.onunmute = this.onUnMute.bind(this)
 
     return connection
+  }
+
+  setCodecs ({ connection, resolutions = "HD", bitrates = 512 }) {
+    const CodecsHandler = connection.CodecsHandler
+    connection.processSdp = function(sdp) {
+        var codecs = 'vp8'
+        console.log("processSdp", sdp)
+
+        if (resolutions == 'HD') {
+            sdp = CodecsHandler.setApplicationSpecificBandwidth(sdp, {
+                audio: 128,
+                video: bitrates,
+                screen: bitrates
+            });
+
+            sdp = CodecsHandler.setVideoBitrates(sdp, {
+                min: bitrates * 8 * 1024,
+                max: bitrates * 8 * 1024,
+            });
+        }
+
+        if (resolutions == 'Ultra-HD') {
+            sdp = CodecsHandler.setApplicationSpecificBandwidth(sdp, {
+                audio: 128,
+                video: bitrates,
+                screen: bitrates
+            });
+
+            sdp = CodecsHandler.setVideoBitrates(sdp, {
+                min: bitrates * 8 * 1024,
+                max: bitrates * 8 * 1024,
+            });
+        }
+
+        if (codecs.length) {
+            sdp = CodecsHandler.preferCodec(sdp, codecs.toLowerCase());
+        }
+
+        return sdp;
+    };
   }
 
   static async newRoom (settings) {
@@ -115,6 +167,11 @@ export default class WebRTCRoom {
       [extra.userid]: {
         ...event,
         extra
+      }
+    }
+    if (event.type === 'local') {
+      if (!this.connection.session.video) {
+        this.toggleVideo()
       }
     }
     this.onStreamsChanged(this)
