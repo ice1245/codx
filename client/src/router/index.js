@@ -36,7 +36,7 @@ router.beforeEach(async (to, from, next) => {
   }
   if (fullPath === "/logout") {
     await $storex.user.logout()
-    fullPath = '/'
+    return next('/')
   } else {
     await $storex.user.fetchAccessToken()
   }

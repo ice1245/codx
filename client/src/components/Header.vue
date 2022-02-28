@@ -44,6 +44,8 @@
           @click="liveClinic && $emit('leave-clinic')"
         >
           <TerminalIcon class="w-6" />
+          <div class="mx-2" v-if="liveClinic">{{ liveClinic.name }}</div>
+           <StopIcon v-if="liveClinic" class="w-6" />
         </label>
         <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52" v-if="!liveClinic">
           <li class="group relative" v-for="(clinic, ix) in clinics" :key="ix"
@@ -77,7 +79,8 @@ import {
   MenuIcon,
   ChatAltIcon,
   PhoneMissedCallIcon,
-  TrashIcon
+  TrashIcon,
+  StopIcon
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -87,13 +90,14 @@ export default {
     VideoCameraIcon,
     MicrophoneIcon,
     ChevronLeftIcon,
-    UserAdd,
-    UserAvatar,
     TerminalIcon,
     MenuIcon,
     ChatAltIcon,
     PhoneMissedCallIcon,
-    TrashIcon
+    TrashIcon,
+    StopIcon,
+    UserAdd,
+    UserAvatar
   },
   props: ['chat', 'explorerVisible', 'chatVisible'],
   data () {
@@ -103,7 +107,7 @@ export default {
   },
   computed: {
     liveClinic () {
-      return !!this.$storex.clinic.currentClinic
+      return this.$storex.clinic.currentClinic
     },
     call () {
       return this.$storex.call.currentCall

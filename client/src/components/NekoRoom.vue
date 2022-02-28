@@ -27,14 +27,14 @@ export default {
   },
   computed: {
     url () {
-      const { url, nekoAdminPwd } = this.room
+      const { url, nekoPassword } = this.room
       const { user: { username } } = this.$storex.user
-      return `${url}/?pwd=${nekoAdminPwd}&displayName=${username}`
+      return `${url}/?pwd=${nekoPassword}&displayName=${username}`
     },
     testUrl () {
-      const { url, nekoAdminPwd } = this.room
+      const { url, nekoPassword } = this.room
       const { user: { username } } = this.$storex.user
-      return `${url}/emoji.json?pwd=${nekoAdminPwd}&displayName=${username}`
+      return `${url}/emoji.json?pwd=${nekoPassword}&displayName=${username}`
     },
     document () {
       const { nekoFrame: { contentWindow: { document } } } = this.$refs

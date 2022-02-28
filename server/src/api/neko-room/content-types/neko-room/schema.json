@@ -36,6 +36,11 @@
     },
     "ports": {
       "type": "json"
+    },
+    "cloud_provider": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::cloud-provider.cloud-provider"
     }
   }
 }

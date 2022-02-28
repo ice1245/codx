@@ -105,11 +105,16 @@
         <label class="block md:text-lg text-md font-medium ">
           Login with...
         </label>
-        <div class="flex flew-row mt-2">
+        <div class="flex flew-row mt-2 gap-4">
           <div class="avatar cursor-pointer w-16 h-16"
             @click="loginWithGithub"
           >
             <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="rounded-lg" />
+          </div>
+          <div class="avatar cursor-pointer w-16 h-16"
+            @click="loginWithGoogle"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/1024px-Google_%22G%22_Logo.svg.png" class="rounded-lg" />
           </div>
         </div>
       </div>
@@ -141,6 +146,9 @@ export default {
     },
     loginWithGithub () {
       window.location = "https://api-codx.meetnav.com/api/connect/github"
+    },
+    loginWithGoogle () {
+      window.location = "https://api-codx.meetnav.com/api/connect/google"
     }
   }
 };

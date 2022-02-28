@@ -3,82 +3,95 @@ const NekoRooms = require('../../neko-rooms')
 const uuid = require('uuid').v4;
 
 module.exports = strapi => {
+  const domain = process.env.WEB_DOMAIN
   return {
-    createTraefikConfiguration ({ pathPrefix, roomName, serviceUrl, prefix }) {
+    createTraefikConfigurationService ({ prefix, serviceUrl, isRemote }) {
+      const pathPrefix = `/${prefix}`
       const middlewares = {
-        [`codx-room-${roomName}prf`]: {
+        [`codx-room-${prefix}rdr`]: {
+          redirectRegex: {
+            regex: pathPrefix + "$$",
+            replacement: pathPrefix + "/"
+          }
+        },
+        [`codx-room-${prefix}cors`]: {
+          headers: {
+            accessControlAllowOriginList: ["*"]
+          }
+        }
+      }
+      if (!isRemote) {
+        middlewares[`codx-room-${prefix}prf`] = {
           stripPrefix: {
             prefixes: [
               pathPrefix + "/"
             ],
             forceSlash: true
           }
-        },
-        [`codx-room-${roomName}rdr`]: {
-          redirectRegex: {
-            regex: pathPrefix + "$",
-            replacement: pathPrefix + "/"
-          }
-        },
+        }
       }
-      if (prefix) {
-        middlewares[`codx-room-${roomName}add`] = {
-          addprefix: {
-            prefix: `/${prefix}`
+      const middlewaresIds = Object.keys(middlewares)
+      const services = {
+        [`codx-room-${prefix}`]: {
+          loadBalancer: {
+            servers: [
+              {
+                url: serviceUrl
+              }
+            ],
+            passHostHeader: false
+          }
+        }
+      }
+      const routers = {
+        [`codx-room-${prefix}`]: {
+          entryPoints: [
+            "websecure"
+          ],
+          middlewares: middlewaresIds,
+          service: `codx-room-${prefix}`,
+          rule: `PathPrefix(\`${pathPrefix}\`) && Host(\`${domain}\`)`,
+          tls: {
+            "certResolver": process.env.PROXY_TLS_RESOLVER || "myresolver"
           }
         }
       }
       return {
         middlewares,
-        services: {
-          [`codx-room-${roomName}`]: {
-            loadBalancer: {
-              servers: [
-                {
-                  url: serviceUrl
-                }
-              ],
-              passHostHeader: true
-            }
-          }
-        },
-        routers: {
-          [`codx-room-${roomName}`]: {
-            entryPoints: [
-              "websecure"
-            ],
-            middlewares: Object.keys(middlewares),
-            service: `codx-room-${roomName}`,
-            rule: "Host(`codx.meetnav.com`) && PathPrefix(`" + pathPrefix + "`)",
-            tls: {
-              "certResolver": process.env.PROXY_TLS_RESOLVER || "myresolver"
-            }
+        services,
+        routers
+      }
+    },
+    createTraefikConfiguration ({ prefix, ip, roomsUrl, serviceUrl: remoteServiceUrl }) {
+      const isRemote = roomsUrl.indexOf(domain) === -1
+      const serviceUrl = isRemote ? remoteServiceUrl : `http://${ip}:${8080}`
+      const neko = this.createTraefikConfigurationService({ prefix, serviceUrl, roomsUrl, isRemote })
+      const openPorts = [['mysite', 3000], ['coder', 9080]]
+        .map(([serviceName, port]) => this.createTraefikConfigurationService({ prefix: prefix + '-' + serviceName, serviceUrl:`http://${ip}:${port}`, roomsUrl }))
+      return openPorts.reduce((http, { middlewares, services, routers }) => {
+         return {
+          middlewares: {
+            ...http.middlewares,
+            ...middlewares
+          },
+          services: {
+            ...http.services,
+            ...services
+          },
+          routers: {
+            ...http.routers,
+            ...routers
           }
         }
-      }
+      }, neko)
     },
-    exposeRoomService ({ username, roomName, serviceUrl, prefix }) {
-      const { pathPrefix, url, wurl } = this.getRoomPublicUrls({ username, roomName })
+    getRoomPublicUrls ({ roomsUrl, prefix}) {
+      const pathPrefix = `/${prefix}`
+      const url = `https://${process.env.WEB_DOMAIN}${pathPrefix}`
       return {
         url,
-        wurl,
-        ...this.createTraefikConfiguration ({ pathPrefix, roomName, serviceUrl, prefix })
-      }
-    },
-    getRoomPublicUrls ({ username, roomName}) {
-      const pathPrefix = `/@${username}/clinic/${roomName}`
-      return {
-        url: `https://${process.env.WEB_DOMAIN}${pathPrefix}`,
-        wurl: `wss://${process.env.WEB_DOMAIN}${pathPrefix}/ws`,
+        wurl: `${url.replace("http", "ws")}/ws`,
         pathPrefix
-      }
-    },
-    createRoomProxyInfo ({ id, username, roomName, ip }) {
-      return {
-        username,
-        roomName,
-        ip,
-        id
       }
     },
     async waitForRoom () {
@@ -95,12 +108,12 @@ module.exports = strapi => {
     async createContainer ({ user, settings = {} }) {
       const {
         template: { repository, folder },
-        roomSettings: { provider, image: neko_image = "codx/room:latest" }
+        roomSettings: { image: neko_image = "codx/room:latest" },
+        cloudProvider: { name: provider, settings: nekoRoomsProvider }
       } = settings
-      const [nekoRoomsProvider = {}] = await strapi.$query('cloud-provider').findMany({ filters: { name: provider }})
       console.log("create container", { provider, nekoRoomsProvider })
-      const { mounts = [] } = nekoRoomsProvider.settings || {}
-      const nekoRooms = new NekoRooms(nekoRoomsProvider.settings)
+      const { mounts = [] } = nekoRoomsProvider || {}
+      const nekoRooms = new NekoRooms(nekoRoomsProvider)
 
       const nekoPwd = `${uuid()}`.slice(0, 5)
       const nekoAdminPwd = `${uuid()}`.slice(0, 5)
@@ -131,16 +144,16 @@ module.exports = strapi => {
         mounts
       }
       const room = await nekoRooms.create(nekoSettings)
-      const proxyInfo = { 
+      const proxy = { 
         id: room.id, 
         username: user.username,
         roomName: settings.name, 
-        ip: null, 
+        roomsUrl: nekoRoomsProvider.roomsUrl,
+        ip: room.ip,
         serviceId: settings.name,
         serviceUrl: room.url,
         prefix: room.name
       }
-      const proxy = this.createRoomProxyInfo(proxyInfo)
       return {
         proxy,
         neko: {
@@ -153,12 +166,9 @@ module.exports = strapi => {
         provider
       }
     },
-    async createVps ({ user, providerName, settings }) {
-      const providerSettings = await strapi.$query('cloud-provider').findMany({ 
-        filters: { name: providerName },
-      })
-      console.log("codx-room", "createRoom", { user, providerName, settings, providerSettings })
-      const provider = cloudProviders[providerName](providerSettings[0].settings)
+    async createVps ({ user, providerName, settings, cloudProvider }) {
+      console.log("codx-room", "createRoom", { user, providerName, settings, cloudProvider })
+      const provider = cloudProviders[providerName](cloudProvider.settings)
       const nekoPwd = `${uuid()}`.slice(0, 5)
       const nekoAdminPwd = `${uuid()}`.slice(0, 5)
       const { repository, folder } = settings
@@ -177,7 +187,7 @@ module.exports = strapi => {
           name: uuid()
         }
       })
-      const proxyInfo = { 
+      const proxy = { 
         id: room.data.server.id, 
         username: user.username, 
         roomName: settings.name, 
@@ -185,7 +195,6 @@ module.exports = strapi => {
         serviceId: room.config.name,
         serviceUrl: room.proxy.url
       }
-      const proxy = this.createRoomProxyInfo(proxyInfo)
       await this.waitForRoom()
       return {
         ...room,
@@ -240,26 +249,36 @@ module.exports = strapi => {
           if(!room.user) {
             room.user = user
           }
-          return this.getRoomPublicInfo(room)
+          const rpi = this.getRoomPublicInfo(room)
+          const res = {
+            ...rpi,
+            nekoPassword: rpi.user.id === user.id ? rpi.nekoAdminPwd : rpi.nekoPwd
+          }
+          delete res.nekoPwd
+          delete res.nekoAdminPwd
+          return res
         })
     },
-    getRoomPublicInfo ({ id, name, description, createdAt, user: { username }, room: { neko: { name: roomName }, nekoPwd, nekoAdminPwd } }) {
-      const { url } = this.getRoomPublicUrls({ username, roomName })
+    getRoomPublicInfo ({ id, name, description, createdAt, user: { id: userId, username }, room: { proxy: { roomsUrl, prefix }, neko: { name: roomName }, nekoPwd, nekoAdminPwd } }) {
+      const { url } = this.getRoomPublicUrls({ roomsUrl, prefix })
       return {
         id,
         name,
         description,
         createdAt,
         url,
+        user: { id: userId, username },
         nekoPwd,
         nekoAdminPwd
       }
     },
-    async roomProxies () {
-      const nekoRooms = await strapi.$query('neko-room').findMany({ populate: { user: true }})
-      return nekoRooms.map(({ user: { username }, room: { neko: { name: roomName, url: serviceUrl,  } } }) =>
-          this.exposeRoomService({ username, roomName, serviceUrl, prefix: roomName })
-      )
+    async roomProxies (proxyToken) {
+      const nekoRooms = await strapi.$query('neko-room').findMany({ populate: { user: true, cloud_provider: true }})
+      const res = nekoRooms
+        .map(({ room: { proxy: { prefix, roomsUrl, serviceUrl }, neko: { id } } }) =>
+          this.createTraefikConfiguration({ prefix, ip: id.substring(0, 12), roomsUrl, serviceUrl })
+        )
+      return res
     }
   }
 }

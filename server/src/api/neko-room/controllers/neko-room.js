@@ -13,6 +13,10 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       let { chat, settings } = body
       chat = chat?.id ? await strapi.$api('chat').findOne(chat.id) : null
       user.token = authorization.split(" ")[1]
+      const {
+        roomSettings: { provider }
+      } = settings
+      settings.cloudProvider = (await strapi.$query('cloud-provider').findMany({ filters: { name: provider }}))[0]
       const room = await codx.room.createRoom({ user, settings })
       const nekoRoom = await strapi.$api('neko-room').create({ data: {
         user,
@@ -20,7 +24,8 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
         settings,
         room,
         name: settings.name,
-        description: settings.description
+        description: settings.description,
+        cloudProvider: settings.cloudProvider
       }})
       return codx.room.getRoomPublicInfo({ ...nekoRoom, user })
     },
@@ -34,11 +39,7 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       return strapi.$api('neko-room').delete(id)
     },
     async proxy ({ query: { token }}) {
-      const isValid = token === process.env.API_TOKEN
-      if (!isValid) {
-        return { isValid }
-      }
-      const nekoRooms = await codx.room.roomProxies()
+      const nekoRooms = await codx.room.roomProxies(token)
       const http = nekoRooms.reduce((conf, { middlewares, services, routers }) => {
         conf.middlewares = {
           ...conf.middlewares,

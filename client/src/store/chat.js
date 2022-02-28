@@ -26,7 +26,7 @@ export const mutations = mutationTree(state, {
         guests,
         get users () {
           return this.admins.concat(this.guests)
-            .map(u => $storex.network.allUsers[u.id] || u)
+            .map(u => ($storex.network.allUsers||[])[u.id] || u)
         }
       }
     }
