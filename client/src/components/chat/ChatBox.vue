@@ -27,55 +27,29 @@
           </div>
         </div>
       </div>
-      <div class="md:p-6 p-4 flex items-center md:space-x-5 space-x-3 border-t border-slate-600/50 w-full">
-        <div class="form-control w-full">
-          <label class="label">
-            <span class="label-text" v-if="editing">Editing, press Esc. to cancel</span>
-          </label>
-          <input type="text" placeholder="Type messages"
-            :class="['input block w-full md:px-4 px-3 md:py-3 py-2 focus:outline-none sm:text-base text-sm border-gray-300 rounded',
-              editing ? 'border-error' : '']"
-            v-model="message"
-            @keydown.enter="sendMessage"
-            @keydown.esc="abortEditing"
-          >
-        </div>
-        <EmojiHappyIcon class="cursor-pointer md:w-5 w-7 text-primary" />
-        <PaperClipIcon class="cursor-pointer md:w-5 w-7 text-primary" />
-        <div>
-          <button
-            class="bg-accent text-accent-content md:w-14 w-10 md:h-12 h-10 flex items-center justify-center rounded-lg"
-          >
-            <ChatAltIcon class="cursor-pointer md:w-6 w-5 t" @click="sendMessage" />
-          </button>
-        </div>
-        <EyeOffIcon class="cursor-pointer md:w-14 text-error btn btn-outline"
-          v-if="closeMe"
-          @click="$emit('hide-chat')" />
-        
-      </div>
+
+      <ChatInputArea
+        class="border-t border-slate-600/50"
+        :editing="editing" :chat="chat" :closeMe="closeMe" :message="message"
+        @send-message="sendMessage"
+        @abort-editing="abortEditing"
+        @hide-chat="$emit('hide-chat')"
+      />
+
     </div>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
-import {
-  ChatAltIcon,
-  EmojiHappyIcon,
-  PaperClipIcon,
-  EyeOffIcon
-} from "@heroicons/vue/outline";
-import ChatEntry from './ChatEntry.vue'
-import ChatEvent from './ChatEvent.vue'
+import ChatEntry from '../chat/ChatEntry.vue'
+import ChatEvent from '../ChatEvent.vue'
+import ChatInputArea from './ChatInputArea.vue'
 export default {
   components: {
-    ChatAltIcon,
-    EmojiHappyIcon,
-    PaperClipIcon,
     ChatEntry,
     ChatEvent,
-    EyeOffIcon
+    ChatInputArea
   },
   props: ['show', 'chat', 'closeMe'],
   data() {
@@ -113,22 +87,29 @@ export default {
           })
           return acc
         }, [])
+    },
+    users () {
+      const { admins, guests } = this.chat
+      return [
+        ...admins.map(u => ({ ...u, isAdmin: true })),
+        ...guests
+      ]
     }
   },
   mounted () {
     this.scrollToBottom()
   },
   methods: {
-    async sendMessage () {
+    async sendMessage (message) {
       await this.$storex.chat.sendMessage({
         chat: this.chat,
         ...this.editing,
-        content: this.message
+        content: message
       })
       this.abortEditing()
     },
     groupedMessages (messages) {
-      const { users } = this.chat
+      const { users } = this
       const grouped = messages
         .reduce((acc, m) => {
           const { id, from, content, createdAt: ts, edited } = m

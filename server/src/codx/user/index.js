@@ -1,3 +1,5 @@
+const channel = require("../../api/channel/controllers/channel")
+
 module.exports = strapi => {
   return {
     filteredUser ({ avatar, blocked, email, id, username }) {
@@ -34,7 +36,7 @@ module.exports = strapi => {
       ]
     },
     async channels ({ id }) {
-      return strapi.$query('channel').findMany({
+      return strapi.$api('channel').findMany({
         filters: {
           $or: [
             { users: [id] },
@@ -59,8 +61,12 @@ module.exports = strapi => {
       const companies = await strapi.codx.company.companies(sme)
       const subscriptions = await this.subscriptions(companies)
       const ds = new Date().getTime()
-      const chats = [...guestChats, ...adminChats]
       const channels = await this.channels(sme)
+      const channelChats = channels
+                          .map(({ entries }) => entries
+                              .map(({ chat_message: { chat: { id } } }) => id ))
+                          .reduce((a, b) => a.concat(b))
+      const chats = [...guestChats, ...adminChats].map(c => ({ ...c, isChannel: channelChats.indexOf(c.id) !== -1 }))
       return {
         ...this.filteredUser(sme),
         roomId: `@${sme.username}`,

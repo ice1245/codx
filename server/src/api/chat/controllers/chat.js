@@ -40,5 +40,19 @@ module.exports = createCoreController('api::chat.chat', ({ strapi }) => ({
       data.admins = [...admins, admin]
     }
     return await strapi.$api('chat').update(id, { data })
+  },
+  async delete (ctx) {
+    const { params: { id }, request: { query: { removeUser } } } = ctx
+    if (removeUser) {
+      const uid = parseInt(removeUser)
+      const { guests = [], admins } = await strapi.$api('chat').findOne(id, { populate: { admins: true, guests: true } })
+      const data = {
+        guests: guests.filter(u => u.id !== uid).map(u => u.id), 
+        admins: admins.filter(u => u.id !== uid).map(u => u.id), 
+      }
+      console.log("chat", "delete", { id, removeUser, data: JSON.stringify(data) })
+      return await strapi.$api('chat').update(id, { data })
+    }
+    return super.delete(ctx)
   }
 }));

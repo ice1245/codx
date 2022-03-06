@@ -14,6 +14,7 @@
     "@strapi/plugin-i18n": "4.1.0",
     "@strapi/plugin-users-permissions": "4.1.0",
     "@strapi/strapi": "4.1.0",
+    "aws-sdk": "^2.1083.0",
     "koa-session2": "^2.2.10",
     "rtcmulticonnection-server": "^1.3.2",
     "sqlite3": "5.0.2",

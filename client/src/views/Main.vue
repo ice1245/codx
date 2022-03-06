@@ -6,7 +6,7 @@
       class="bg-neutral-focus text-neutral-content" />
     <div :class="[
       'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md my-4',
-      'lg:w-2/6 lg:px-4 lg:relative lg:ml-0 lg:w-1/6',
+      'w-2/6 lg:px-4 relative ml-0',
       'flex flex-col justify-between',
       '']"
       v-if="explorerVisible || profileVisible">
@@ -47,6 +47,7 @@
           @close-explorer="sideBar = ''"
           @open-explorer="sideBar = 'explorer'"
           @toggle-chat="toggleChatHidden"
+          @remove-user="removeUser"
           v-if="showHeader"
         />
       <div class="lg:flex flex-row hidden h-full w-full">
@@ -64,7 +65,7 @@
         <VideoCall
           class="tflex-none w-1/6 m-5 rounded-md"
           :call="$storex.call.currentCall"
-          v-if="false && $storex.call.currentCall && $storex.call.currentCall.streams"
+          v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
         />
 
       </div>
@@ -87,7 +88,7 @@
 </template>
 <script>
 import SideBar from "@/components/SideBar.vue"
-import ChatBox from "@/components/ChatBox.vue"
+import ChatBox from "@/components/chat/ChatBox.vue"
 import Profile from "@/components/Profile.vue"
 import ChatList from "@/views/ChatList.vue"
 import Explorer from "@/views/Explorer.vue"
@@ -271,6 +272,10 @@ export default {
       this.$storex.clinic.setCurrentClinic()
       this.$storex.chat.setOpenedChat()
       this.taskManager = this.currentCompnay
+    },
+    removeUser (user) {
+      const chat = this.$storex.chat.openedChat
+      this.$storex.chat.removeUser({ user, chat })
     }
   }
 };

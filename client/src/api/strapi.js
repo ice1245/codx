@@ -38,6 +38,11 @@ class Strapi {
     return useFetch.delete("api/chats/" + chat.id, { headers })
   }
 
+  async removeUserFromChat ({ user: { id: userId }, chat: { id } }) {
+    const { headers } = this
+    return useFetch.delete(`api/chats/${id}?removeUser=${userId}`, { headers })
+  }
+
   async loadChat (id) {
     const { headers } = this
     return useFetch.get(`api/chats/${id}?populate=admins,guests`, { headers })
@@ -77,6 +82,16 @@ class Strapi {
   async createChanne (channel) {
     const { headers } = this
     return useFetch.post("api/channels", channel, { headers })
+  }
+
+  async getChannel (id) {
+    const { headers } = this
+    return useFetch.get("api/channels/" + id, { headers })
+  }
+
+  async newChannelEntry ({ channel, entry }) {
+    const { headers } = this
+    return useFetch.put("api/channels/" + channel.id, { channel, entry }, { headers })
   }
 
   async createTask (taskSettings) {

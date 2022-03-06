@@ -4,6 +4,33 @@
  * channel service.
  */
 
-const { createCoreService } = require('@strapi/strapi').factories;
+const { createCoreService } = require('../../strapix')
 
-module.exports = createCoreService('api::channel.channel');
+const populate = {
+  entries: {
+    populate: {
+      chat_message: {
+        populate: {
+          chat: true
+        }
+      }
+    }
+  }
+}
+module.exports = createCoreService('api::channel.channel', ({ strapi }) => ({
+  async findOne (id, params = {}) {
+    params.populate = {
+      ...params.populate,
+      ...populate
+    }
+    const channel = await strapi.$query('channel').findOne(id, params)
+    return channel
+  },
+  async findMany (params = {}) {
+    params.populate = {
+      ...params.populate,
+      ...populate
+    }
+    return strapi.$query('channel').findMany(params)
+  },
+}));

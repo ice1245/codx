@@ -14,12 +14,20 @@
         @click="$emit('close-explorer')"
       />
       <div class="flex flex-row">
-        <UserAvatar
-          v-for="(user, ix) in chatUsers" :key="ix"
+        <div class="dropdown"
+          :title="`@${user.username}`"
+          v-for="(user, ix) in chatUsers" :key="ix">
+          <UserAvatar
+          :tabindex="ix"
           :user="user"
-          class="mr-2"
+          class="mr-2 cursor-pointer"
         />
-        <UserAdd class="ml-2 w-18 h18" @user="user => addUser(user)" />
+          <ul :tabindex="ix" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
+            <li><a>{{ `@${user.username}` }} </a></li>
+            <li v-if="user.id !== me.id" @click="$emit('remove-user', user)" ><a><BanIcon class="w-5 mr-2"/>Remove</a></li>
+          </ul>
+        </div>
+        <UserAdd class="ml-2 w-18 h18" :ignoreUsers="chatUsers" @user="user => addUser(user)" />
       </div>
     </div>
     <div class="flex items-center space-x-6">
@@ -80,7 +88,8 @@ import {
   ChatAltIcon,
   PhoneMissedCallIcon,
   TrashIcon,
-  StopIcon
+  StopIcon,
+  BanIcon
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -96,6 +105,7 @@ export default {
     PhoneMissedCallIcon,
     TrashIcon,
     StopIcon,
+    BanIcon,
     UserAdd,
     UserAvatar
   },
@@ -132,6 +142,9 @@ export default {
     },
     clinics () {
       return this.$storex.clinic.clinics
+    },
+    me () {
+      return this.$storex.user.user
     }
   },
   watch: {

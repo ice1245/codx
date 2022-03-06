@@ -2,17 +2,27 @@
   "collectionName": "components_components_tasks",
   "info": {
     "displayName": "Task",
-    "icon": "edit"
+    "icon": "edit",
+    "description": ""
   },
   "options": {},
   "attributes": {
-    "chat": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::chat.chat"
-    },
     "status": {
       "type": "string"
+    },
+    "chat_message": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::chat-message.chat-message"
+    },
+    "upVotes": {
+      "type": "integer"
+    },
+    "answers": {
+      "type": "integer"
+    },
+    "tags": {
+      "type": "json"
     }
   }
 }

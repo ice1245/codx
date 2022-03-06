@@ -37,11 +37,11 @@
       style="max-height: calc(100vh - 280px)"
       v-if="channelsOpen"
     >
-      <div class="text-base pl-3 cursor-pointer ml-3 mt-2"
+      <div class="text-base pl-3 cursor-pointer ml-3 mt-2 prose"
         v-for="(channel, ix) in $storex.channel.channels" :key="ix"
         @click="$emit('open-channel', channel)"
       >
-        <HashtagIcon class="h-5 w-5 float-left mr-2" />{{ channel.name }}
+        <h4># {{ channel.name }}</h4>
       </div>
       <div class="text-base pl-3 cursor-pointer ml-3 mt-2"
         @click="onCreateNewChannel"
@@ -63,13 +63,12 @@
       v-if="directMessagesOpen"
     >
       <div
-        v-for="(chat, ix) in $storex.chat.chats" :key="ix"
+        v-for="(chat, ix) in $storex.chat.userChats" :key="ix"
         :class="['text-base pl-3 cursor-pointer ml-3 mt-2 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
         @click="$emit('open-chat', chat)"
       >
-          <div class="grow">
-            <AtSymbolIcon :class="['h-5 w-5 float-left mr-2']" />
-            <span :data-id="chat.id">{{ chatName(chat)}}</span>
+          <div class="grow prose">
+            <h4>@ {{ chatName(chat)}}</h4>
           </div>
           <div class="group-hover:visible invisible ml-4 pt-1">
             <TrashIcon class="w-5" @click.stop="confirmDeleteChat = chat" />
@@ -151,6 +150,9 @@ export default {
     showTasks () {
       const { settings } = this.currentCompany
       return settings?.tasks
+    },
+    me () {
+      return this.$storex.user.user
     }
   },
   methods: {
@@ -164,7 +166,10 @@ export default {
       this.loading = false
     },
     chatName (chat) {
-      return chat.users.map(u => u.username).join(" - ") 
+      const { id: myId } = this.me
+      const { users } = chat
+      return (users.length > 1 ? chat.users.filter(({ id }) => id !== myId) : users)
+        .map(u => u.username).join("-") 
     },
     onCreateNewChannel () {
       if (!this.$root.login()) return

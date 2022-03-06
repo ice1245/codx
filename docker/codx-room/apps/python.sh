@@ -1,1 +1,1 @@
-sudo apt update && apt install -y python pip
+sudo apt update && apt install -y python python3-pip 

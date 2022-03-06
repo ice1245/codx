@@ -112,6 +112,7 @@
             <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="rounded-lg" />
           </div>
           <div class="avatar cursor-pointer w-16 h-16"
+            v-if="false"
             @click="loginWithGoogle"
           >
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/1024px-Google_%22G%22_Logo.svg.png" class="rounded-lg" />

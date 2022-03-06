@@ -81,8 +81,8 @@ class ioManager {
       const users = userIds.map(id => this.onlineUsers[id]).filter(u => !!u)
       users.forEach(u => {
         try {
-          u.socket.emit(event, data, (response) => {
-            console.log("io", "user ack", { id: u.id, status: response });
+          u.socket.emit(event, data, (...args) => {
+            console.log("io", "user ack", { id: u.id, args });
           })
         } catch (ex) {
           console.error("io", "Error emmiting to user", { id: u.id, event, ex })

@@ -4,12 +4,14 @@ import api from '@/api'
 export const namespaced = true
 
 export const state = () => ({
-  chats: null,
-  channels: null,
+  chats: {},
   openedChat: null
 })
 
 export const getters = getterTree(state, {
+  userChats: ({ chats }) => Object.keys(chats)
+                            .map(k => chats[k])
+                            .reduce((acc, c) => [acc, !c.isChannel && (acc[c.id] = c)][0], {})
 })
 
 export const mutations = mutationTree(state, {
@@ -31,9 +33,6 @@ export const mutations = mutationTree(state, {
       }
     }
   },
-  setChannels (state, channels) {
-    state.channels = channels
-  },
   async setOpenedChat (state, id) {
     if (id) {
       const { data: chat } = await api.loadChat(id)
@@ -45,8 +44,7 @@ export const mutations = mutationTree(state, {
   },
   async addMessage (state, { id, chat: { id: chatId }, from, content, createdAt, extra, edited }) {
     if (!state.chats[chatId]) {
-      const { data: chat } = await api.loadChat(chatId)
-      $storex.chat.addChat(chat)
+      await $storex.chat.refreshChat({ chatId })
     }
     const { messages = [] } = state.chats[chatId]
     const messageIx = messages.findIndex(m => m.id === id)
@@ -97,8 +95,17 @@ export const actions = actionTree(
       await api.chatAddUser(chatAddUser)
       $storex.chat.setOpenedChat(chatAddUser.chat.id)
     },
+    async removeUser ({ state: { openedChat = {} }}, { user, chat }) {
+      await api.removeUserFromChat({ user, chat })
+      $storex.chat.setOpenedChat(openedChat.id)
+    },
     async onEditMessage (ctx, { chat, message }) {
       await api.sendMessage({ chat, ...message })
+    },
+    async refreshChat (ctx, { id, isChannel = false }) {
+      const { data: chat } = await api.loadChat(id)
+      $storex.chat.addChat({ ...chat, isChannel })
+      return chat
     }
   },
 )

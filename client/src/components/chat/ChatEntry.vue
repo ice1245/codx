@@ -87,8 +87,8 @@ import {
   ClockIcon,
   EmojiHappyIcon
 } from "@heroicons/vue/outline";
-import MessageOptions from './MessageOptions.vue'
-import Avatar from './Avatar.vue'
+import MessageOptions from '../MessageOptions.vue'
+import Avatar from '../Avatar.vue'
 
 export default {
   components: {

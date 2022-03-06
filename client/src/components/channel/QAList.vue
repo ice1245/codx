@@ -6,17 +6,17 @@
     >
       <div class="flex flex-col m-1 text-center">
         <div class="">
-          <div>{{ result.votes }}</div>
+          <div>{{ result.votes || 0 }}</div>
           <div class="-mt-2"><small>votes</small></div>
         </div>
         <div class="border mt-1 px-2 pt-1 bg-secondary text-secondary-content">
-          <div>{{ result.answers.length }}</div>
+          <div>{{ result.answers || 0 }}</div>
           <div class="-mt-2"><small>answers</small></div>
         </div>
       </div>
-      <div class="flex flex-col pt-2 ml-2">
+      <div class="flex flex-col py-2 ml-2 justify-between grow">
         <div class="text-accent">
-          <h3><strong>{{ result.title }}</strong></h3>
+          <h3><strong>{{ result.chat_message.content }}</strong></h3>
         </div>
         <div>
           <div class="badge badge-outline"
@@ -25,11 +25,28 @@
           </div>
         </div>
       </div>
+      <div class="pr-2 h-full">
+        <UserAvatar v-for="(user, uix) in users(result)" :key="uix" :user="user" />
+      </div>
     </div>
   </div>
 </template>
 <script>
+import UserAvatar from '@/components/UserAvatar.vue'
 export default {
-  props: ['results']
+  components: {
+    UserAvatar
+  },
+  props: ['results'],
+  computed: {
+    me () {
+      return this.$storex.user.user
+    }
+  },
+  methods: {
+    users ({ chat_message: { chat: { id } } }) {
+      return this.$storex.chat.chats[id].users
+    }
+  }
 }
 </script>

@@ -28,10 +28,8 @@
       "relation": "oneToMany",
       "target": "plugin::users-permissions.user"
     },
-    "channel": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::channel.channel"
+    "tags": {
+      "type": "json"
     }
   }
 }
