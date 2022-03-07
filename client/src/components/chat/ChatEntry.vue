@@ -3,7 +3,7 @@
     <div class="flex items-end justify-start" v-if="!isMe">
         <div>
           <div class="h-9 w-10">
-            <Avatar :url="message.from.avatar" />
+            <UserAvatar :user="message.from" />
           </div>
         </div>
         <div class="flex items-start space-x-1 chat">
@@ -75,7 +75,7 @@
         </div>
         <div class="">
           <div class="ml-3 h-9 w-10">
-            <Avatar :url="message.from.avatar" />
+            <UserAvatar :user="message.from" />
           </div>
         </div>
       </div>
@@ -88,14 +88,14 @@ import {
   EmojiHappyIcon
 } from "@heroicons/vue/outline";
 import MessageOptions from '../MessageOptions.vue'
-import Avatar from '../Avatar.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 
 export default {
   components: {
     ClockIcon,
     EmojiHappyIcon,
     MessageOptions,
-    Avatar
+    UserAvatar
   },
   props: ['isMe', 'message'],
   methods: {

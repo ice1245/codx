@@ -1,8 +1,7 @@
 # https://hub.docker.com/_/docker
 FROM docker:dind
 
-#RUN wget -O "/usr/local/bin/docker-compose" "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)"
-#RUN chmod +x /usr/local/bin/docker-compose
+# docker-compose
 # https://github.com/tiangolo/docker-with-compose
 RUN apk add --no-cache py3-pip python3-dev libffi-dev openssl-dev curl gcc libc-dev rust cargo make && \
     pip3 install --no-cache-dir docker-compose

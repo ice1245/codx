@@ -1,6 +1,6 @@
 <template>
   <div
-    class="lg:py-4 py-1 h-full lg:px-2 px-1 flex flex-col justify-between items-center fixed relative bottom-0 z-50 bg-gray-300"
+    class="lg:py-4 py-1 h-full lg:px-2 px-1 flex flex-col justify-between items-center fixed relative bottom-0 z-50"
   >
     <img
       :src="logos[logoIx]"

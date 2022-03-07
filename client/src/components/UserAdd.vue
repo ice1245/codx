@@ -10,8 +10,8 @@
         <div class="mt-2 mb-6 w-full">
           <label class="input-group input-group-sm w-full">
             <input type="text"
-              placeholder="Search..." class="input input-bordered input-sm w-full" @keypress.enter="doSearch"> 
-            <span class="cursor-pointer text-base-content" @click="doSearch">Go</span>
+              placeholder="Search..." class="input input-bordered input-sm w-full" @keypress.enter="doUserSearch"> 
+            <span class="cursor-pointer text-base-content" @click="doUserSearch">Go</span>
           </label>
         </div>
       </li>
@@ -58,6 +58,8 @@ export default {
   methods: {
     showUser (user) {
       return (this.ignoreUsers||[]).map(u => u.id).indexOf(user.id) === -1
+    },
+    doUserSearch () {
     }
   }
 }

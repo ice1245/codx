@@ -5,12 +5,27 @@
         <input type="text"
           v-model="searchString"
           placeholder="Search..." class="input input-bordered input-sm w-full" @keypress.enter="doSearch"> 
-        <span class="cursor-pointer text-base-content" @click="doSearch">Go</span>
+        <span class="cursor-pointer text-base-content bg-base-200" @click="doSearch">
+          <SearchIcon class="w-4" />
+        </span>
       </label>
     </div>
 
     <div
-      :class="['text-base pl-3 cursor-pointer mb-2', liveClinics.length ? 'font-bold' : '']"
+      :class="['text-base pl-3 cursor-pointer mb-2 flex btn btn-outline btn-accent', searchType === 'academy' ? 'font-bold' : '']"
+      @click="$emit('acamedy-courses')"
+    >
+      <AcademicCapIcon class="h-6 mr-2" />
+      <div>codx academy</div>
+      <div class="flex grow ml-2 mr-4">
+        <progress class="progress progress-secondary mt-3 mx-2" value="20" max="100"></progress>
+        <small>200,5</small>
+        <CreditCardIcon class="h-6 ml-1" />
+      </div>
+    </div>
+
+    <div
+      :class="['text-base pl-3 cursor-pointer mb-2 mt-6', searchType === 'clinic' ? 'font-bold' : '']"
       @click="$emit('coding-clinics')"
     >
       <TerminalIcon class="h-5 w-5 float-left mr-2" />
@@ -64,11 +79,20 @@
     >
       <div
         v-for="(chat, ix) in $storex.chat.userChats" :key="ix"
-        :class="['text-base pl-3 cursor-pointer ml-3 mt-2 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
+        :class="['text-base pl-3 cursor-pointer ml-3 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
         @click="$emit('open-chat', chat)"
       >
-          <div class="grow prose">
-            <h4>@ {{ chatName(chat)}}</h4>
+          <div class="grow flex">
+            <h4 class="">
+              @ {{ chatName(chat)}}
+            </h4>
+            <div class="-space-x-1 ml-2">
+              <UserAvatar v-for="(user, uix) in chat.users" :key="uix"
+                :class="[user.online && !user.isMe ? '' : 'hidden']"
+                :size="6"
+                :user="user"
+              />
+            </div>
           </div>
           <div class="group-hover:visible invisible ml-4 pt-1">
             <TrashIcon class="w-5" @click.stop="confirmDeleteChat = chat" />
@@ -104,11 +128,15 @@ import {
   StarIcon,
   MapIcon,
   TrashIcon,
-  CalendarIcon
+  CalendarIcon,
+  AcademicCapIcon,
+  CreditCardIcon,
+  SearchIcon
 } from '@heroicons/vue/outline'
 import Dialog from '@/components/Dialog.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
 import ChannelCreateDialog from '@/components/channel/ChannelCreateDialog.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 export default {
   components: {
     TerminalIcon,
@@ -122,9 +150,13 @@ export default {
     MapIcon,
     TrashIcon,
     CalendarIcon,
+    AcademicCapIcon,
+    CreditCardIcon,
+    SearchIcon,
     Dialog,
     LoadingDialog,
-    ChannelCreateDialog
+    ChannelCreateDialog,
+    UserAvatar
   },
   data() {
     return {
@@ -137,9 +169,9 @@ export default {
     }
   },
   computed: {
-    liveClinics () {
-      const { clinics } = this.$storex.clinic
-      return clinics || []
+    searchType () {
+      const { currentSearch } = this.$storex.search
+      return currentSearch?.searchType
     },
     session () {
       return this.$storex.user.session
@@ -159,7 +191,7 @@ export default {
     async deleteConfirmChat () {
       this.loading = true
       if (this.$storex.chat.openedChat === this.confirmDeleteChat) {
-        this.$emit('coding-clinics')
+        this.$emit('academy-courses')
       }
       await this.$storex.chat.deleteChat(this.confirmDeleteChat)
       this.confirmDeleteChat = null

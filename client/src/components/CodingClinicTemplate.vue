@@ -44,12 +44,28 @@
           <VueMarkdown :source="templateInfo" class="w-full h-full p-5" />
         </div>
       </div>
+      <template v-slot:actions>
+        <div class="flex gap-2 justify-end py-4">
+          <button class="btn btn-accent shadow-sm px-4 py-2 gap-2"
+            @click="onClose(true)"
+          >
+            <TerminalIcon class="w-6" />
+              Run
+          </button> 
+          <button class="btn btn-error shadow-sm px-4 py-2"
+            @click="$emit('close')"
+          >
+              Close
+            </button>
+        </div>
+      </template>
     </Dialog>
 </template>
 <script>
 import {
   ThumbUpIcon,
-  ThumbDownIcon
+  ThumbDownIcon,
+  TerminalIcon
 } from '@heroicons/vue/outline'
 import VueMarkdown from '@/components/VueMarkdown.vue'
 import Dialog from '@/components/Dialog.vue'
@@ -59,6 +75,7 @@ export default {
   components: {
     ThumbUpIcon,
     ThumbDownIcon,
+    TerminalIcon,
     Dialog,
     Avatar,
     VueMarkdown

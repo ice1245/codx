@@ -1,24 +1,26 @@
 <template>
-  <div class="flex flex-row h-screen overflow-hidden w-full">
+  <div class="flex flex-row h-screen overflow-hidden w-full bg-base-200">
     <SideBar
+      class=""
       @sideBar="toggleSideBar"
       @switch-company="onSwitchCompany"
-      class="bg-neutral-focus text-neutral-content" />
+    />
     <div :class="[
-      'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md my-4',
+      'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md py-4',
       'w-2/6 lg:px-4 relative ml-0',
       'flex flex-col justify-between',
       '']"
       v-if="explorerVisible || profileVisible">
       <Explorer class="explorer w-full"
         v-if="explorerVisible"
+        @academy-courses="onAcademyCourses"
         @coding-clinics="onCodingClinics"
         @open-chat="chat => onOpenChat(chat)"
         @open-channel="onOpenChannel"
         @new-chat="onNewChat"
         @task-manager="onTaskManager"
       />
-      <Profile v-if="profileVisible" :user="$storex.user.user"/>
+      <Profile v-if="profileVisible" :user="profileVisible"/>
       <InviteBtn />
     </div>
     <TaskManager class="w-1/3"
@@ -35,8 +37,10 @@
       class="h-full w-full"
       :channel="$storex.channel.currentChannel"
     />
-    <div class="lg:flex flex-col w-full" v-if="splittedView">
+    <div class="lg:flex flex-col w-full bg-base-200" v-if="splittedView">
+      <CodxAcademyHero v-if="hero === 'academy'" @close="hero = null" />
       <Header
+          class="bg-neutral"
           :chat="$storex.chat.openedChat"
           :explorerVisible="explorerVisible"
           :chatVisible="chatVisible"
@@ -48,6 +52,7 @@
           @open-explorer="sideBar = 'explorer'"
           @toggle-chat="toggleChatHidden"
           @remove-user="removeUser"
+          @user-profile="showUserProfile"
           v-if="showHeader"
         />
       <div class="lg:flex flex-row hidden h-full w-full">
@@ -56,7 +61,7 @@
             :room="currentClinic"
           />
         </div>
-        <ChatBox class="chat-box grow border-l border-slate-500"
+        <ChatBox class="chat-box grow border-l border-slate-500 bg-neutral-focus text-neutral-content"
           :chat="$storex.chat.openedChat" v-if="chatVisible"
           :closeMe="!!currentClinic"
           @on-event-click="onEventClick"
@@ -103,6 +108,7 @@ import Sprint from '@/components/Sprint.vue'
 import { ChatAltIcon } from "@heroicons/vue/outline"
 import TaskManager from '@/components/TaskManager.vue'
 import InviteBtn from '@/components/InviteBtn.vue'
+import CodxAcademyHero from '@/components/hero/CodxAcademyHero.vue'
 export default {
   components: {
     SideBar,
@@ -120,7 +126,8 @@ export default {
     Sprint,
     ChatAltIcon,
     TaskManager,
-    InviteBtn
+    InviteBtn,
+    CodxAcademyHero
   },
   data() {
     return {
@@ -132,11 +139,12 @@ export default {
       showCodingClinicDialog: false,
       chatHidden: false,
       loading: false,
-      taskManager: null
+      taskManager: null,
+      hero: 'academy',
+      profileUser: null
     };
   },
   created () {
-    this.$storex.search.doSearch()
   },
   computed: {
     openChat () {
@@ -168,7 +176,7 @@ export default {
       return this.$storex.company.currentCompnay
     },
     splittedView () {
-      return !this.showCodingClinics && !this.showChannel && (!this.taskManager || this.chatVisible) 
+      return !this.showCodingClinics && !this.showChannel && (!this.taskManager || this.chatVisible) || this.hero
     }
   },
   methods: {
@@ -177,20 +185,31 @@ export default {
     },
     toggleSideBar (view) {
       this.sideBar = view
+      if (view === 'profile') {
+        this.profileUser = this.$storex.user.user
+      }
     },
     onOpenChat (chat) {
       this.showCodingClinics = false
       this.leaveClinic ()
-      this.$storex.user.setOpenedChat(chat.id)
+      this.$storex.chat.setOpenedChat({ id: chat.id, visible: true })
       this.$storex.channel.setCurrentChannel(null)
+      this.hero = null
     },
     async onOpenChannel (channel) {
       this.showCodingClinics = false
       this.$storex.channel.openChannel(channel)
+      this.hero = null
+    },
+    async onAcademyCourses () {
+      this.$storex.channel.openChannel()
+      this.showCodingClinics = await this.$storex.search.academyCourses()
+      this.hero = null
     },
     async onCodingClinics () {
-      await this.$storex.search.doSearch()
-      this.showCodingClinics = true
+      this.$storex.channel.openChannel()
+      this.showCodingClinics = await this.$storex.search.codingClinics()
+      this.hero = null
     },
     async onNewChat () {
       if (!this.$root.login()) return
@@ -200,6 +219,7 @@ export default {
     async onResultsNewCodingClinic (settings) {
       await this.onNewCodingClinic(settings)
       this.showCodingClinics = false
+      this.hero = null
     },
     async onNewCodingClinic (settings) {
       try {
@@ -218,6 +238,7 @@ export default {
         }
         this.joinClinic(clinic.id)
         this.showCodingClinicDialog = false
+        this.hero = null
       } catch{}
     },
     deleteClinic (clinic) {
@@ -229,7 +250,7 @@ export default {
       if (!alreadyNotified) {
         const chat = this.$storex.chat.openedChat
         const { user: { username } } = this.$storex.user
-        if (false && chat) {
+        if (chat) {
           this.$storex.chat.sendMessage({
             chat,
             content: `@${username} joined clinic.`,
@@ -240,6 +261,7 @@ export default {
           })
         }
       }
+      this.hero = null
     },
     leaveClinic () {
       this.clinicList = false
@@ -247,6 +269,7 @@ export default {
     },
     toggleChatHidden () {
       this.chatHidden = !this.chatHidden
+      this.$storex.chat.openedChat.visible = !this.chatHidden 
     },
     onEventClick ({ event: eventSettings }) {
       const { event, clinic, type, roomId } = eventSettings

@@ -1,5 +1,5 @@
 <template>
-  <div class="neko-room w-full h-full relative">
+  <div class="neko-room w-full h-full relative p-2">
     <iframe :class="['w-full h-full', loading ? 'opacity-0' : '']" :src="pageReady ? `${url}&ts=${ts}` : ''" frameborder="0" ref="nekoFrame" @load="onLoad()" v-if="pageReady">
     </iframe>
     <div class="absolute top-0 left-0 right-0 bottom-0 place-content-center prose" v-if="loading">
@@ -77,6 +77,7 @@ export default {
       }
       const style = `
         <style>
+          body p,
           .room-container,
           .header-container,
           .video-menu.bottom,
@@ -84,6 +85,12 @@ export default {
           .neko-menu
           {
             display: none !important;
+          }
+          html,
+          body,
+          .video-container,
+          .video .player {
+            background-color: transparent !important;
           }
         </style>`
       this.document.head.insertAdjacentHTML("beforeend", style)

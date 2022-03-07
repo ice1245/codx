@@ -38,7 +38,8 @@ export const mutations = mutationTree(state, {
       state.allUsers = {
         [user.id]: {
           ...user,
-          isMe: true
+          isMe: true,
+          online: $storex.session.isOnline
         },
         ...state.friends
       }

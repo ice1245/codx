@@ -14,29 +14,38 @@ export const getters = getterTree(state, {
                             .reduce((acc, c) => [acc, !c.isChannel && (acc[c.id] = c)][0], {})
 })
 
+function prepareChat (chat, { visible }) {
+  const { id, admins = [], guests = [], messages = [] } = chat
+  messages.forEach(m => {
+    m.from = $storex.network.allUsers[m.from.id]
+  })
+  return {
+    ...chat,
+    admins,
+    guests,
+    visible,
+    get users () {
+      return this.admins.concat(this.guests)
+        .map(u => ($storex.network.allUsers||[])[u.id] || u)
+    }
+  }
+}
+
 export const mutations = mutationTree(state, {
   setChats ({}, chats = []) {
     chats.forEach(c => $storex.chat.addChat(c))
   },
   addChat (state, chat) {
-    const { id, admins = [], guests = [] } = chat
+    const { id } = chat
     state.chats = {
       ...state.chats,
-      [id]: {
-        ...chat,
-        admins,
-        guests,
-        get users () {
-          return this.admins.concat(this.guests)
-            .map(u => ($storex.network.allUsers||[])[u.id] || u)
-        }
-      }
+      [id]: prepareChat(chat, state.chats[chat.id] || {})
     }
   },
-  async setOpenedChat (state, id) {
+  async setOpenedChat (state, { id, visible }) {
     if (id) {
       const { data: chat } = await api.loadChat(id)
-      $storex.chat.addChat(chat)
+      $storex.chat.addChat({ ...chat, visible })
     }
     if (state.chats) {
       state.openedChat = state.chats[id]
@@ -56,14 +65,17 @@ export const mutations = mutationTree(state, {
     } else {
       messages.push(newMessage)  
     }
-    state.chats = {
-      ...state.chats,
-      [chatId]: {
-        ...state.chats[chatId],
-        messages
-      }
-    }
+    $storex.chat.addChat({
+      ...state.chats[chatId],
+      messages
+    })
     if (state.openedChat && id === state.openedChat.id) {
+      if (!state.openedChat.visible) {
+        this.app.$notify({
+          text: $storex.chat.formatMessage(newMessage),
+          group: "success"
+        }, 2000);
+      }
       state.openedChat = state.chats[id]
     }
   },
@@ -93,11 +105,11 @@ export const actions = actionTree(
     },
     async addUser (ctx, chatAddUser) {
       await api.chatAddUser(chatAddUser)
-      $storex.chat.setOpenedChat(chatAddUser.chat.id)
+      $storex.chat.setOpenedChat(chatAddUser.chat)
     },
     async removeUser ({ state: { openedChat = {} }}, { user, chat }) {
       await api.removeUserFromChat({ user, chat })
-      $storex.chat.setOpenedChat(openedChat.id)
+      $storex.chat.setOpenedChat(openedChat)
     },
     async onEditMessage (ctx, { chat, message }) {
       await api.sendMessage({ chat, ...message })
@@ -106,6 +118,9 @@ export const actions = actionTree(
       const { data: chat } = await api.loadChat(id)
       $storex.chat.addChat({ ...chat, isChannel })
       return chat
+    },
+    formatMessage(ctx, newMessage) {
+      return newMessage.content
     }
   },
 )

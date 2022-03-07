@@ -1,6 +1,6 @@
 <template>
   <div
-      class="text-primary md:p-6 p-4 flex flex-row space-x-5 border-b border-slate-600/50 w-full"
+      class="text-primary pt-3 pb-2 px-4 flex flex-row space-x-5 border-b border-slate-600/50 w-full"
     >
     <div class="flex flex-row grow">
       <MenuIcon 
@@ -23,7 +23,7 @@
           class="mr-2 cursor-pointer"
         />
           <ul :tabindex="ix" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
-            <li><a>{{ `@${user.username}` }} </a></li>
+            <li><a @click="$emit('user-profile', user)" >{{ `@${user.username}` }} </a></li>
             <li v-if="user.id !== me.id" @click="$emit('remove-user', user)" ><a><BanIcon class="w-5 mr-2"/>Remove</a></li>
           </ul>
         </div>

@@ -32,13 +32,6 @@ export const mutations = mutationTree(state, {
     $storex.chat.setChats(chats)
     $storex.channel.setChannels(channels)
     $storex.clinic.setClinics(clinics)
-    try {
-      $storex.chat.setOpenedChat(session.lastOpenChat)
-    } catch {}
-  },
-  setOpenedChat ({ session }, id) {
-    session.lastOpenChat = id
-    $storex.chat.setOpenedChat(session.lastOpenChat)
   }
 })
 

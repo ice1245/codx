@@ -1,6 +1,6 @@
 <template>
-  <div class="channel flex flex-col relative">
-    <div class="navbar mb-2 shadow-lg">
+  <div class="channel flex flex-col relative bg-base-800">
+    <div class="navbar mb-2 shadow-lg bg-neutral-focus">
       <div class="flex-1 px-2 mx-2">
         <span class="text-lg font-bold"># {{ channel.name }}</span>
       </div>
@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <div class="popup absolute top-10 w-full" v-if="newEntry">
+    <div class="popup absolute top-10 w-full z-10 drop-shadow-lg" v-if="newEntry">
       <div class="alert shadow-lg w-2/3 m-auto mt-10 flex flex-col gap-4">
         <div>
           <FireIcon class="w-12 mr-2" />
@@ -52,14 +52,14 @@
       </div>
     </div>
     <div class="channel-body flex h-full flew-col">
-      <div class="channel-results ml-2 mr-4 w-1/3 grow">
+      <div class="channel-results pl-2 pr-4 w-1/3 grow">
           <QAList
             class="w-full h-full"
             :results="channel.entries"
             @show-qa="openQA"
           />
       </div>
-      <QA class="w-5/6"
+      <QA class="w-5/6 bg-info-focus text-info-content"
         :qa="currentQA"
         v-if="currentQA">
       </QA>

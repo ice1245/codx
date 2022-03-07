@@ -8,7 +8,7 @@
         <div class="chat-date"
           v-for="(dayMessages, dix) in dayMessages" :key="dix"
         >
-          <div class="divider mb-6"><span class="bg-neutral text-accent border rounded-lg px-3 py-1">{{ dayMessages.displayDate }}</span></div>
+          <div class="divider mb-6"><span class="bg-info border rounded-lg px-3 py-1">{{ dayMessages.displayDate }}</span></div>
           <div
             class="mb-4"
             v-for="(message, ix) in groupedMessages(dayMessages.messages)" :key="ix"
@@ -133,7 +133,7 @@ export default {
           }
           acc.push({
             createdAt,
-            from: users.filter(u => u.id === from.id)[0],
+            from: this.findUser(from),
             entries: [{ id, content, createdAt, extra, from: { id: from.id }, edited }],
             event: event ? extra : null
           })
@@ -148,7 +148,9 @@ export default {
     },
     scrollToBottom () {
       const element = this.$refs.messageWindow
-      element.scrollTop = element.scrollHeight
+      if (element) {
+        element.scrollTop = element.scrollHeight
+      }
     },
     onMessageWindowScroll () {
       const element = this.$refs.messageWindow
@@ -162,6 +164,9 @@ export default {
     abortEditing () {
       this.message = null
       this.editing = null
+    },
+    findUser (user) {
+      return user ? (this.$storex.network.allUsers[user.id] || user) : user
     }
   }
 };

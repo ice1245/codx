@@ -1,7 +1,7 @@
-version: "3.4"
+version: "2"
 services:
-  neko:
-    image: gbrian/neko
+  codx:
+    image: codx/room:latest
     restart: unless-stopped
     shm_size: 2gb
     ports:
@@ -20,15 +20,4 @@ services:
       - "NEKO_VIDEO_BITRATE=$NEKO_VIDEO_BITRATE"
       - "NEKO_OPUS=$NEKO_OPUS"
       - "NEKO_AUDIO_BITRATE=$NEKO_AUDIO_BITRATE"
-    restart: unless-stopped
-  
-  codx-coder:
-    depends_on:
-      - neko
-    image: gbrian/coder
-    user: root
-    environment:
-      - "PASSWORD=$NEKO_PASSWORD"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     restart: unless-stopped

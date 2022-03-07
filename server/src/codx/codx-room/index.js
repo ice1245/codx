@@ -108,10 +108,10 @@ module.exports = strapi => {
     async createContainer ({ user, settings = {} }) {
       const {
         template: { repository, folder },
-        roomSettings: { image: neko_image = "codx/room:latest" },
+        roomSettings: { image },
         cloudProvider: { name: provider, settings: nekoRoomsProvider }
       } = settings
-      console.log("create container", { provider, nekoRoomsProvider })
+      const neko_image = image || nekoRoomsProvider.nekoImage || "codx/room:latest"
       const { mounts = [] } = nekoRoomsProvider || {}
       const nekoRooms = new NekoRooms(nekoRoomsProvider)
 

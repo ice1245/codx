@@ -2,9 +2,9 @@
   <div class="border-l qa flex flex-col justify-between">
     <div class="flex flex-row mb-4 h-1/6">
       <div class="flex flex-col m-2 text-center justify-between bg-base-300 p-2 rounded h-full">
-        <div class="">
-          <div>{{ qa.votes }}</div>
-          <div class="-mt-2"><small>votes</small></div>
+        <div class="text-secondary">
+          <h2>{{ qa.votes || 0 }}</h2>
+          <h3 class="-mt-2"><small>votes</small></h3>
         </div>
         <button class="btn btn-sm btn-accent mt-2 ">
           <HeartIcon class="w-5 mr-1" />

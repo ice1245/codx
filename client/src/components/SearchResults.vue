@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col" v-if="search">
-    <div class="navbar mb-2 shadow-lg" v-if="!showWelcome">
-      <div class="px-2 mx-2">
+    <div class="navbar mb-2 shadow-lg">
+      <div class="px-2 mx-2 flex-1">
         <div><span class="text-lg font-bold">{{ search.topic }}</span></div>
       </div>
       <div class="flex-none hidden px-2 mx-2 lg:flex" v-if="user">
@@ -32,23 +32,6 @@
         </div>
       </div> 
     </div>
-    <div class="flex items-center w-full h-2/3 px-4 py-10 bg-cover bg-base-200"
-      :style="`background-image: url('${search.banner.bgImage}');`"
-      v-else
-    >
-      <div class="card glass lg:card-side text-neutral-content h-full">
-        <figure class="p-6 scroll-hidden">
-          <img :src="search.banner.image" class="shadow-lg h-3/6" style="width:300px">
-        </figure> 
-        <div class="max-w-md card-body">
-          <h2 class="card-title">{{ search.topic }}</h2> 
-          <p>{{ search.description }}</p> 
-          <div class="card-actions">
-            <button class="btn glass rounded-full" @click="showWelcome = false" >Get Started</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="p-2">
       <button
@@ -59,8 +42,8 @@
     </div>
     <div class="my-2" v-if="searchString"><i>results for: {{ searchString }}</i></div>
 
-    <div class="p-2 grid grid-cols-4 gap-5 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
-      <div class="bg-base-100 text-base-content card rounded h-80 mr-4 cursor-pointer"
+    <div class="p-2 grid grid-cols-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
+      <div class="card rounded h-80 mr-4 cursor-pointer"
         v-for="(result, ix) in search.results" :key="ix"
         @mouseover="carrouselMe(result)"
         @mouseout="carrouselMe(null)"
@@ -95,13 +78,6 @@
             </p>
           </div>
         </div>
-        <div class="flex justify-end w-full gap-2 mt-1">
-          <button class="btn btn-sm bg-accent text-accent-content drop-shadow-md"
-            @click="runClinicTemplate(result)"
-          >
-            <TerminalIcon class="w-4 mr-1" /> Run
-          </button>
-        </div>
       </div> 
     </div>
     <CodingClinicDialog
@@ -113,6 +89,7 @@
     <CodingClinicTemplate
       @close="resultDialog = null"
       @ok="resultDialog = null"
+      @run="runClinicTemplate(resultDialog)"
       v-if="resultDialog"
       :template="resultDialog"
       :media="getResultMedia(resultDialog)"
@@ -166,49 +143,7 @@ export default {
     },
     search () {
       const { currentSearch } = this.$storex.search
-      if (!currentSearch) {
-        return null
-      }
-      // const { results } = currentSearch
-      const results = [
-        'https://i.ytimg.com/vi/rfscVS0vtbw/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLABBQtpk83-Gm8-IgPAiGlTtrLH9w',
-        'https://i.ytimg.com/vi/wDIQ17T3sRk/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCUasho5kBu25lowid1F5e9pfTyNw',
-        'https://i.ytimg.com/vi/esX7SFtEjHg/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCD8mvtnRms6oId-LL62pB7mRz-zw',
-        'https://i.ytimg.com/an_webp/wDIQ17T3sRk/mqdefault_6s.webp?du=3000&sqp=CNT3yo8G&rs=AOn4CLA_r_N-3ERl_ElTSRSpu12TL5K9vQ',
-        'https://i.ytimg.com/vi/I-k-iTUMQAY/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLA8to4KTlPsGQyiaLFEV7KR61Bxkw',
-        'https://i.ytimg.com/vi/N7ZmPYaXoic/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDT6u4Jv1G8JZc6I_9Km5PSU5IZFQ',
-        'https://i.ytimg.com/vi/5HaJPpihkBI/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLCCFqj15e1jOCiE-QPhBTYviLpm5A',
-        'https://i.ytimg.com/vi/MHPGeQD8TvI/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDzKmd7-5BsioY2Vae3I3maYFvMHA',
-        'https://i.ytimg.com/vi/l9nh1l8ZIJQ/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLC5dy2pAHtpEK6aS2vkixXIZlGwkQ',
-        'https://i.ytimg.com/vi/kbKty5ZVKMY/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLD9ig7IJeWqwDLhRpeJrlPYy0GkaQ',
-        'https://i.ytimg.com/an_webp/MHPGeQD8TvI/mqdefault_6s.webp?du=3000&sqp=CLbiyo8G&rs=AOn4CLDAK5Gh3IkMPJolZ8Bpn-whYm6zVA',
-        'https://i.ytimg.com/vi/hb7Q33ysCwI/hqdefault.jpg?sqp=-oaymwEcCOADEI4CSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDnhyhqR0LolwC_2pkPEcXuI4jwkw'
-      ].map(i => {
-          return {
-            ...currentSearch.results[0],
-            media: [
-              {
-                "type": "image",
-                "url": i
-              },
-            ]
-          }
-        })
-      
-      return {
-        query: currentSearch.query,
-        topic: '#coding-clinic',
-        description: 'Find developers to connect and work together in an online development environment. A coding clinic is a timeboxed session where two or more participants will collaborate to solve a problem',
-        banner: {
-          bgImage: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZ3JhbW1pbmd8ZW58MHx8MHx8&w=1000&q=80',
-          image: 'https://careertraining.ed2go.com/common/images/2/22516/GES375-agnesscott-Full-Stack-Software-Developer-935x572.jpg'
-        },
-        showWelcome: true,
-        tags: results.map(r => r.tags.split(" "))
-              .reduce((a, b) => a.concat(b), [])
-              .filter((v, ix, arr) => arr.indexOf(v) === ix),
-        results: [...currentSearch.results, ...results]
-      }
+      return currentSearch
     },
     searchString () {
       const { search: { query: { q } = {}} } = this
@@ -252,14 +187,14 @@ export default {
         this.slideResultMedia ()
       }
     },
-    slideResultMedia () {
+    slideResultMedia (shift) {
       clearTimeout(this.slidInterval)
       const { media } = this.carrouselMeTarget || {}
       if (!media || media.length === 1) {
         return
       }
-      media.push(media.shift())
-      this.slidInterval = setTimeout(() => this.slideResultMedia(), 4000)
+      shift ? media.push(media.shift()) : setTimeout(() => media.push(media.shift()), 1000)
+      this.slidInterval = setTimeout(() => this.slideResultMedia(true), 4000)
     },
     newBlankClinic () {
       this.clinicTemplates = null

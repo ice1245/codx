@@ -64,8 +64,8 @@ module.exports = strapi => {
       const channels = await this.channels(sme)
       const channelChats = channels
                           .map(({ entries }) => entries
-                              .map(({ chat_message: { chat: { id } } }) => id ))
-                          .reduce((a, b) => a.concat(b))
+                              .map(({ chat_message: { chat: { id } } = { chat: {} } }) => id ))
+                          .reduce((a, b) => a.concat(b), [])
       const chats = [...guestChats, ...adminChats].map(c => ({ ...c, isChannel: channelChats.indexOf(c.id) !== -1 }))
       return {
         ...this.filteredUser(sme),
