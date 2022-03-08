@@ -60,3 +60,4 @@ dist
 .env.local
 
 docker/.env
+docker/letsencrypt

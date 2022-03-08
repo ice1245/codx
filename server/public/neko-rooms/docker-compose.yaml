@@ -1,0 +1,53 @@
+version: "3.5"
+
+networks:
+  default:
+    attachable: "true"
+    name: "neko-rooms-traefik"
+
+services:
+  traefik:
+    image: "traefik:2.4"
+    restart: "unless-stopped"
+    environment:
+      - "TZ=Europe/Vienna"
+    command:
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--providers.docker.watch=true"
+      - "--accesslog=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=neko-rooms-traefik"
+      - "--entrypoints.web.address=:8080"
+    ports:
+      - "$NEKO_ROOMS_PORT:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  neko-rooms:
+    image: "m1k1o/neko-rooms:latest"
+    restart: "unless-stopped"
+    environment:
+      - "TZ=Europe/Vienna"
+      - "NEKO_ROOMS_EPR=52000-52100"
+      - "NEKO_ROOMS_NAT1TO1" # IP address of your server
+      - "NEKO_ROOMS_TRAEFIK_ENTRYPOINT=web"
+      - "NEKO_ROOMS_TRAEFIK_NETWORK=neko-rooms-traefik"
+      - "NEKO_ROOMS_NEKO_IMAGES"
+      - "NEKO_ROOMS_INSTANCE_URL" # external URL
+      - "NEKO_ROOMS_STORAGE_ENABLED=true"
+      - "NEKO_ROOMS_STORAGE_INTERNAL=/data"
+      - "NEKO_ROOMS_STORAGE_EXTERNAL=/neko-rooms"
+      - "NEKO_ROOMS_MOUNTS_WHITELIST=/neko-rooms"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/neko-rooms:/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.neko-rooms-frontend.loadbalancer.server.port=8080"
+      - "traefik.http.routers.neko-rooms.entrypoints=web"
+      - "traefik.http.routers.neko-rooms.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.neko-rooms.priority=1"
+      # OPTIONAL: Enable authentication.
+      - "traefik.http.middlewares.neko-rooms-auth.basicauth.users=${NEKO_ROOMS_USER}"
+      - "traefik.http.routers.neko-rooms.middlewares=neko-rooms-auth"
