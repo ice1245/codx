@@ -4,18 +4,32 @@
   "info": {
     "singularName": "chat",
     "pluralName": "chats",
-    "displayName": "chat"
+    "displayName": "Chat",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "users": {
+    "roomId": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "admins": {
       "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "chats"
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user"
+    },
+    "guests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user"
+    },
+    "tags": {
+      "type": "json"
     }
   }
 }

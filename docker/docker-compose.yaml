@@ -4,7 +4,7 @@ services:
     image: node:16
     container_name: codx-api
     working_dir: /src
-    command: bash -c "yarn build && yarn develop"
+    command: bash -c "yarn && yarn build && yarn develop"
     volumes:
       - "$CODX_PATH/server:/src"
     restart: unless-stopped
@@ -12,11 +12,17 @@ services:
       - "NODE_ENV=$NODE_ENV"
       - "BASE_URL=$API_BASE_URL"
       - "STRAPI_ADMIN_BACKEND_URL=$API_BASE_URL"
+      - "NEKO_ROOMS_TRAEFIK_DOMAIN"
+      - "NEKO_ROOMS_TRAEFIK_ROOMS_DOMAIN"
+      - "PROXY_TLS_RESOLVER"
+      - "API_TOKEN"
+      - "API_DOMAIN"
+      - "WEB_DOMAIN"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codx-api.rule=Host(`$API_DOMAIN`)"
-      - "traefik.http.routers.codx-api.entrypoints=websecure"
-      - "traefik.http.routers.codx-api.tls.certresolver=myresolver"
+      - "traefik.http.routers.codx-api.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+      - "traefik.http.routers.codx-api.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
       - "traefik.http.routers.codx-api.service=codx-api"
       - "traefik.http.services.codx-api.loadbalancer.server.port=1337"
 
@@ -32,15 +38,89 @@ services:
       - "NODE_ENV=$NODE_ENV"
       - "BASE_URL=$WEB_BASE_URL"
       - "VUE_APP_API=$API_BASE_URL"
+      - "CODX_WEB_PORT"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codx-web.rule=Host(`$WEB_DOMAIN`)"
-      - "traefik.http.routers.codx-web.entrypoints=websecure"
-      - "traefik.http.routers.codx-web.tls.certresolver=myresolver"
+      - "traefik.http.routers.codx-web.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+      - "traefik.http.routers.codx-web.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
       - "traefik.http.routers.codx-web.service=codx-web"
       - "traefik.http.services.codx-web.loadbalancer.server.port=8080"
+
+  neko-rooms:
+    image: "codx/neko-rooms:latest"
+    build:
+      context: ../neko-rooms
+    restart: "unless-stopped"
+    environment:
+      - "TZ"
+      - "NEKO_ROOMS_EPR"
+      - "NEKO_ROOMS_NAT1TO1"
+      - "NEKO_ROOMS_TRAEFIK_DOMAIN=localhost"
+      - "NEKO_ROOMS_TRAEFIK_ENTRYPOINT"
+      - "NEKO_ROOMS_TRAEFIK_CERTRESOLVER"
+      - "NEKO_ROOMS_TRAEFIK_NETWORK"
+      - "NEKO_ROOMS_TRAEFIK_CORS"
+      - "NEKO_ROOMS_LOGS=true"
+      - "NEKO_ROOMS_NEKO_IMAGES=$NEKO_ROOMS_NEKO_IMAGES"
+      - "NEKO_ROOMS_DEBUG"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.neko-rooms-frontend.loadbalancer.server.port=8080"
+      - "traefik.http.routers.neko-rooms.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+      - "traefik.http.routers.neko-rooms.rule=Host(`${NEKO_ROOMS_TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.neko-rooms.tls=true"
+      - "traefik.http.routers.neko-rooms.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
+      #- "traefik.http.routers.neko-rooms.middlewares=neko-rooms-auth"
+      # IPWHITELIST
+      - "traefik.http.middlewares.neko-rooms-ipwhitelist.ipwhitelist.sourcerange=${NEKO_ROOMS_IP_WHITELIST}"
+      # MIDDLEWARES
+      - "traefik.http.routers.neko-rooms.middlewares=neko-rooms-ipwhitelist"
+  
+  codx-images:
+    image: registry:2
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/docker.auth
+    volumes:
+      - $CODX_PATH/docker/auth:/auth
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.codx-images.rule=Host(`$DOCKER_DOMAIN`)"
+      - "traefik.http.routers.codx-images.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+      - "traefik.http.routers.codx-images.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.codx-images.service=codx-images"
+      - "traefik.http.services.codx-images.loadbalancer.server.port=5000"
+
+  traefik:
+    image: "traefik:latest"
+    container_name: "traefik"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.http=true"
+      - "--accesslog=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=${NEKO_ROOMS_TRAEFIK_NETWORK}"
+      - "--providers.http.endpoint=https://$API_DOMAIN/api/neko-rooms/proxy?token=$API_TOKEN"
+      - "--providers.http.pollInterval=15s"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=$GITHUB_EMAIL"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      - "8800:8080"
+    volumes:
+      - "$CODX_PATH/docker/letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - $CODX_PATH/docker/auth:/auth
 
 networks:
   default:
     external: true
-    name: coder_default
+    name: $NEKO_ROOMS_TRAEFIK_NETWORK

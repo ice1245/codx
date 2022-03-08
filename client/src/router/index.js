@@ -28,15 +28,20 @@ const router = createRouter({
   routes,
 });
 router.beforeEach(async (to, from, next) => {
-  let { fullPath } = to
+  let { fullPath, path, query } = to
+  if (path.startsWith('/auth/')) {
+    const provider = path.split("/").reverse()[0]
+    await $storex.user.loginWithProvider({ ...query, provider })
+    return next("/")
+  }
   if (fullPath === "/logout") {
     await $storex.user.logout()
-    fullPath = '/'
+    return next('/')
   } else {
     await $storex.user.fetchAccessToken()
   }
-  if (!$storex.user.authenticated) {
-    fullPath === '/' && next("/login");
+  if (!$storex.user.authenticated && fullPath !== '/login') {
+    fullPath !== '/' && next("/login");
   }
   next();
 });

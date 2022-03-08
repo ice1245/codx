@@ -1,0 +1,24 @@
+version: "3.4"
+services:
+  neko:
+    image: "m1k1o/neko:firefox"
+    restart: "unless-stopped"
+    shm_size: "2gb"
+    ports:
+      - "8080:8080"
+      - "52000-52003:53000-53003/udp"
+    environment:
+      NEKO_SCREEN: 1920x1080@30
+      NEKO_PASSWORD: neko
+      NEKO_PASSWORD_ADMIN: admin
+      NEKO_EPR: 53000-53003
+      NEKO_ICELITE: 1
+      NEKO_NAT1TO1: 65.108.52.230
+    restart: unless-stopped
+  
+  codx-coder:
+    image: codercom/code-server:latest
+    user: root
+    environment:
+      - "PASSWORD=coder"
+    restart: unless-stopped

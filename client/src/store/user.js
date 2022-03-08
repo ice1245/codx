@@ -1,7 +1,6 @@
 /* eslint no-empty-pattern: 0 */
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import { $storex } from '@/store'
-import WebRTCRoom from '../webrtc'
 
 export const namespaced = true
 
@@ -12,7 +11,6 @@ export const state = () => ({
   token: localStorage.getItem("token") || "",
   user: null,
   lastLogin: null,
-  userRoom: null,
   session: null
 })
 
@@ -25,22 +23,15 @@ export const mutations = mutationTree(state, {
     state.token = token
     state.user = user
     state.lastLogin = new Date()
-    const { chats, channels, clinics, session = {}, roomId } = user || {}
+    const { username, chats, channels, clinics, session = {} } = user || {}
+    // TODO: pass to neko
+    localStorage.setItem("displayname", username)
     state.session = session
+    $storex.network.init()
+    $storex.session.init()
     $storex.chat.setChats(chats)
-    $storex.chat.setChannels(channels)
+    $storex.channel.setChannels(channels)
     $storex.clinic.setClinics(clinics)
-    $storex.chat.setOpenedChat(session.lastOpenChat)
-    if (user) {
-      state.userRoom = await WebRTCRoom.newRoom({ name: roomId })
-    } else if(state.userRoom){
-      state.userRoom.disconnect()
-      state.userRoom = null
-    }
-  },
-  setOpenedChat ({ session }, id) {
-    session.lastOpenChat = id
-    $storex.chat.setOpenedChat(session.lastOpenChat)
   }
 })
 
@@ -69,7 +60,7 @@ export const actions = actionTree(
     },
     async signup({}, signload) {
       try {
-        const { data: { jwt: token }} = await api.signup(signload)
+        const { data: { jwt: token }} = await api.register(signload)
         const { data: user } = await api.me(token)
         const payload = {
           token: token,
@@ -79,25 +70,24 @@ export const actions = actionTree(
         localStorage.setItem("token", token)
         localStorage.setItem("user", JSON.stringify(user))
         $storex.user.onSignup(payload)
-        this.app.$toast.open({
-          message: "Sign Up Successfully!!",
-          type: "success",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+            text: "Success",
+            group: "success"
+          }, 2000);
         } catch (e) {
-          this.app.$toast.open({
-            message: e.response?.data?.error?.message,
-            type: "error",
-            duration: 1000,
-            dismissible: true,
-            position: "top-right",
-          })
+          this.app.$notify({
+              text: "Ops, something went wrong!",
+              group: "error"
+            }, 2000);
+          throw e
         }
     },
     async login({}, loginload) {
       try {
+        this.app.$notify({
+          text: "loging...",
+          group: "generic"
+        }, 2000);
         const { data: { jwt: token }} = await api.login(loginload)
         const { data: user } = await api.me(token)
         const payload = {
@@ -108,27 +98,27 @@ export const actions = actionTree(
         localStorage.setItem("user", JSON.stringify(user))
         localStorage.setItem("token", token)
         $storex.user.onSignup(payload)
-        this.app.$toast.open({
-          message: "Login Successfully!",
-          type: "success",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+          text: "Success",
+          group: "success"
+        }, 2000);
       } catch(e) {
-        this.app.$toast.open({
-          message: e.response?.data?.error?.message,
-          type: "error",
-          duration: 1000,
-          dismissible: true,
-          position: "top-right",
-        })
+        this.app.$notify({
+          text: e.response?.data?.error?.message,
+          group: "error"
+        }, 2000);
+        throw e
       }
     },
     async logout () {
       localStorage.removeItem("user")
       localStorage.removeItem("token")
       $storex.user.onSignup({ authenticated: false })
+    },
+    async loginWithProvider (ctx, { provider, access_token }) {
+      const { data: { jwt: token } } = await api.loginWithProvider({ provider, access_token })
+      localStorage.setItem("token", token)
+      $storex.user.fetchAccessToken()
     }
   }
 )

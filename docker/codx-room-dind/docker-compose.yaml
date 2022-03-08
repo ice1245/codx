@@ -1,0 +1,23 @@
+version: "2"
+services:
+  codx:
+    image: codx/room:latest
+    restart: unless-stopped
+    shm_size: 2gb
+    ports:
+      - "8080:8080"
+      - "${NEKO_EPR:-52000-52001}:${NEKO_EPR:-52000-52001}/udp"
+    environment:
+      - "NEKO_BIND=$NEKO_BIND"
+      - "NEKO_EPR=${NEKO_EPR:-52000-52001}"
+      - "NEKO_ICELITE=$NEKO_ICELITE"
+      - "NEKO_NAT1TO1=$NEKO_NAT1TO1"
+      - "NEKO_PASSWORD=$NEKO_PASSWORD"
+      - "NEKO_PASSWORD_ADMIN=$NEKO_PASSWORD_ADMIN"
+      - "NEKO_SCREEN=$NEKO_SCREEN"
+      - "NEKO_MAX_FPS=$NEKO_MAX_FPS"
+      - "NEKO_VP8=$NEKO_VP8"
+      - "NEKO_VIDEO_BITRATE=$NEKO_VIDEO_BITRATE"
+      - "NEKO_OPUS=$NEKO_OPUS"
+      - "NEKO_AUDIO_BITRATE=$NEKO_AUDIO_BITRATE"
+    restart: unless-stopped

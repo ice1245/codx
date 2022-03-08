@@ -60,4 +60,10 @@ dist
 .env.local
 
 docker/.env
-docker/letsencrypt
+*.tar
+
+neko-rooms
+neko
+
+# traefic certs
+acme.json

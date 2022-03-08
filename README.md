@@ -16,8 +16,9 @@ codx has come to help developers to connect with other developers and solve prob
 * Forums
 * Multiple communities
 
-## Mockups
+## Prototype
 
-![image](https://user-images.githubusercontent.com/767180/148520333-c15fd9f9-c0f1-451f-987b-2d5ab6019760.png)
+![image](https://user-images.githubusercontent.com/767180/154649090-0f949467-c10c-43e6-9e6c-d82f6cf32f4c.png)
 
-![image](https://user-images.githubusercontent.com/767180/148520789-81e0367b-e343-42ed-b2c8-40dd551fbc16.png)
+
+![image](https://user-images.githubusercontent.com/767180/151044544-247e071d-7cb9-4322-84b1-15fb90bc802e.png)

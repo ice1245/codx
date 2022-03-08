@@ -1,0 +1,1 @@
+FROM m1k1o/neko:firefox

@@ -1,0 +1,57 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clinic_templates",
+  "info": {
+    "singularName": "clinic-template",
+    "pluralName": "clinic-templates",
+    "displayName": "ClinicTemplate",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "repository": {
+      "type": "string"
+    },
+    "folder": {
+      "type": "string"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "clinic_templates"
+    },
+    "description": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "string"
+    },
+    "media": {
+      "type": "json"
+    },
+    "likeCount": {
+      "type": "integer"
+    },
+    "dislikeCount": {
+      "type": "integer"
+    },
+    "sponsor": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "image": {
+      "type": "string"
+    },
+    "config": {
+      "type": "json"
+    },
+    "readme": {
+      "type": "string"
+    }
+  }
+}

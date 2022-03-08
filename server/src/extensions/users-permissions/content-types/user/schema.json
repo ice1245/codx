@@ -63,14 +63,32 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "chats": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::chat.chat",
-      "inversedBy": "users"
-    },
     "avatar": {
       "type": "string"
+    },
+    "clinic_templates": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::clinic-template.clinic-template",
+      "mappedBy": "user"
+    },
+    "companies": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::company.company",
+      "inversedBy": "users"
+    },
+    "webrtc": {
+      "type": "json"
+    },
+    "channel": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::channel.channel",
+      "inversedBy": "users"
+    },
+    "profiles": {
+      "type": "json"
     }
   }
 }
