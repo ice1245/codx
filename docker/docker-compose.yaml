@@ -20,11 +20,11 @@ services:
       - "WEB_DOMAIN"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.codx-api.rule=Host(`$API_DOMAIN`)"
-      - "traefik.http.routers.codx-api.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
-      - "traefik.http.routers.codx-api.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.codx-api.service=codx-api"
-      - "traefik.http.services.codx-api.loadbalancer.server.port=1337"
+      - "traefik.http.routers.codx-api-$CONTAINER_PREFIX.rule=Host(`$API_DOMAIN`)"
+      - "traefik.http.routers.codx-api-$CONTAINER_PREFIX.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+      - "traefik.http.routers.codx-api-$CONTAINER_PREFIX.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.codx-api-$CONTAINER_PREFIX.service=codx-api-$CONTAINER_PREFIX"
+      - "traefik.http.services.codx-api-$CONTAINER_PREFIX.loadbalancer.server.port=1337"
 
   web:
     image: node:16
@@ -41,11 +41,11 @@ services:
       - "CODX_WEB_PORT"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.codx-web.rule=Host(`$WEB_DOMAIN`)"
-      - "traefik.http.routers.codx-web.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
-      - "traefik.http.routers.codx-web.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.codx-web.service=codx-web"
-      - "traefik.http.services.codx-web.loadbalancer.server.port=8080"
+      - "traefik.http.routers.codx-web-$CONTAINER_PREFIX.rule=Host(`$WEB_DOMAIN`)"
+      - "traefik.http.routers.codx-web-$CONTAINER_PREFIX.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+      - "traefik.http.routers.codx-web-$CONTAINER_PREFIX.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
+      - "traefik.http.routers.codx-web-$CONTAINER_PREFIX.service=codx-web-$CONTAINER_PREFIX"
+      - "traefik.http.services.codx-web-$CONTAINER_PREFIX.loadbalancer.server.port=8080"
 
   neko-rooms:
     image: "codx/neko-rooms:latest"
