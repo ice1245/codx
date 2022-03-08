@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_subscriptions",
+  "info": {
+    "singularName": "user-subscription",
+    "pluralName": "user-subscriptions",
+    "displayName": "UserSubscription",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "active": {
+      "type": "boolean"
+    },
+    "subscription": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::subscription.subscription"
+    },
+    "cloud_provider": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::cloud-provider.cloud-provider"
+    }
+  }
+}

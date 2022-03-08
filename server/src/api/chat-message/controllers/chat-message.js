@@ -4,24 +4,26 @@
  *  chat-message controller
  */
 
-const { createCoreController } = require('@strapi/strapi').factories;
-const { CHAT_MESSAGE_SERVICE, CHAT_SERVICE } = require('../../constants')
+const { createCoreController } = require('../../strapix')
 
-module.exports = createCoreController(CHAT_MESSAGE_SERVICE, ({ strapi }) => ({
+module.exports = createCoreController('api::chat-message.chat-message', ({ strapi }) => ({
   async create ({ request: { body } }) {
-    const { chat: { id }, from, content } = body
+    const { id: msgId, chat, from, content, extra, edited } = body
     const data = {
-      chat: id,
+      chat,
       from,
-      content
+      content,
+      extra,
+      edited
     }
-    const msg = await strapi.entityService.create(CHAT_MESSAGE_SERVICE, { data })
-    const { admins = [], guests = [] } = await strapi.entityService.findOne(CHAT_SERVICE, id, { populate: { admins: true, guests: true } })
+    const msg = (msgId ? await strapi.$api('chat-message').update(msgId, { data }) :
+      await strapi.$api('chat-message').create({ data }))
+    const { id } = chat
+    const { admins = [], guests = [] } = await strapi.$api('chat').findOne(id, { populate: { admins: true, guests: true } })
     const evData = { 
-      chat: { id },
-      from: from.id,
-      content: { message: content },
-      ts: msg.createdAt
+      ...msg,
+      from: { id: from.id },
+      chat: { id }
     }
     strapi.io.emit('chat-message', evData, admins.concat(guests).map(u => u.id))
     return msg

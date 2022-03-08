@@ -23,19 +23,15 @@ export const mutations = mutationTree(state, {
     state.token = token
     state.user = user
     state.lastLogin = new Date()
-    const { chats, channels, clinics, session = {} } = user || {}
+    const { username, chats, channels, clinics, session = {} } = user || {}
+    // TODO: pass to neko
+    localStorage.setItem("displayname", username)
     state.session = session
-    $storex.chat.setChats(chats)
-    $storex.chat.setChannels(channels)
-    $storex.clinic.setClinics(clinics)
-    try {
-      $storex.chat.setOpenedChat(session.lastOpenChat)
-    } catch {}
+    $storex.network.init()
     $storex.session.init()
-  },
-  setOpenedChat ({ session }, id) {
-    session.lastOpenChat = id
-    $storex.chat.setOpenedChat(session.lastOpenChat)
+    $storex.chat.setChats(chats)
+    $storex.channel.setChannels(channels)
+    $storex.clinic.setClinics(clinics)
   }
 })
 
@@ -64,7 +60,7 @@ export const actions = actionTree(
     },
     async signup({}, signload) {
       try {
-        const { data: { jwt: token }} = await api.signup(signload)
+        const { data: { jwt: token }} = await api.register(signload)
         const { data: user } = await api.me(token)
         const payload = {
           token: token,
@@ -80,7 +76,7 @@ export const actions = actionTree(
           }, 2000);
         } catch (e) {
           this.app.$notify({
-              text: e.response?.data?.error?.message,
+              text: "Ops, something went wrong!",
               group: "error"
             }, 2000);
           throw e
@@ -88,6 +84,10 @@ export const actions = actionTree(
     },
     async login({}, loginload) {
       try {
+        this.app.$notify({
+          text: "loging...",
+          group: "generic"
+        }, 2000);
         const { data: { jwt: token }} = await api.login(loginload)
         const { data: user } = await api.me(token)
         const payload = {
@@ -114,6 +114,11 @@ export const actions = actionTree(
       localStorage.removeItem("user")
       localStorage.removeItem("token")
       $storex.user.onSignup({ authenticated: false })
+    },
+    async loginWithProvider (ctx, { provider, access_token }) {
+      const { data: { jwt: token } } = await api.loginWithProvider({ provider, access_token })
+      localStorage.setItem("token", token)
+      $storex.user.fetchAccessToken()
     }
   }
 )

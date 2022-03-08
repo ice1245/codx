@@ -1,16 +1,12 @@
 <template>
-  <div class="flex flex-col items-center">
-    <div class="prose text-primary">
-      <h1 class="m-5">
-        {{ call.callee.username }}
-      </h1>
-    </div>
+  <div class="flex flex-col items-center relative">
+    <EyeOffIcon class="w-14 btn absolute bottom-4 right-2 z-10" @click="$emit('close')" />
     <video
       autoplay
       :muted="calleeVideo.type === 'local'"
       :src-object.prop.camel="calleeVideo.stream"
       v-if="calleeVideo"
-      class="rounded-md object-fill"
+      class="rounded-md object-fill z-0"
     ></video>
     <Avatar
       class="animate-pulse"
@@ -19,59 +15,48 @@
       :ring="100"
       v-else
     />
-    <div class="prose text-primary">
-      <h6 class="m-5">
-        {{ call.rtc.roomId }}
-      </h6>
-    </div>
-    <div class="flex flex-row px-10 w-full justify-between items-center">
-      <div class="rounded-full border p-2">
-        <MicrophoneIcon
-          class="hidden md:block cursor-pointer w-10 h-10 "
-        />
-      </div>
-      <div :class="['rounded-full border p-2']">
-        <VideoCameraIcon
-          :class="['rounded-full hidden md:block cursor-pointer w-10',
-            , call.type === 'video' ? 'fill-currentColor' : 'fill-gray-50']"
-        />
-      </div>
-      <div class="rounded-full border p-2 bg-error">
-        <PhoneMissedCallIcon
-          class="rounded-full hidden md:block cursor-pointer w-10 fill-white"
-          @click="$storex.call.endCurrentCall()"
-        />
-      </div>
-    </div>
     <div class="mt-10 fex flex-row">
-      <Avatar
-        v-for="(user, ix) in call.users" :key="ix"
-        :size="12"
-        :url="user.avatar"
-        :ring="100"
-      />
+      <div v-for="(stream, six) in call.streams" :key="six">
+        <video
+          v-if="stream.type !== 'local'"
+          autoplay
+          :src-object.prop.camel="stream.stream"
+          class="rounded-md object-fill"
+        ></video>
+      </div>
     </div>
   </div>
 </template>
 <script>
+import { EyeOffIcon } from '@heroicons/vue/solid'
 import Avatar from '@/components/Avatar.vue'
-import {
-  MicrophoneIcon,
-  VideoCameraIcon,
-  PhoneMissedCallIcon
-} from '@heroicons/vue/solid'
 export default {
   components: {
-    Avatar,
-    MicrophoneIcon,
-    VideoCameraIcon,
-    PhoneMissedCallIcon
+    EyeOffIcon,
+    Avatar
   },
   props: ["call"],
+  data () {
+    return {
+    }
+  },
   computed: {
     calleeVideo () {
-      return this.call.rtc.streams[this.call.callee.id]
-      // parentNode.insertBefore(e.mediaElement
+      return this.call.streams[this.call.callee.id]
+    },
+    micOff () {
+      return this.calleeVideo.muted
+    },
+    camOff () {
+      return this.calleeVideo.paused
+    }
+  },
+  methods: {
+    toggleVideo () {
+      this.$storex.call.toggleVideo(this.call)
+    },
+    toggleAudio () {
+      this.$storex.call.toggleAudio(this.call)
     }
   }
 };

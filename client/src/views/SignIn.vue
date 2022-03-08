@@ -5,6 +5,10 @@
     >
       Sign in
     </h1>
+    <h1
+      class="md:pt-1 text-center px-3 md:px-0 md:text-xl text-lg font-medium">
+      <img src="logo.png" class="" width="80" style="margin:auto" />
+    </h1>
     <h3
       class="md:pt-1 text-center px-3 md:px-0 md:text-xl text-lg font-medium "
     >
@@ -97,6 +101,23 @@
             Register...
           </router-link>
         </label>
+        <br/>
+        <label class="block md:text-lg text-md font-medium ">
+          Login with...
+        </label>
+        <div class="flex flew-row mt-2 gap-4">
+          <div class="avatar cursor-pointer w-16 h-16"
+            @click="loginWithGithub"
+          >
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="rounded-lg" />
+          </div>
+          <div class="avatar cursor-pointer w-16 h-16"
+            v-if="false"
+            @click="loginWithGoogle"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/1024px-Google_%22G%22_Logo.svg.png" class="rounded-lg" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -123,6 +144,12 @@ export default {
       const { identifier, password } = this
       await this.$storex.user.login({ identifier, password })
       return this.$router.push("/")
+    },
+    loginWithGithub () {
+      window.location = "https://api-codx.meetnav.com/api/connect/github"
+    },
+    loginWithGoogle () {
+      window.location = "https://api-codx.meetnav.com/api/connect/google"
     }
   }
 };

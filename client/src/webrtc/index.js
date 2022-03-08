@@ -22,30 +22,114 @@ function makeid (slots) {
 
 export default class WebRTCRoom {
   connection = null
+  screenConnection = null
   roomId = null
   streams = {}
+  onStreamsChanged = () => {}
+
   constructor (settings) {
-    const { video, audio } = settings
-    this.connection = RTCMulticonnection()
-    this.connection.socketURL = `${process.env.VUE_APP_API}/`
-    this.connection.session = {
+    this.roomSettings = settings
+    this.connection = this.createConnection(settings)
+  }
+
+  createConnection (settings) {
+    const { video, audio, screen } = settings
+    const connection = RTCMulticonnection()
+    connection.socketURL = `${process.env.VUE_APP_API}/`
+    // STUN / TURN Servers
+    if (settings.webrtc) {
+      const { stunServer, turnServer, turnPassword, turnUser } = settings.webrtc
+      connection.iceServers = []
+      connection.iceServers.push({
+        urls: stunServer
+      })
+      connection.iceServers.push({
+        urls: turnServer,
+        credential: turnPassword,
+        username: turnUser
+      })
+      connection.iceTransportPolicy = 'relay'
+    }
+    connection.session = {
         audio,
-        video,
+        video: video ? {
+            width: {
+                ideal: 1280
+            },
+            height: {
+                ideal: 720
+            },
+            frameRate: 30
+        } : null,
+        screen,
         data: true
     }
-    this.connection.extra = this.encodeExtra(settings)
-    this.connection.onstream = this.onStream.bind(this)
+    this.setCodecs({ connection })
+    connection.extra = this.encodeExtra(settings)
+    connection.onstream = this.onStream.bind(this)
+    connection.onstreamended = this.onStreamEnded.bind(this)
+    connection.onmute = this.onMute.bind(this)
+    connection.onunmute = this.onUnMute.bind(this)
+
+    return connection
+  }
+
+  setCodecs ({ connection, resolutions = "HD", bitrates = 512 }) {
+    const CodecsHandler = connection.CodecsHandler
+    connection.processSdp = function(sdp) {
+        var codecs = 'vp8'
+        console.log("processSdp", sdp)
+
+        if (resolutions == 'HD') {
+            sdp = CodecsHandler.setApplicationSpecificBandwidth(sdp, {
+                audio: 128,
+                video: bitrates,
+                screen: bitrates
+            });
+
+            sdp = CodecsHandler.setVideoBitrates(sdp, {
+                min: bitrates * 8 * 1024,
+                max: bitrates * 8 * 1024,
+            });
+        }
+
+        if (resolutions == 'Ultra-HD') {
+            sdp = CodecsHandler.setApplicationSpecificBandwidth(sdp, {
+                audio: 128,
+                video: bitrates,
+                screen: bitrates
+            });
+
+            sdp = CodecsHandler.setVideoBitrates(sdp, {
+                min: bitrates * 8 * 1024,
+                max: bitrates * 8 * 1024,
+            });
+        }
+
+        if (codecs.length) {
+            sdp = CodecsHandler.preferCodec(sdp, codecs.toLowerCase());
+        }
+
+        return sdp;
+    };
   }
 
   static async newRoom (settings) {
     const room = new WebRTCRoom(settings)
+    const { onStreamsChanged } = settings
+    if (onStreamsChanged) {
+      room.onStreamsChanged = onStreamsChanged
+    }
     await room.connect(settings)
     return room
   }
 
-  async connect ({ name }) {
-    const { isRoomCreated, roomId } = await this.connection.openOrJoin(name || makeid(3))
-    this.roomId = roomId
+  shareScreen () {
+  }
+
+  async connect ({ roomId: name }) {
+    this.roomId = name || makeid(3)
+    const { isRoomCreated, roomId } = await this.connection.openOrJoin(this.roomId)
     console.log("rtc", "Room openend", isRoomCreated, roomId)
   }
 
@@ -85,10 +169,89 @@ export default class WebRTCRoom {
         extra
       }
     }
+    if (event.type === 'local') {
+      if (!this.connection.session.video) {
+        this.toggleVideo()
+      }
+    }
+    this.onStreamsChanged(this)
+  }
+
+  onStreamEnded (event) {
+    const { streamid } = event
+    const k = Object.keys(this.streams).filter(k => this.streams[k].streamid === streamid)[0]
+    if (k) {
+      delete this.streams[k]
+      this.onStreamsChanged(this)
+    }
   }
 
   get socket () {
     const { connection: { socket } } = this
     return socket
+  }
+
+  get allStreams () {
+    const { streams } = this
+    return Object.values(streams)
+  }
+
+  get myStreams () {
+    return this.allStreams
+      .filter(s => s.type === 'local')
+  }
+
+  onMute (event) {
+    const { streamid, muteType } = event
+    const stream = this.allStreams.filter(s => s.streamid === streamid)[0]
+    if (muteType === 'video') {
+      if (stream.paused)
+        return
+      stream.paused = true
+    }
+    if (muteType === 'audio') {
+      if (stream.muted)
+        return
+      stream.muted = true
+    }
+    this.onStreamsChanged(this)
+    console.log("onmute", event)
+  }
+
+  onUnMute (event) {
+    const { streamid, unmuteType } = event
+    const stream = this.allStreams.filter(s => s.streamid === streamid)[0]
+    if (unmuteType === 'video') {
+      if (!stream.paused)
+        return
+      stream.paused = false
+    }
+    if (unmuteType === 'audio') {
+      if (!stream.muted)
+        return
+      stream.muted = false
+    }
+    this.onStreamsChanged(this)
+    console.log("onunmute", event)
+  }
+
+  toggleVideo () {
+    const isAudioMuted = this.myStreams[0].muted
+    this.myStreams.forEach(s => {
+      if (s.paused) {
+        s.stream.unmute('video')
+      } else {
+        s.stream.mute('video')
+      }
+      if (isAudioMuted) {
+        s.stream.mute('audio')
+      } else {
+        s.stream.unmute('audio')
+      }
+    })
+  }
+
+  toggleAudio () {
+    this.myStreams.forEach(s => s.muted ? s.stream.unmute('audio') : s.stream.mute('audio'))
   }
 }

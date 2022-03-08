@@ -24,6 +24,12 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "extra": {
+      "type": "json"
+    },
+    "edited": {
+      "type": "datetime"
     }
   }
 }

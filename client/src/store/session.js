@@ -25,19 +25,30 @@ export const mutations = mutationTree(state, {
     if (room) {
       const { socket } = room
       const heartbeat = () => {
-        if ((new Date() - state.lastHeartBeat) > 10000) {
+        if ((new Date() - state.lastHeartBeat) > 30000) {
+          console.error("session", "user offline")
           state.isOnline = false
         }
-        socket.emit('heartbeat', $storex.user.user)
+        const { user } = $storex.user
+        socket.emit('heartbeat', user)
       }
-      state.heartbeat = setInterval(heartbeat, 5000)
+      state.heartbeat = setInterval(heartbeat, 20000)
+      heartbeat()
 
-      socket.on('chat-message', msg => {
-        $storex.chat.addMessage(msg)
+      socket.on('chat-message', (msg, callbackFn) => {
+        try {
+          $storex.chat.addMessage(msg)
+          callbackFn()
+        } catch (ex) {
+          console.error(ex)
+          callbackFn(ex)
+        }
       })
-      socket.on('heartbeat', ts => {
-        state.lastHeartBeat = Date.parse(ts)
+      socket.on('heartbeat', data => {
+        const { network: { friends } } = data
+        state.lastHeartBeat = new Date()
         state.isOnline = true
+        $storex.network.updateFriendStatus(friends)
       })
     }
   }
@@ -50,7 +61,11 @@ export const actions = actionTree(
       const user = $storex.user.user
       if (user) {
         const { roomId } = user
-        const room = await WebRTCRoom.newRoom({ name: roomId })
+        const room = await WebRTCRoom.newRoom({
+          name: roomId,
+          turnUser: user.webrtc?.turnUser,
+          turnPassword: user.webrtc?.turnPassword
+        })
         $storex.session.setRoom(room)
       } else if(state.userRoom){
         $storex.session.setRoom(null)

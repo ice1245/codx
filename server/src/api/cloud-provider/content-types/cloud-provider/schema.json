@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cloud_providers",
+  "info": {
+    "singularName": "cloud-provider",
+    "pluralName": "cloud-providers",
+    "displayName": "CloudProvider",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "settings": {
+      "type": "json"
+    },
+    "company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "type": {
+      "type": "string"
+    },
+    "data": {
+      "type": "json"
+    }
+  }
+}

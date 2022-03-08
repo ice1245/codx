@@ -5,14 +5,26 @@
   </div>
 </template>
 <script>
-import Notifications from '@/components/Notifications.vue'
 import { themeChange } from 'theme-change'
+import Notifications from '@/components/Notifications.vue'
 export default {
   components: {
     Notifications
   },
+  data () {
+    return {
+      doLogin: false
+    }
+  },
   mounted () {
     themeChange(false)
+  },
+  methods: {
+    login () {
+      const { authenticated } = this.$storex.user
+      !authenticated && this.$router.push("/login")
+      return authenticated
+    }
   }
 }
 </script>

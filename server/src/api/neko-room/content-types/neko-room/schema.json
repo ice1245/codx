@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "neko_rooms",
+  "info": {
+    "singularName": "neko-room",
+    "pluralName": "neko-rooms",
+    "displayName": "NekoRoom",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "settings": {
+      "type": "json"
+    },
+    "chat": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::chat.chat"
+    },
+    "room": {
+      "type": "json"
+    },
+    "name": {
+      "type": "string"
+    },
+    "descripition": {
+      "type": "string"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "ports": {
+      "type": "json"
+    },
+    "cloud_provider": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::cloud-provider.cloud-provider"
+    }
+  }
+}

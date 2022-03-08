@@ -1,0 +1,1 @@
+(cd codx-room && bash build.sh)

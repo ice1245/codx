@@ -1,37 +1,60 @@
 <template>
-  <div class="dropdown dropdown-right dropdown-end text-primary">
-    <Avatar tabindex="0" class="cursor-pointer" :url="src" :online="online" />
-    <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-40">
-      <li>
-        <a
-          @click="$emit('option', 'profile')"
-        >
-          Profile
-          <PencilAltIcon
-            class="ml-3 h-4 w-4 group-hover:"
-            aria-hidden="true"
-          />
-        </a>
-      </li> 
-      <li>
-        <a
-          @click="$router.push('/logout')"
-        >
-          Logout
-          <LogoutIcon
-            class="ml-3 h-4 w-4 group-hover:"
-            aria-hidden="true"
-          />
-        </a>
-      </li>
-    </ul>
+  <div>
+    <div class="dropdown dropdown-right dropdown-end text-primary" v-if="user">
+      <Avatar tabindex="0" class="cursor-pointer" :url="user.avatar" :online="online"/>
+      <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-40">
+        <li>
+          <a
+            @click="$emit('option', 'profile')"
+          >
+            Profile
+            <PencilAltIcon
+              class="ml-3 h-4 w-4 group-hover:"
+              aria-hidden="true"
+            />
+          </a>
+        </li> 
+        <li>
+          <a
+            @click="$router.push('/logout')"
+          >
+            Logout
+            <LogoutIcon
+              class="ml-3 h-4 w-4 group-hover:"
+              aria-hidden="true"
+            />
+          </a>
+        </li>
+        <li>
+          <a
+            href="#"
+            @click="showAbout = true"
+          >
+            About
+            <LogoutIcon
+              class="ml-3 h-4 w-4 group-hover:"
+              aria-hidden="true"
+            />
+            <AboutDialog v-if="showAbout" @cancel="showAbout = false" />
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="avatar ring rounded-full p-2 cursor-pointer" tabindex="0"
+      @click="$root.login()"
+      v-else>
+      <div class="w-6 h-6 rounded-full">
+        <UserAddIcon :class="`hidden md:block cursor-pointer w-6`" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue"
-import { PencilAltIcon, LogoutIcon } from "@heroicons/vue/solid"
+import { PencilAltIcon, LogoutIcon, UserAddIcon } from "@heroicons/vue/solid"
 import Avatar from './Avatar.vue'
+import AboutDialog from './AboutDialog.vue'
 
 export default {
   components: {
@@ -41,14 +64,24 @@ export default {
     MenuItems,
     PencilAltIcon,
     LogoutIcon,
-    Avatar
+    UserAddIcon,
+    Avatar,
+    AboutDialog
   },
   props: {
     imgClass: { type: String, default: "h-8 w-8 rounded-full" },
     src: { type: String, default: "../../assets/dots.svg" },
     menuItemClass: { type: String, default: "" },
   },
+  data () {
+    return {
+      showAbout: false
+    }
+  },
   computed: {
+    user () {
+      return this.$storex.user.user
+    },
     online () {
       return this.$storex.session.isOnline
     }

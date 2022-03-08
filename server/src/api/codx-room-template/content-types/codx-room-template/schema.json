@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "codx_room_templates",
+  "info": {
+    "singularName": "codx-room-template",
+    "pluralName": "codx-room-templates",
+    "displayName": "CodxRoomTemplate",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "company": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::company.company"
+    },
+    "repository": {
+      "type": "string"
+    }
+  }
+}
