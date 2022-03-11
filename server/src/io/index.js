@@ -43,9 +43,9 @@ class ioManager {
       }
     })
       .on('connection', (socket) => {
-        this.onConnection(socket)
         rtcmulticonnectionServer.addSocket(socket);
         rtcmulticonnectionServer.pushLogs({}, 'ioManager', { message: 'Socket added to rtcmulticonnection-server' })
+        this.onConnection(socket)
       })
     this.rooms = {}
     this.sockets = []
@@ -56,6 +56,7 @@ class ioManager {
     try {
       socket.emit("welcome", {})
       socket.on('heartbeat', user => this.onHeartBeat({ ...user, socket }))
+      socket.on('log', event => this.onLog(event))
       console.log("new socket", socket.handshake)
     } catch (ex) {
       console.error("io", "new socket connection error", { ex })
@@ -70,6 +71,9 @@ class ioManager {
     }
     this.refreshUsers([user])
     this.offlineUserIds.forEach(id => delete this.users[id])
+  }
+  onLog ({user, log}) {
+    console.log("user-log", { user, log })
   }
 
   emit (event, data, userIds = null) {

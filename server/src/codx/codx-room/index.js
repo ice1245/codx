@@ -240,7 +240,8 @@ module.exports = strapi => {
           ]
         },
         populate: {
-          user: true
+          user: true,
+          chat: true
         }
       })
       return nekoRooms
@@ -259,7 +260,13 @@ module.exports = strapi => {
           return res
         })
     },
-    getRoomPublicInfo ({ id, name, description, createdAt, user: { id: userId, username }, room: { proxy: { roomsUrl, prefix }, neko: { name: roomName }, nekoPwd, nekoAdminPwd } }) {
+    getRoomPublicInfo (room) {
+      const { id, name, description, createdAt,
+        user: { id: userId, username },
+        room: { proxy: { roomsUrl, prefix },
+        neko: { name: roomName }, nekoPwd, nekoAdminPwd },
+        chat: { id: chatId}
+      } = room
       const { url } = this.getRoomPublicUrls({ roomsUrl, prefix })
       return {
         id,
@@ -269,7 +276,8 @@ module.exports = strapi => {
         url,
         user: { id: userId, username },
         nekoPwd,
-        nekoAdminPwd
+        nekoAdminPwd,
+        chat: { id: chatId }
       }
     },
     async roomProxies (proxyToken) {

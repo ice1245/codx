@@ -42,7 +42,7 @@ export const mutations = mutationTree(state, {
       [id]: prepareChat(chat, state.chats[chat.id] || {})
     }
   },
-  async setOpenedChat (state, { id, visible }) {
+  async setOpenedChat (state, { id, visible } = {}) {
     if (id) {
       const { data: chat } = await api.loadChat(id)
       $storex.chat.addChat({ ...chat, visible })

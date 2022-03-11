@@ -12,6 +12,7 @@ export const state = () => ({
 })
 
 export const getters = getterTree(state, {
+  socket: state => state.userRoom?.socket
 })
 
 export const mutations = mutationTree(state, {
@@ -25,7 +26,7 @@ export const mutations = mutationTree(state, {
     if (room) {
       const { socket } = room
       const heartbeat = () => {
-        if ((new Date() - state.lastHeartBeat) > 30000) {
+        if (state.lastHeartBeat && (new Date() - state.lastHeartBeat) > 30000) {
           console.error("session", "user offline")
           state.isOnline = false
         }
@@ -50,6 +51,9 @@ export const mutations = mutationTree(state, {
         state.isOnline = true
         $storex.network.updateFriendStatus(friends)
       })
+      socket.on('welcome', () => {
+        $storex.user.fetchAccessToken()
+      })
     }
   }
 })
@@ -70,6 +74,11 @@ export const actions = actionTree(
       } else if(state.userRoom){
         $storex.session.setRoom(null)
       }
+    },
+    log (_, log) {
+      const { user: { id, username } = {} } = $storex.user
+      const { socket } =  $storex.session
+      socket && socket.emit('log', { user: { id, username }, log })
     }
   },
 )

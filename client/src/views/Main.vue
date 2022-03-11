@@ -3,6 +3,7 @@
     <SideBar
       class=""
       @sideBar="toggleSideBar"
+      @home="goHome"
       @switch-company="onSwitchCompany"
     />
     <div :class="[
@@ -38,7 +39,7 @@
       :channel="$storex.channel.currentChannel"
     />
     <div class="lg:flex flex-col w-full bg-base-200" v-if="splittedView">
-      <CodxAcademyHero v-if="hero === 'academy'" @close="hero = null" />
+      <CodxAcademyHero v-if="hero === 'welcome'" @close="hero = null" />
       <Header
           class="bg-neutral"
           :chat="$storex.chat.openedChat"
@@ -56,23 +57,22 @@
           v-if="showHeader"
         />
       <div class="lg:flex flex-row hidden h-full w-full">
-        <div :class="[chatVisible ? 'w-2/3' : 'grow']" v-if="currentClinic">
-          <NekoRoom
-            :room="currentClinic"
+        <NekoRoom :class="['grow']" v-if="currentClinic"
+          :room="currentClinic"
+        />
+        <div :class="['grow flex', stackPanels ? 'flex-col-reverse w-2/6' : 'flex-row']">
+          <ChatBox class="chat-box grow border-l border-slate-500 bg-neutral-focus text-neutral-content"
+            :chat="$storex.chat.openedChat" v-if="chatVisible"
+            :closeMe="!!currentClinic"
+            @on-event-click="onEventClick"
+            @hide-chat="toggleChatHidden"
+          />
+          <VideoCall
+            :class="['flex-none rounded-md', stackPanels ? 'w-2/3' : 'w-1/6']"
+            :call="$storex.call.currentCall"
+            v-if="videoCallVisible"
           />
         </div>
-        <ChatBox class="chat-box grow border-l border-slate-500 bg-neutral-focus text-neutral-content"
-          :chat="$storex.chat.openedChat" v-if="chatVisible"
-          :closeMe="!!currentClinic"
-          @on-event-click="onEventClick"
-          @hide-chat="toggleChatHidden"
-        />
-        <VideoCall
-          class="tflex-none w-1/6 m-5 rounded-md"
-          :call="$storex.call.currentCall"
-          v-if="$storex.call.currentCall && $storex.call.currentCall.streams"
-        />
-
       </div>
     </div>
     <LoadingDialog v-if="loading" />
@@ -140,11 +140,18 @@ export default {
       chatHidden: false,
       loading: false,
       taskManager: null,
-      hero: 'academy',
+      hero: 'welcome',
       profileUser: null
     };
   },
-  created () {
+  mounted () {
+    const { chat, channel } = this.$route.params
+    if (chat) {
+      this.onOpenChat({ id: parseInt(chat) })
+    }
+    if (channel) {
+      this.onOpenChannel({ id: parseInt(channel) })
+    }
   },
   computed: {
     openChat () {
@@ -177,6 +184,12 @@ export default {
     },
     splittedView () {
       return !this.showCodingClinics && !this.showChannel && (!this.taskManager || this.chatVisible) || this.hero
+    },
+    videoCallVisible () {
+      return this.$storex.call.currentCall && this.$storex.call.currentCall.streams
+    },
+    stackPanels () {
+      return this.chatVisible && this.videoCallVisible && this.currentClinic
     }
   },
   methods: {
@@ -189,27 +202,35 @@ export default {
         this.profileUser = this.$storex.user.user
       }
     },
-    onOpenChat (chat) {
-      this.showCodingClinics = false
-      this.leaveClinic ()
-      this.$storex.chat.setOpenedChat({ id: chat.id, visible: true })
-      this.$storex.channel.setCurrentChannel(null)
+    resetView () {
       this.hero = null
+      this.leaveClinic ()
+      this.$storex.chat.setOpenedChat()
+      this.$storex.channel.setCurrentChannel()
+      this.showCodingClinics = false
+      this.$router.push('/')
+    },
+    goHome () {
+      this.resetView()
+      this.hero = 'welcome'
+    },
+    onOpenChat (chat) {
+      this.resetView()
+      this.$storex.chat.setOpenedChat({ id: chat.id, visible: true })
+      this.$router.push(`/chat/${chat.id}`)
     },
     async onOpenChannel (channel) {
-      this.showCodingClinics = false
+      this.resetView()
+      this.$router.push(`/channel/${channel.id}`)
       this.$storex.channel.openChannel(channel)
-      this.hero = null
     },
     async onAcademyCourses () {
-      this.$storex.channel.openChannel()
+      this.resetView()
       this.showCodingClinics = await this.$storex.search.academyCourses()
-      this.hero = null
     },
     async onCodingClinics () {
-      this.$storex.channel.openChannel()
+      this.resetView()
       this.showCodingClinics = await this.$storex.search.codingClinics()
-      this.hero = null
     },
     async onNewChat () {
       if (!this.$root.login()) return
@@ -217,9 +238,8 @@ export default {
       this.onOpenChat(chat)
     },
     async onResultsNewCodingClinic (settings) {
+      this.resetView()
       await this.onNewCodingClinic(settings)
-      this.showCodingClinics = false
-      this.hero = null
     },
     async onNewCodingClinic (settings) {
       try {

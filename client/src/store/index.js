@@ -12,13 +12,17 @@ import * as network from './network'
 import * as search from './search'
 import * as channel from './channel'
 import * as company from './company'
+import * as log from './log'
 
 const storePattern = {
-  modules: { user, chat, clinic, call, session, network, search, channel, company },
+  modules: { user, chat, clinic, call, session, network, search, channel, company, log },
 }
 
 const store = createStore(storePattern)
 
 export const $storex = useAccessor(store, storePattern)
+$storex.init = () => {
+  $storex.log.init()
+}
 window.$storex = $storex
 export default store

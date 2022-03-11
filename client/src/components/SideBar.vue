@@ -3,10 +3,10 @@
     class="lg:py-4 py-1 h-full lg:px-2 px-1 flex flex-col justify-between items-center fixed relative bottom-0 z-50"
   >
     <img
-      :src="logos[logoIx]"
+      src="/logo.png"
       class="w-10 cursor-pointer mb-4"
       alt=""
-      @click="logoClick"
+      @click="$emit('home')"
     />
     <div class="flex flex-col grow justify-start">
       <div :class="['mb-2', isCurrentCompany(company) ? 'drop-shadow-lg' : '']"

@@ -15,3 +15,4 @@ const app = createApp(App)
 
 store.app = app;
 app.$.appContext.config.globalProperties.$storex = $storex
+$storex.init()

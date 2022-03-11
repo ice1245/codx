@@ -48,9 +48,12 @@ export const actions = actionTree(
   {
     init () {
     },
-    async openChannel (ctx, channel = {}) {
-      await $storex.channel.updateChannel(channel.id)
-      requestAnimationFrame(() => $storex.channel.setCurrentChannel(channel))
+    async openChannel (ctx, { id } = {}) {
+      await $storex.channel.updateChannel(id)
+      requestAnimationFrame(() => {
+        const channel = $storex.channel.channels.filter(c => c.id === id)[0]
+        $storex.channel.setCurrentChannel(channel)
+      })
     },
     async createChannel ({ state: { channels }}, channelSettings) {
       const { user: { id } } = $storex.user

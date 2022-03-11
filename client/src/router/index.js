@@ -21,6 +21,16 @@ const routes = [
     name: "Main",
     component: () => import("../views/Main.vue"),
   },
+  {
+    path: "/chat/:chat",
+    name: "Chat",
+    component: () => import("../views/Main.vue"),
+  },
+  {
+    path: "/channel/:channel",
+    name: "Channel",
+    component: () => import("../views/Main.vue"),
+  },
 ];
 
 const router = createRouter({
