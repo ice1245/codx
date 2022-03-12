@@ -2,7 +2,10 @@
   <div class="hero min-h-screen relative">
     <iframe class="w-full h-full" src="/landing/index.html" frameborder="0" @unload="onClose" ref="landing" >
     </iframe>
-    <button class="btn btn-warning absolute bottom-4 drop-shadow-lg left-2 right-2" @click="onClose"> Let's go!</button>
+    <div class="absolute bottom-4 left-2 right-6 flex gap-4">
+      <button class="btn btn-primary grow" @click="$router.push('/signup')"> Register!</button>
+      <button class="btn btn-warning grow" @click="onClose"> Show me more!</button>
+    </div>
   </div>
 </template>
 <script>

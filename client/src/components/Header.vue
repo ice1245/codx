@@ -57,7 +57,7 @@
         </label>
         <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52" v-if="!liveClinic">
           <li class="group relative" v-for="(clinic, ix) in clinics" :key="ix"
-            @click="$emit('join-clinic', clinic.id)"
+            @click="$emit('join-clinic', clinic)"
           >
             <a>{{ clinic.name }}</a>
             <div class="group-hover:visible invisible ml-4 pt-1 absolute right-2 top-1 cursor-pointer">
@@ -141,7 +141,12 @@ export default {
       return this.liveClinic
     },
     clinics () {
-      return this.$storex.clinic.clinics
+      const { clinics } = this.$storex.clinic
+      const { chat: openedChat } = this
+      if (openedChat) {
+        return clinics.filter(({ chat }) => !chat || chat.id === openedChat.id)
+      }
+      return clinics
     },
     me () {
       return this.$storex.user.user

@@ -32,13 +32,44 @@
         </div>
       </div> 
     </div>
+    <div class="m-2 shadow-lg flex flex-col">
+      <div class="p-2 flex" v-if="runningClinics">
+        <TerminalIcon class="w-8 mr-2" />
+        <div class="prose">
+          <h3>Running clinics</h3>
+        </div>
+      </div>
+      <OpenClinics class="p-2" v-if="runningClinics"
+        @join-clinic="clinic => $emit('join-clinic', clinic)"
+        @delete-clinic="clinic => $emit('delete-clinic', clinic)"
+      />
+    </div>
 
-    <div class="p-2">
-      <button
-        v-for="(tag, ix) in search.tags" :key="ix"
-        :class="`mr-2 btn btn-${labelColors[ix]}`">
-        {{ tag }} 
-      </button> 
+    <div class="p-2 flex gap-4">
+      <div class="flex flex-row text-primary drop-shadow-sm">
+        <FireIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Sponsored</div>
+        </div>
+      </div>
+      <div class="flex flex-row text-secondary drop-shadow-sm">
+        <AcademicCapIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Free</div>
+        </div>
+      </div>
+      <div class="flex flex-row text-info drop-shadow-sm">
+        <BeakerIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Data</div>
+        </div>
+      </div>
+      <div class="flex flex-row text-warning drop-shadow-sm">
+        <CodeIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Coding/Web</div>
+        </div>
+      </div>
     </div>
     <div class="my-2" v-if="searchString"><i>results for: {{ searchString }}</i></div>
 
@@ -101,13 +132,18 @@ import {
   ThumbUpIcon,
   ThumbDownIcon,
   PlayIcon,
-  TerminalIcon,
   PlusCircleIcon,
-  CogIcon
+  CogIcon,
+  FireIcon,
+  TerminalIcon,
+  AcademicCapIcon,
+  BeakerIcon,
+  CodeIcon
 } from '@heroicons/vue/outline'
 import Avatar from '@/components/Avatar.vue'
 import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
 import CodingClinicTemplate from '@/components/CodingClinicTemplate.vue'
+import OpenClinics from '@/components/OpenClinics.vue'
 export default {
   components: {
     Avatar,
@@ -117,8 +153,13 @@ export default {
     TerminalIcon,
     PlusCircleIcon,
     CogIcon,
+    FireIcon,
+    AcademicCapIcon,
+    BeakerIcon,
+    CodeIcon,
     CodingClinicDialog,
-    CodingClinicTemplate
+    CodingClinicTemplate,
+    OpenClinics
   },
   data () {
     return {
@@ -148,6 +189,9 @@ export default {
     searchString () {
       const { search: { query: { q } = {}} } = this
       return q
+    },
+    runningClinics () {
+      return !!this.$storex.clinic.clinics?.length
     }
   },
   methods: {

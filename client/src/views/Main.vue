@@ -32,6 +32,7 @@
       v-if="showCodingClinics"
       class="h-full w-full"
       @new-clinic="onResultsNewCodingClinic"
+      @join-clinic="joinClinic"
     />
     <Channel
       v-if="showChannel"
@@ -256,7 +257,7 @@ export default {
             }
           })
         }
-        this.joinClinic(clinic.id)
+        this.joinClinic(clinic)
         this.showCodingClinicDialog = false
         this.hero = null
       } catch{}
@@ -264,8 +265,11 @@ export default {
     deleteClinic (clinic) {
       $storex.clinic.deleteClinic(clinic)
     },
-    joinClinic (id, alreadyNotified) {
-      this.clinicList = false
+    joinClinic ({ id, chat = {} }, alreadyNotified) {
+      this.resetView()
+      if (chat.id) {
+        this.onOpenChat(chat)
+      }
       this.$storex.clinic.setCurrentClinic(id)
       if (!alreadyNotified) {
         const chat = this.$storex.chat.openedChat
@@ -281,7 +285,6 @@ export default {
           })
         }
       }
-      this.hero = null
     },
     leaveClinic () {
       this.clinicList = false
@@ -297,7 +300,7 @@ export default {
         this.$storex.call.joinCall({ type, roomId })
       }
       if (event === 'clinic') {
-        this.joinClinic(clinic.id, true)
+        this.joinClinic(clinic, true)
       }
     },
     onSwitchCompany (company) {
