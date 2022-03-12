@@ -4,6 +4,7 @@
     v-model="key"
     class="select select-bordered w-full max-w-xs"
     data-choose-theme
+    @change="$root.setTheme(key)"
   >
    <option v-for="(theme, index) in themes" :key="index" class="mr-5">
     {{ theme }}

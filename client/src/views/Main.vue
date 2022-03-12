@@ -214,6 +214,7 @@ export default {
     goHome () {
       this.resetView()
       this.hero = 'welcome'
+      this.sideBar = 'explorer'
     },
     onOpenChat (chat) {
       this.resetView()

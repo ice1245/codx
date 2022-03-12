@@ -2,10 +2,8 @@
   <div
     class="lg:py-4 py-1 h-full lg:px-2 px-1 flex flex-col justify-between items-center fixed relative bottom-0 z-50"
   >
-    <img
-      src="/logo.png"
+    <Logo
       class="w-10 cursor-pointer mb-4"
-      alt=""
       @click="$emit('home')"
     />
     <div class="flex flex-col grow justify-start">
@@ -41,11 +39,13 @@
 import {
   PlusIcon
 } from "@heroicons/vue/outline";
-import UserMenu from "./UserMenu.vue";
+import UserMenu from "@/components/UserMenu.vue";
+import Logo from "@/components/Logo.vue";
 export default {
   components: {
     PlusIcon,
     UserMenu,
+    Logo
   },
   data () {
     return {
