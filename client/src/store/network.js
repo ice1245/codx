@@ -1,5 +1,6 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import { $storex } from '.'
+import api from '@/api'
 
 export const namespaced = true
 
@@ -25,9 +26,14 @@ export const mutations = mutationTree(state, {
     $storex.network.updateAllUsers()
   },
   updateFriendStatus (state, friendStatus = []) {
-    const friends = friendStatus.reduce((acc, v) => [acc, (acc[v.id] = v)][0], {})
+    const { friends } = state
+    friendStatus.forEach(({id, online, openedChat }) =>
+      friends[id] = {
+        ...friends[id],
+        online,
+        openedChat
+      })
     state.friends = {
-      ...state.friends,
       ...friends
     }
     $storex.network.updateAllUsers()
@@ -59,6 +65,10 @@ export const actions = actionTree(
       } else {
         $storex.network.setNetwork({})
       }
+    },
+    async joinUser ({ state: { token } }, user) {
+      await api.updateNetwork({ addFriend: user })
+      await api.me(token)
     }
   },
 )

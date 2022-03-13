@@ -139,11 +139,31 @@ export default {
       errorPassword: null
     }
   },
+  async created () {
+    let redirect = null
+    const { query, params: { provider } } = this.$route
+    if (provider) {
+      await this.$storex.user.loginWithProvider({ ...query, provider })
+      redirect = "/"
+    }
+    const loginRedirect = localStorage.getItem("loginRedirect")
+    if (loginRedirect) {
+      localStorage.setItem("loginRedirect", null)
+      redirect = loginRedirect
+    }
+    if (redirect) {
+      this.$router.push(redirect)
+    }
+    if (query.next) {
+      localStorage.setItem("loginRedirect", query.next)
+    }
+  },
   methods: {
     async submit () {
       const { identifier, password } = this
       await this.$storex.user.login({ identifier, password })
-      return this.$router.push("/")
+      const loginRedirect = localStorage.getItem("loginRedirect") || "/"
+      return this.$router.push(loginRedirect)
     },
     loginWithGithub () {
       window.location = "https://api-codx.meetnav.com/api/connect/github"

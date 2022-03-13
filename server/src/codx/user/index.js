@@ -12,6 +12,7 @@ module.exports = strapi => {
       })
       const network = networks[0] || { friends: [], following: [], followed: [] }
       return {
+        id: network.id,
         friends: network.friends.map(this.filteredUser),
         following: network.following.map(this.filteredUser),
         followed: network.followed.map(this.filteredUser),
@@ -44,6 +45,14 @@ module.exports = strapi => {
           ]
         }
       })
+    },
+    async findUserByName (username) {
+      const users = await strapi.$query("users-permissions.user").findMany({
+        filters: {
+          username
+        }
+      })
+      return users[0]
     },
     async me (params) {
       const { id } = params

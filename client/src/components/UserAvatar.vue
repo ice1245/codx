@@ -43,7 +43,7 @@ export default {
     avatarClass () {
       const { user, video, paused, size, ring } = this
       return video && !paused ? 'rounded-btn w-24 h-12' :
-        [`bg-neutral-focus border-2 rounded-full w-${size || 12} h-${size || 12}`, (ring ? `ring ring-primary ring-offset-base-${ring} ring-offset-2` : '')]
+        [`bg-neutral-focus rounded-full w-${size || 12} h-${size || 12}`, (ring ? `ring ring-primary ring-offset-base-${ring} ring-offset-2` : '')]
     }
   }
 }

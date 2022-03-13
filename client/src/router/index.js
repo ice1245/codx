@@ -7,6 +7,11 @@ const routes = [
     component: () => import("../views/SignIn.vue"),
   },
   {
+    path: "/login/:provider",
+    name: "Auth",
+    component: () => import("../views/SignIn.vue"),
+  },
+  {
     path: "/signup",
     name: "Signup",
     component: () => import("../views/SignUp.vue"),
@@ -31,6 +36,11 @@ const routes = [
     name: "Channel",
     component: () => import("../views/Main.vue"),
   },
+  {
+    path: "/join/@:joinMe",
+    name: "JoinMe",
+    component: () => import("../views/Main.vue"),
+  }
 ];
 
 const router = createRouter({
@@ -38,20 +48,22 @@ const router = createRouter({
   routes,
 });
 router.beforeEach(async (to, from, next) => {
-  let { fullPath, path, query } = to
-  if (path.startsWith('/auth/')) {
-    const provider = path.split("/").reverse()[0]
-    await $storex.user.loginWithProvider({ ...query, provider })
-    return next("/")
-  }
-  if (fullPath === "/logout") {
+  let { fullPath, path, query, params: { joinMe } } = to
+  const isLogin = path.startsWith("/login")
+  if (path === "/logout") {
     await $storex.user.logout()
     return next('/')
   } else {
     await $storex.user.fetchAccessToken()
   }
-  if (!$storex.user.authenticated && fullPath !== '/login') {
-    fullPath !== '/' && next("/login");
+  if (!$storex.user.authenticated && !isLogin) {
+    if (path !== '/') {
+      return next({ path: "/login", query: { next: fullPath } })
+    }
+  }
+  if (joinMe) {
+    await $storex.network.joinUser(joinMe)
+    return next("/")
   }
   next();
 });

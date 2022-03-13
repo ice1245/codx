@@ -38,13 +38,14 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    async fetchAccessToken({ state: { lastLogin }}) {
+    async fetchAccessToken({ state: { lastLogin }}, force) {
       const token = localStorage.getItem("token")
       const fecthPayload = {
         authenticated: false
       }
       if (token) {
-        if (lastLogin && (new Date() - lastLogin) < 60000) { 
+        if (!force && lastLogin && (new Date() - lastLogin) < 60000) {
+          console.log("No need to refresh token")
           return
         }
         try {
@@ -118,7 +119,13 @@ export const actions = actionTree(
     async loginWithProvider (ctx, { provider, access_token }) {
       const { data: { jwt: token } } = await api.loginWithProvider({ provider, access_token })
       localStorage.setItem("token", token)
-      $storex.user.fetchAccessToken()
+      await $storex.user.fetchAccessToken(true)
+    },
+    notify (ctx, message) {
+      this.app.$notify({
+        text: message,
+        group: "generic"
+      }, 2000);
     }
   }
 )

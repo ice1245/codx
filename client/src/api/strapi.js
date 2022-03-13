@@ -107,6 +107,11 @@ class Strapi {
   async loginWithProvider ({ provider, access_token }) {
     return useFetch.get(`/api/auth/${provider}/callback?access_token=${access_token}`) 
   }
+
+  async updateNetwork (settings) {
+    const { headers } = this
+    return useFetch.put("/api/networks/1", settings, { headers })
+  }
 }
 
 export default new Strapi()

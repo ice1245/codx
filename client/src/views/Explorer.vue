@@ -88,8 +88,8 @@
             </h4>
             <div class="-space-x-1 ml-2">
               <UserAvatar v-for="(user, uix) in chat.users" :key="uix"
-                :class="[user.online && !user.isMe ? '' : 'hidden']"
-                :size="6"
+                :class="[user.openedChat === chat.id && user.online && !user.isMe ? '' : 'hidden']"
+                :size="4"
                 :user="user"
               />
             </div>
@@ -113,6 +113,7 @@
     </Dialog>
     <LoadingDialog v-if="loading" />
     <ChannelCreateDialog v-if="createNewChannel" @close="createNewChannel = false" />
+    <Share v-if="share" />
   </div>
 </template>
 
@@ -137,6 +138,7 @@ import Dialog from '@/components/Dialog.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
 import ChannelCreateDialog from '@/components/channel/ChannelCreateDialog.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import Share from '@/components/Share.vue'
 export default {
   components: {
     TerminalIcon,
@@ -156,7 +158,8 @@ export default {
     Dialog,
     LoadingDialog,
     ChannelCreateDialog,
-    UserAvatar
+    UserAvatar,
+    Share
   },
   data() {
     return {
@@ -165,7 +168,8 @@ export default {
       confirmDeleteChat: null,
       loading: false,
       createNewChannel: false,
-      searchString: null
+      searchString: null,
+      share: false
     }
   },
   computed: {

@@ -29,11 +29,23 @@ export const mutations = mutationTree(state, {
         if (state.lastHeartBeat && (new Date() - state.lastHeartBeat) > 30000) {
           console.error("session", "user offline")
           state.isOnline = false
+          if (!socket.connected) {
+            $storex.session.init()
+          }
         }
-        const { user } = $storex.user
-        socket.emit('heartbeat', user)
+        const { user: { id, username, network: { friends } } } = $storex.user
+        const { chats = {}, openedChat } = $storex.chat
+        socket.emit('heartbeat', {
+          id,
+          username,
+          chats: Object.keys(chats).map(k => parseInt(k)),
+          openedChat: openedChat?.id,
+          network: {
+            friends: friends?.map(f => f.id)
+          }
+        })
       }
-      state.heartbeat = setInterval(heartbeat, 20000)
+      state.heartbeat = setInterval(heartbeat, 10000)
       heartbeat()
 
       socket.on('chat-message', (msg, callbackFn) => {
