@@ -27,13 +27,14 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
         description: settings.description,
         cloudProvider: settings.cloudProvider
       }})
-      return codx.room.getRoomPublicInfo({ ...nekoRoom, user })
+      return codx.room.getRoomPublicInfo({ ...nekoRoom, user, chat })
     },
     async find ({ state: { user }}) {
       return codx.room.listRooms(user)
     },
     async delete ({ state: { user }, params: { id } }) {
-      const { room } = await strapi.$api('neko-room').findOne(id)
+      //const { room } = await strapi.$api('neko-room').findOne(id)
+      return strapi.$api('neko-room').update(id, { data: { deleted: true }})
       console.log("neko-rooms", "delete", { user, room })
       codx.room.deleteRoom(room)
       return strapi.$api('neko-room').delete(id)

@@ -134,7 +134,7 @@ export default {
           acc.push({
             createdAt,
             from: this.findUser(from),
-            entries: [{ id, content, createdAt, extra, from: { id: from.id }, edited }],
+            entries: [{ id, content, createdAt, extra, from: { id: (from||{}).id }, edited }],
             event: event ? extra : null
           })
           return acc

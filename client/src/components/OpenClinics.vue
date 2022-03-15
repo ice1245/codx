@@ -72,7 +72,7 @@ export default {
     },
     clinicUsers (clinic) {
       const chat = this.clinicChat(clinic)
-      return chat.users
+      return chat?.users
     },
     canEdit ({ user: id }) {
       return id === this.me.id

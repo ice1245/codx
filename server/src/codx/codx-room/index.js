@@ -245,7 +245,7 @@ module.exports = strapi => {
         }
       })
       return nekoRooms
-        .filter(room => room.user)
+        .filter(room => room.user && !room.deleted)
         .map(room => {
           if(!room.user) {
             room.user = user
@@ -265,8 +265,9 @@ module.exports = strapi => {
         user: { id: userId, username },
         room: { proxy: { roomsUrl, prefix },
         neko: { name: roomName }, nekoPwd, nekoAdminPwd },
-        chat: { id: chatId}
+        chat
       } = room
+      const { id: chatId } = chat||{}
       const { url } = this.getRoomPublicUrls({ roomsUrl, prefix })
       return {
         id,

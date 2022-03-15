@@ -69,6 +69,10 @@ export const actions = actionTree(
     async joinUser ({ state: { token } }, user) {
       await api.updateNetwork({ addFriend: user })
       await api.me(token)
+    },
+    async joinCompany ({ state: { token } }, company) {
+      await api.updateNetwork({ addCompany: company })
+      await api.me(token)
     }
   },
 )

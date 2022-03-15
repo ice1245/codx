@@ -15,19 +15,30 @@ export const getters = getterTree(state, {
 })
 
 function prepareChat (chat, { visible }) {
-  const { id, admins = [], guests = [], messages = [] } = chat
+  const { id, admins = [], guests = [], messages = [], lastView = new Date() } = chat
   messages.forEach(m => {
     m.from = $storex.network.allUsers[m.from.id]
+    m.createdAt = Date.parse(m.createdAt)
   })
+  const mention = `@${$storex.user.user.username}`
   return {
     ...chat,
     admins,
     guests,
     visible,
+    messages,
     get users () {
       return this.admins.concat(this.guests)
         .map(u => ($storex.network.allUsers||[])[u.id] || u)
-    }
+    },
+    get unreadMessages () {
+      const unread = this.messages.filter(({ createdAt }) => createdAt > this.lastView)
+      return unread.length ? unread : null
+    },
+    get missingMention () {
+      return !!(this.unreadMessages||[]).filter(({ content }) => content.indexOf(mention) !== -1).length
+    },
+    lastView
   }
 }
 
@@ -49,6 +60,9 @@ export const mutations = mutationTree(state, {
     }
     if (state.chats) {
       state.openedChat = state.chats[id]
+      if (state.openedChat) {
+        state.openedChat.lastView = new Date()
+      }
     }
   },
   async addMessage (state, { id, chat: { id: chatId }, from, content, createdAt, extra, edited }) {

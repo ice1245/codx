@@ -41,6 +41,9 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::cloud-provider.cloud-provider"
+    },
+    "deleted": {
+      "type": "boolean"
     }
   }
 }

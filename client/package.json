@@ -14,6 +14,7 @@
     "add": "^2.0.6",
     "axios": "^0.25.0",
     "daisyui": "^1.25.4",
+    "dayspan-vuetify": "^0.4.0",
     "marked": "^4.0.12",
     "moment": "^2.29.1",
     "notiwind": "^1.2.5",

@@ -196,7 +196,7 @@ export default {
       const { user: { username } } = this.$storex.user
 
       await this.$storex.call.createNewCall({ roomId, type, users })
-      false && id && this.$storex.chat.sendMessage({
+      id && this.$storex.chat.sendMessage({
         chat: this.chat,
         content: `@${username} started new call.`,
         extra: {

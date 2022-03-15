@@ -37,6 +37,11 @@ const routes = [
     component: () => import("../views/Main.vue"),
   },
   {
+    path: "/join/:joinCompany",
+    name: "JoinCompany",
+    component: () => import("../views/Main.vue"),
+  },
+  {
     path: "/join/@:joinMe",
     name: "JoinMe",
     component: () => import("../views/Main.vue"),
@@ -48,7 +53,7 @@ const router = createRouter({
   routes,
 });
 router.beforeEach(async (to, from, next) => {
-  let { fullPath, path, query, params: { joinMe } } = to
+  let { fullPath, path, query, params: { joinMe, joinCompany } } = to
   const isLogin = path.startsWith("/login")
   if (path === "/logout") {
     await $storex.user.logout()
@@ -63,6 +68,10 @@ router.beforeEach(async (to, from, next) => {
   }
   if (joinMe) {
     await $storex.network.joinUser(joinMe)
+    return next("/")
+  }
+  if (joinCompany) {
+    await $storex.network.joinCompany(joinCompany)
     return next("/")
   }
   next();

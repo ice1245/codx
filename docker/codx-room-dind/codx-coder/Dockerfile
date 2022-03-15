@@ -1,6 +1,4 @@
-FROM codercom/code-server:latest
-
-USER root
+FROM ubuntu:latest
 
 RUN apt-get update && apt install -y libarchive-tools docker.io
 RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -48,6 +46,52 @@ RUN dpkg -i github-cli.deb
 
 # os tools
 RUN apt install -y iputils-ping host lsof p7zip-full
+
+## CODE-SERVER
+RUN apt-get update \
+ && apt-get install -y \
+    curl \
+    dumb-init \
+    zsh \
+    htop \
+    locales \
+    man \
+    nano \
+    git \
+    git-lfs \
+    procps \
+    openssh-client \
+    sudo \
+    vim.tiny \
+    lsb-release \
+  && git lfs install \
+  && rm -rf /var/lib/apt/lists/*
+
+# https://wiki.debian.org/Locale#Manually
+RUN sed -i "s/# en_US.UTF-8/en_US.UTF-8/" /etc/locale.gen \
+  && locale-gen
+ENV LANG=en_US.UTF-8
+
+RUN adduser --gecos '' --disabled-password coder && \
+  echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/nopasswd
+
+RUN ARCH="$(dpkg --print-architecture)" && \
+    curl -fsSL "https://github.com/boxboat/fixuid/releases/download/v0.5/fixuid-0.5-linux-$ARCH.tar.gz" | tar -C /usr/local/bin -xzf - && \
+    chown root:root /usr/local/bin/fixuid && \
+    chmod 4755 /usr/local/bin/fixuid && \
+    mkdir -p /etc/fixuid && \
+    printf "user: coder\ngroup: coder\n" > /etc/fixuid/config.yml
+
+ARG CODE_SERVER_VER=4.0.2
+RUN ARCH="$(dpkg --print-architecture)" && \
+    curl -fsSL "https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VER}/code-server_${CODE_SERVER_VER}_${ARCH}.deb" > /tmp/code-server.deb
+
+RUN dpkg -i /tmp/code-server.deb && rm /tmp/code-server*.deb
+
+COPY --chown=coder code-server/.config.yaml /home/coder/.config/code-server/config.yaml
+COPY --chown=coder code-server/settings.json /home/coder/.local/share/code-server/User/settings.json
+## CODE-SERVER
+
 
 ## homebrew
 RUN curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh > /brew.sh

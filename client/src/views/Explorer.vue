@@ -36,7 +36,7 @@
     </div>
     <div class="text-base pl-3 cursor-pointer mb-2"><ChatAltIcon class="h-5 w-5 float-left mr-2" />Recent</div>
     <div class="text-base pl-3 cursor-pointer mb-2"><StarIcon class="h-5 w-5 float-left mr-2" />Starred messages</div>
-    <div class="text-base pl-3 cursor-pointer mb-2"><CalendarIcon class="h-5 w-5 float-left mr-2" />Next events</div>
+    <div class="text-base pl-3 cursor-pointer mb-2" @click="$emit('calendar')"><CalendarIcon class="h-5 w-5 float-left mr-2" />Next events</div>
 
     <div class="text-base pl-3 mt-3 cursor-pointer"
       @click="channelsOpen = !channelsOpen"
@@ -93,6 +93,10 @@
                 :user="user"
               />
             </div>
+            <ChatAltIcon
+              :class="['w-4 ml-2 text-warning', chat.missingMention ? 'animate-bounce' : '']"
+              v-if="chat.unreadMessages"
+            />
           </div>
           <div class="group-hover:visible invisible ml-4 pt-1">
             <TrashIcon class="w-5" @click.stop="confirmDeleteChat = chat" />

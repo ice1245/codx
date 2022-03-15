@@ -11,7 +11,7 @@
       'w-2/6 lg:px-4 relative ml-0',
       'flex flex-col justify-between',
       '']"
-      v-if="explorerVisible || profileVisible">
+      v-if="explorerBarVisible">
       <Explorer class="explorer w-full"
         v-if="explorerVisible"
         @academy-courses="onAcademyCourses"
@@ -20,8 +20,10 @@
         @open-channel="onOpenChannel"
         @new-chat="onNewChat"
         @task-manager="onTaskManager"
+        @calendar="() => toggleSideBar('calendar')"
       />
       <Profile v-if="profileVisible" :user="profileVisible"/>
+      <UserCalendar class="w-full" v-if="calendarVisible"/>
       <InviteBtn />
     </div>
     <TaskManager class="w-1/3"
@@ -33,6 +35,7 @@
       class="h-full w-full"
       @new-clinic="onResultsNewCodingClinic"
       @join-clinic="joinClinic"
+      @delete-clinic="deleteClinic"
     />
     <Channel
       v-if="showChannel"
@@ -110,6 +113,7 @@ import { ChatAltIcon } from "@heroicons/vue/outline"
 import TaskManager from '@/components/TaskManager.vue'
 import InviteBtn from '@/components/InviteBtn.vue'
 import CodxAcademyHero from '@/components/hero/CodxAcademyHero.vue'
+import UserCalendar from '@/components/UserCalendar.vue'
 export default {
   components: {
     SideBar,
@@ -128,7 +132,8 @@ export default {
     ChatAltIcon,
     TaskManager,
     InviteBtn,
-    CodxAcademyHero
+    CodxAcademyHero,
+    UserCalendar
   },
   data() {
     return {
@@ -171,6 +176,9 @@ export default {
     profileVisible () {
       return this.sideBar === 'profile'
     },
+    calendarVisible () {
+      return this.sideBar === 'calendar'
+    },
     showLeftBar () {
       return this.sideBar !== ''
     },
@@ -191,6 +199,9 @@ export default {
     },
     stackPanels () {
       return this.chatVisible && this.videoCallVisible && this.currentClinic
+    },
+    explorerBarVisible () {
+      return this.explorerVisible || this.profileVisible || this.calendarVisible
     }
   },
   methods: {
