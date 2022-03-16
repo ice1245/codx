@@ -1,6 +1,6 @@
 set -e
-source ../load_env.sh
+source ./.env
 docker build -t codx/neko:latest .
-# docker login -u $DOCKER_USER -p $DOCKER_PWD https://$DOCKER_DOMAIN
-# docker image tag codx/neko:latest $DOCKER_DOMAIN/codx/neko:latest
-# docker image push $DOCKER_DOMAIN/codx/neko
+echo docker login -u $DOCKER_LOGIN_USER -p $DOCKER_LOGIN_PWD $DOCKER_DOMAIN
+docker image tag codx/neko:latest $DOCKER_DOMAIN/gbrian/codx:latest
+docker image push $DOCKER_DOMAIN/gbrian/codx

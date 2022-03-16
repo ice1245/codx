@@ -250,21 +250,16 @@ module.exports = strapi => {
           if(!room.user) {
             room.user = user
           }
-          const rpi = this.getRoomPublicInfo(room)
-          const res = {
-            ...rpi,
-            nekoPassword: rpi.user.id === user.id ? rpi.nekoAdminPwd : rpi.nekoPwd
-          }
-          delete res.nekoPwd
-          delete res.nekoAdminPwd
-          return res
+          return this.getRoomPublicInfo(room, user)
         })
     },
-    getRoomPublicInfo (room) {
+    getRoomPublicInfo (room, { reqUserId } = {}) {
       const { id, name, description, createdAt,
         user: { id: userId, username },
         room: { proxy: { roomsUrl, prefix },
-        neko: { name: roomName }, nekoPwd, nekoAdminPwd },
+          neko: { name: roomName },
+          nekoPwd, nekoAdminPwd, provider
+        },
         chat
       } = room
       const { id: chatId } = chat||{}
@@ -276,9 +271,9 @@ module.exports = strapi => {
         createdAt,
         url,
         user: { id: userId, username },
-        nekoPwd,
-        nekoAdminPwd,
-        chat: { id: chatId }
+        nekoPassword: !reqUserId || reqUserId === user.id ? nekoAdminPwd : nekoPwd,
+        chat: { id: chatId },
+        provider
       }
     },
     async roomProxies (proxyToken) {

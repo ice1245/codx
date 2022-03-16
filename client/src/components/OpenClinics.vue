@@ -1,7 +1,7 @@
 <template>
   <div class="clinic-list">
     <div class="flex flex-row gap-4 mt-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
-      <div class="relative w-1/6 h-24 px-2 py-1 border rounded-md flex flex-col justify-between bg-base-100 border-accent-focus"
+      <div class="relative w-1/6 h-32 px-2 py-1 border rounded-md flex flex-col justify-between bg-base-100 border-accent-focus"
         v-for="(clinic, cix) in clinics" :key="cix"
       >
         <div class="grow flex gap-2">
@@ -30,6 +30,7 @@
             <TrashIcon class="w-4" /> Delete
           </button>
         </div>
+        <small>{{ clinic.provider }}</small>
       </div>
     </div>
   </div>

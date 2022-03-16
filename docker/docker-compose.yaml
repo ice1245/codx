@@ -63,6 +63,7 @@ services:
       - "NEKO_ROOMS_TRAEFIK_CORS"
       - "NEKO_ROOMS_LOGS=true"
       - "NEKO_ROOMS_NEKO_IMAGES=$NEKO_ROOMS_NEKO_IMAGES"
+      - "NEKO_ROOMS_NEKO_PRIVILEGED_IMAGES=$NEKO_ROOMS_NEKO_PRIVILEGED_IMAGES"
       - "NEKO_ROOMS_DEBUG"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

@@ -4,7 +4,6 @@
  *  neko-room controller
  */
 const { createCoreController } = require('../../strapix')
-const nekoRooms = require('../../../neko-rooms')
 
 module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) => {
   const codx = require('../../../codx')(strapi)
@@ -33,8 +32,8 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
       return codx.room.listRooms(user)
     },
     async delete ({ state: { user }, params: { id } }) {
-      //const { room } = await strapi.$api('neko-room').findOne(id)
-      return strapi.$api('neko-room').update(id, { data: { deleted: true }})
+      // return strapi.$api('neko-room').update(id, { data: { deleted: true }})
+      const { room } = await strapi.$api('neko-room').findOne(id)
       console.log("neko-rooms", "delete", { user, room })
       codx.room.deleteRoom(room)
       return strapi.$api('neko-room').delete(id)

@@ -62,8 +62,5 @@ dist
 docker/.env
 *.tar
 
-neko-rooms
-neko
-
 # traefic certs
 acme.json

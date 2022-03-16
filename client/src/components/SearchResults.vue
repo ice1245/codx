@@ -41,7 +41,7 @@
       </div>
       <OpenClinics class="p-2" v-if="runningClinics"
         @join-clinic="clinic => $emit('join-clinic', clinic)"
-        @delete-clinic="clinic => $emit('delete-clinic', clinic)"
+        @delete-clinic="clinic => deleteClinic = clinic"
       />
     </div>
 
@@ -125,6 +125,12 @@
       :template="resultDialog"
       :media="getResultMedia(resultDialog)"
     />
+    <DeleteClinicDialog
+      :clinic="deleteClinic"
+      @ok="onDeleteClinic"
+      @cancel="deleteClinic = null"
+      v-if="deleteClinic"
+    />
   </div>
 </template>
 <script>
@@ -144,6 +150,7 @@ import Avatar from '@/components/Avatar.vue'
 import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
 import CodingClinicTemplate from '@/components/CodingClinicTemplate.vue'
 import OpenClinics from '@/components/OpenClinics.vue'
+import DeleteClinicDialog from '@/components/DeleteClinicDialog.vue'
 export default {
   components: {
     Avatar,
@@ -159,7 +166,8 @@ export default {
     CodeIcon,
     CodingClinicDialog,
     CodingClinicTemplate,
-    OpenClinics
+    OpenClinics,
+    DeleteClinicDialog
   },
   data () {
     return {
@@ -175,7 +183,8 @@ export default {
       resultDialog: null,
       carrouselMeTarget: null,
       slidInterval: null,
-      clinicTemplates: null
+      clinicTemplates: null,
+      deleteClinic: null
     }
   },
   computed: {
@@ -243,6 +252,10 @@ export default {
     newBlankClinic () {
       this.clinicTemplates = null
       this.newCodingClinic = true
+    },
+    onDeleteClinic () {
+      this.$emit('delete-clinic', this.deleteClinic)
+      this.deleteClinic = null
     }
   }
 }

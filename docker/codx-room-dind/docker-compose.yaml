@@ -1,7 +1,7 @@
 version: "2"
 services:
   codx:
-    image: codx/room:latest
+    image: gbrian/codx:latest
     restart: unless-stopped
     shm_size: 2gb
     ports:
@@ -20,4 +20,6 @@ services:
       - "NEKO_VIDEO_BITRATE=$NEKO_VIDEO_BITRATE"
       - "NEKO_OPUS=$NEKO_OPUS"
       - "NEKO_AUDIO_BITRATE=$NEKO_AUDIO_BITRATE"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     restart: unless-stopped
