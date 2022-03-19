@@ -22,4 +22,6 @@ services:
       - "NEKO_AUDIO_BITRATE=$NEKO_AUDIO_BITRATE"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/home/codx:/home/codx"
+    user: $USER
     restart: unless-stopped

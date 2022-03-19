@@ -61,18 +61,23 @@
           v-if="showHeader"
         />
       <div class="lg:flex flex-row hidden h-full w-full">
-        <NekoRoom :class="['grow']" v-if="currentClinic"
-          :room="currentClinic"
-        />
-        <div :class="['grow flex', stackPanels ? 'flex-col-reverse w-2/6' : 'flex-row']">
-          <ChatBox class="chat-box grow border-l border-slate-500 bg-neutral-focus text-neutral-content"
+        <div class="grow" v-if="currentClinic">
+          <NekoRoom :room="currentClinic" />
+        </div>
+        <div :class="['flex',
+            stackPanels ? 'flex-col-reverse' : 'flex-row',
+            currentClinic ? (chatVisible ? 'w-1/3' : 'w-1/6') : 'grow'
+          ]"
+          v-if="chatVisible || videoCallVisible"
+        >
+          <ChatBox class="w-full chat-box grow border-l border-slate-500 bg-neutral-focus text-neutral-content"
             :chat="$storex.chat.openedChat" v-if="chatVisible"
             :closeMe="!!currentClinic"
             @on-event-click="onEventClick"
             @hide-chat="toggleChatHidden"
           />
           <VideoCall
-            :class="['flex-none rounded-md', stackPanels ? 'w-2/3' : 'w-1/6']"
+            :class="['flex-none rounded-md p-2', chatVisible ? 'w-1/3' : 'w-full']"
             :call="$storex.call.currentCall"
             v-if="videoCallVisible"
           />
@@ -168,7 +173,7 @@ export default {
       return this.$storex.clinic.currentClinic
     },
     chatVisible () {
-      return this.openChat && (!this.currentClinic || !this.chatHidden)
+      return this.openChat && !this.chatHidden
     },
     explorerVisible () {
       return this.sideBar === 'explorer'
@@ -214,11 +219,14 @@ export default {
         this.profileUser = this.$storex.user.user
       }
     },
-    resetView () {
+    async resetView (options) {
+      const { keepChat } = options||{}
       this.hero = null
       this.leaveClinic ()
-      this.$storex.chat.setOpenedChat()
-      this.$storex.channel.setCurrentChannel()
+      if (!keepChat) {
+        await this.$storex.chat.setOpenedChat()
+      }
+      await this.$storex.channel.setCurrentChannel()
       this.showCodingClinics = false
       this.$router.push('/')
     },
@@ -227,9 +235,12 @@ export default {
       this.hero = 'welcome'
       this.sideBar = 'explorer'
     },
-    onOpenChat (chat) {
-      this.resetView()
-      this.$storex.chat.setOpenedChat({ id: chat.id, visible: true })
+    async onOpenChat (chat) {
+      if (this.$storex.chat.openedChat?.id === chat?.id) {
+        return
+      }
+      await this.resetView()
+      await this.$storex.chat.setOpenedChat({ id: chat.id, visible: true })
       this.$router.push(`/chat/${chat.id}`)
     },
     async onOpenChannel (channel) {
@@ -277,10 +288,10 @@ export default {
     deleteClinic (clinic) {
       $storex.clinic.deleteClinic(clinic)
     },
-    joinClinic ({ id, chat = {} }, alreadyNotified) {
-      this.resetView()
+    async joinClinic ({ id, chat = {} }, alreadyNotified) {
+      await this.resetView({ keepChat: true })
       if (chat.id) {
-        this.onOpenChat(chat)
+        await this.onOpenChat(chat)
       }
       this.$storex.clinic.setCurrentClinic(id)
       if (!alreadyNotified) {

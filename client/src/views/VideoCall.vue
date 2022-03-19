@@ -4,10 +4,12 @@
     <video
       autoplay
       :muted="calleeVideo.type === 'local'"
-      :src-object.prop.camel="calleeVideo.stream"
+      :src-object.prop.camel="camOff ? null : calleeVideo.stream"
+      :poster="camOff ? 'https://cdn.dribbble.com/users/2208826/screenshots/6286951/guanxian.gif' : ''"
       v-if="calleeVideo"
       class="rounded-md object-fill z-0"
-    ></video>
+    >
+    </video>
     <Avatar
       class="animate-pulse"
       :size="24"

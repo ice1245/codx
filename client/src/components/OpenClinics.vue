@@ -27,7 +27,7 @@
             @click="$emit('delete-clinic', clinic)"
             v-if="clinic.user.id === me.id"
           >
-            <TrashIcon class="w-4" /> Delete
+            <TrashIcon class="w-4" />
           </button>
         </div>
         <small>{{ clinic.provider }}</small>

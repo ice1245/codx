@@ -80,7 +80,7 @@
         @mouseout="carrouselMe(null)"
       >
         <div @click="resultDialog = result">
-          <div class="h-40 carousel rounded-box relative">
+          <div class="h-36 carousel rounded-box relative">
             <div class="w-full carousel-item"
               v-for="(mhtml, iix) in getResultMedia(result)" :key="iix"
               >
@@ -90,7 +90,7 @@
           </div>
           <div class="p-2 w-full text-base-content">
             <div class="flex flex-row w-full">
-              <Avatar size="12" :url="result.user.avatar" />
+              <Avatar size="8" :url="result.user.avatar" />
               <div class="ml-4 flex flex-col w-full">
                 <div class="flex flex-row justify-between w-full">
                   <strong>{{ `@${result.user.username}` }}</strong>
@@ -102,11 +102,9 @@
                 <small>Category 4*</small>
               </div>
             </div>
-            <p class="prose">
-              <span>
-                {{ result.description }}
-              </span>
-            </p>
+            <div class="">
+              {{ result.description }}
+            </div>
           </div>
         </div>
       </div> 

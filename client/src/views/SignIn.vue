@@ -148,7 +148,7 @@ export default {
     }
     const loginRedirect = localStorage.getItem("loginRedirect")
     if (loginRedirect) {
-      localStorage.setItem("loginRedirect", null)
+      localStorage.removeItem("loginRedirect")
       redirect = loginRedirect
     }
     if (redirect) {

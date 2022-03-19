@@ -44,6 +44,15 @@
       >
         <VideoCameraIcon class="hidden md:block cursor-pointer w-5 "/>
       </div>
+      <div
+        :class="['avatar bg-error text-error-content btn btn-sm rounded-md']"
+         @click="onEndCall"
+         v-if="call"
+      >
+        <PhoneMissedCallIcon class="hidden md:block cursor-pointer w-5 "/>
+      </div>
+
+      
 
       <div class="dropdown">
         <label tabindex="0"
@@ -89,7 +98,7 @@ import {
   PhoneMissedCallIcon,
   TrashIcon,
   StopIcon,
-  BanIcon
+  BanIcon,
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -153,21 +162,6 @@ export default {
     }
   },
   watch: {
-    micOn () {
-      if (this.call && !this.micOn && !this.camOn) {
-        this.onEndCall()
-      }
-    },
-    camOn () {
-      if (this.call && !this.micOn && !this.camOn) {
-        this.onEndCall()
-      }
-    },
-    chat () {
-      if (this.call) {
-        this.onEndCall()
-      }
-    }
   },
   methods: {
     addUser (user) {

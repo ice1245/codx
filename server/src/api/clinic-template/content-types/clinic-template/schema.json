@@ -52,6 +52,9 @@
     },
     "readme": {
       "type": "string"
+    },
+    "name": {
+      "type": "string"
     }
   }
 }

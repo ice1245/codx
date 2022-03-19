@@ -4,14 +4,15 @@
     ]"
     :title="'@' + user.username">
   <div :class="avatarClass">
-    <span class="indicator-item badge badge-secondary" v-if="video && !muted">
-      <MicrophoneIcon class="w-4 animate-pulse" />
+    <span :class="['indicator-item badge', muted ? 'badge-error text-black' : 'badge-secondary']" v-if="video">
+      <MicrophoneIcon :class="['w-4', muted ? '' : 'animate-pulse']" />
     </span> 
     <video
       autoplay
       :muted="video.type === 'local'"
-      :src-object.prop.camel="video.stream"
-      v-if="video && !paused"
+      :src-object.prop.camel="paused ? null : video.stream"
+      :poster="paused ? 'https://cdn.dribbble.com/users/2208826/screenshots/6286951/guanxian.gif' : ''"
+      v-if="video"
       class="rounded-md object-fill z-0"
     ></video>
     <img :src="user.avatar" :width="size || 12" :height="size || 12" :class="user.online ? '' : 'grayscale'" v-else>
@@ -20,7 +21,7 @@
 </template>
 <script>
 import {
-  MicrophoneIcon,
+  MicrophoneIcon
 } from "@heroicons/vue/outline"
 export default {
   components: {
@@ -41,8 +42,8 @@ export default {
       return video && video.muted
     },
     avatarClass () {
-      const { user, video, paused, size, ring } = this
-      return video && !paused ? 'rounded-btn w-24 h-12' :
+      const { user, video, size, ring } = this
+      return video ? 'rounded-btn w-24 h-12' :
         [`bg-neutral-focus rounded-full w-${size || 12} h-${size || 12}`, (ring ? `ring ring-primary ring-offset-base-${ring} ring-offset-2` : '')]
     }
   }

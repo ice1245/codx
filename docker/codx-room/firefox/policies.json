@@ -7,15 +7,15 @@
     "Bookmarks": [
       {
         "Title": "code-server",
-        "URL": "http://localhost:9080/",
+        "URL": "http://localhost:9080/?folder=/home/codx",
         "Favicon": "https://raw.githubusercontent.com/coder/code-server/main/src/browser/media/favicon.svg",
         "Folder": "Pages",
         "Placement": "toolbar"
       },
       {
-        "Title": "YouTube",
-        "URL": "https://www.youtube.com/",
-        "Favicon": "https://www.youtube.com/favicon.ico",
+        "Title": "About codx",
+        "URL": "https://github.com/gbrian/codx",
+        "Favicon": "https://github.com/favicon.ico",
         "Folder": "Pages",
         "Placement": "toolbar"
       },
@@ -45,7 +45,7 @@
     "DisableSetDesktopBackground": true,
     "DisableSystemAddonUpdate": true,
     "DisableTelemetry": true,
-    "DisplayBookmarksToolbar": false,
+    "DisplayBookmarksToolbar": true,
     "DontCheckDefaultBrowser": true,
     "EnableTrackingProtection": {
       "Cryptomining": true,
