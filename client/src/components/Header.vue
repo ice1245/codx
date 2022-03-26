@@ -23,7 +23,7 @@
             class="mr-2 cursor-pointer"
           >
             <template v-slot:badges>
-              <TerminalIcon class="w-4 bg-neutral-focus text-neutral-content animate-pulse" v-if="user.currentClinicChatId && !liveClinic?.id" />
+              <TerminalIcon class="w-4 bg-neutral-focus text-neutral-content animate-pulse" v-if="userOnClinic(user)" />
             </template>
           </UserAvatar>
           <ul :tabindex="ix" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
@@ -205,6 +205,9 @@ export default {
           roomId
         }
       })
+    },
+    userOnClinic ({ clinic }) {
+      return !!clinic
     }
   },
   beforeUnmount () {

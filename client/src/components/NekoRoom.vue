@@ -1,6 +1,8 @@
 <template>
   <div class="neko-room w-full h-full relative p-2">
-    <iframe :class="['w-full h-full', loading ? 'opacity-0' : '']" :src="pageReady ? `${url}&ts=${ts}` : ''" frameborder="0" ref="nekoFrame" @load="onLoad()" v-if="pageReady">
+    <iframe :class="['w-full h-full', loading ? 'opacity-0' : '']"
+      :src="pageReady ? `${url}&ts=${ts}` : ''" frameborder="0" ref="nekoFrame" @load="onLoad()" v-if="pageReady"
+    >
     </iframe>
     <div class="absolute top-0 left-0 right-0 bottom-0 place-content-center prose" v-if="loading">
       <h2>Setting up room</h2>
@@ -14,6 +16,8 @@
 </template>
 <script>
 import axios from 'axios'
+import { mount } from 'mount-vue-component'
+import NekoRoomUserLayer from './NekoRoomUserLayer.vue'
 export default {
   props: ['room'],
   data () {
@@ -22,7 +26,17 @@ export default {
       loading: true,
       checkCount: 1,
       ts: new Date().getTime(),
-      checkTout: null
+      checkTout: null,
+      userLayer: null
+    }
+  },
+  created () {
+    this.checkPage()
+  },
+  beforeDestroy () {
+    clearInterval(this.checkTout)
+    if (this.userLayer) {
+      this.userLayer.destroy()
     }
   },
   computed: {
@@ -50,13 +64,10 @@ export default {
     },
     overlay () {
       return this.document.getElementsByClassName('overlay')[0]
+    },
+    users () {
+      return this.$storex.network.friends
     }
-  },
-  created () {
-    this.checkPage()
-  },
-  destroyed () {
-    clearInterval(this.checkTout)
   },
   methods: {
     async checkPage () {
@@ -92,13 +103,42 @@ export default {
           .video .player {
             background-color: transparent !important;
           }
+          .user-layer {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+          }
+          .overlay {
+            z-index: 2;
+          }
+          .player-overlay {
+            z-index: 3;
+          }
         </style>`
       this.document.head.insertAdjacentHTML("beforeend", style)
       this.overlay.addEventListener('click', ev => {
         this.neko.remote.request()
       })
+      this.overlay.addEventListener('mousemove', this.setUserCursor.bind(this))
+      this.overlay.addEventListener('mouseleave', this.removeUserCursor.bind(this))
       this.room.neko = this.neko
+      this.room.nekoClient = this.$client
       this.loading = false
+      // Create user layer
+      this.userLayer = mount(NekoRoomUserLayer, { props: { storex: this.$storex } })
+      const { el } = this.userLayer
+      el.className = "user-layer"
+      this.overlay.parentNode.prepend(el)
+    },
+    setUserCursor ({ layerX, layerY }) {
+      const { clientWidth, clientHeight } = this.overlay
+      const px = 100 / clientWidth * layerX
+      const py = 100 / clientHeight * layerY
+      this.room.cursorPosition = { px, py, ts: new Date().getTime() }
+    },
+    removeUserCursor () {
+      this.room.cursorPosition = null
     }
   }
 }

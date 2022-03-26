@@ -52,6 +52,10 @@ export const actions = actionTree(
         $stotex.clinic.setCurrentClinic()
       }
       $storex.clinic.setClinics(clinics.filter(c => c.id !== id))
+    },
+    notifyUserCursorPistion ({ state: { currentClinic }}, position) {
+      const { id } = $storex.user.user
+      console.log("clinic", { user: { id }, position })
     }
   },
 )

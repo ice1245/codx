@@ -35,19 +35,22 @@ export const mutations = mutationTree(state, {
         }
         const { user: { id, username, network: { friends } } } = $storex.user
         const { chats = {}, openedChat } = $storex.chat
-        const { chat: currentClinicChat } = $storex.clinic.currentClinic || {}
+        const { chat: currentClinicChat, cursorPosition } = $storex.clinic.currentClinic || {}
         socket.emit('heartbeat', {
           id,
           username,
           chats: Object.keys(chats).map(k => parseInt(k)),
           openedChat: openedChat?.id,
-          currentClinicChatId: currentClinicChat?.id,
+          clinic: {
+            currentClinicChatId: currentClinicChat?.id,
+            cursorPosition
+          },
           network: {
             friends: friends?.map(f => f.id)
           }
         })
       }
-      state.heartbeat = setInterval(heartbeat, 10000)
+      state.heartbeat = setInterval(heartbeat, 1000)
       heartbeat()
 
       socket.on('chat-message', (msg, callbackFn) => {

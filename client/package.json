@@ -17,6 +17,7 @@
     "dayspan-vuetify": "^0.4.0",
     "marked": "^4.0.12",
     "moment": "^2.29.1",
+    "mount-vue-component": "^0.10.1",
     "notiwind": "^1.2.5",
     "rtcmulticonnection": "^3.7.0",
     "socket.io-client": "^4.4.1",
