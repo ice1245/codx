@@ -35,11 +35,13 @@ export const mutations = mutationTree(state, {
         }
         const { user: { id, username, network: { friends } } } = $storex.user
         const { chats = {}, openedChat } = $storex.chat
+        const { chat: currentClinicChat } = $storex.clinic.currentClinic || {}
         socket.emit('heartbeat', {
           id,
           username,
           chats: Object.keys(chats).map(k => parseInt(k)),
           openedChat: openedChat?.id,
+          currentClinicChatId: currentClinicChat?.id,
           network: {
             friends: friends?.map(f => f.id)
           }
@@ -88,9 +90,11 @@ export const actions = actionTree(
       }
     },
     log (_, log) {
-      const { user: { id, username } = {} } = $storex.user
-      const { socket } =  $storex.session
-      socket && socket.emit('log', { user: { id, username }, log })
+      try {
+        const { id, username } = $storex.user.user || { id: 0, username: 'not-logged' }
+        const { socket } =  $storex.session
+        socket && socket.emit('log', { user: { id, username }, log })
+      } catch {}
     }
   },
 )

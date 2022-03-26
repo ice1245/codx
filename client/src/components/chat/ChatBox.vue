@@ -17,10 +17,10 @@
               :message="message"
               @cancel="onCancelEvent(message)"
               @ok="onConfirmEvent(message)"
-              :isMe="me.id === message.from.id"
+              :isMe="me.id === message?.from?.id"
               v-if="message.event" />
             <ChatEntry
-              :isMe="me.id === message.from.id"
+              :isMe="me.id === message?.from?.id"
               :message="message"
               @edit-message="onEditMessage"
               v-else/>

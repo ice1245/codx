@@ -9,4 +9,4 @@ done
 echo "DOCKER READY $(docker-compose --version)"
 
 echo "Run compose"
-docker-compose -f docker-compose.yaml up -d
+docker-compose -f docker-compose.yaml up

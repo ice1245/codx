@@ -1,17 +1,20 @@
 <template>
   <div class="clinic-list">
     <div class="flex flex-row gap-4 mt-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
-      <div class="relative w-1/6 h-32 px-2 py-1 border rounded-md flex flex-col justify-between bg-base-100 border-accent-focus"
-        v-for="(clinic, cix) in clinics" :key="cix"
+      <div class="relative grow h-32 px-2 py-1 border rounded-md flex flex-col justify-between bg-base-100 border-accent-focus drop-shadow-lg"
+        v-for="(clinic, cix) in orderedClinics" :key="cix"
       >
-        <div class="grow flex gap-2">
-          <h3 class="cursor-pointer" @click="canEdit(clinic) && (clinic.nameEdit = clinic.name)" v-if="!clinic.nameEdit">{{ clinic.name }}</h3>
-          <input v-model="clinic.nameEdit" type="text"
-            class="input input-bordered input-sm w-full max-w-xs"
-            @keypress.enter="() => [(clinic.nameEdit = null), $emit('update-clinic', { ...clinic, name: clinic.nameEdit })]"
-            v-else
-          >
-          <XCircleIcon class="w-4 cursor-pointer text-error" @click="clinic.nameEdit = null" v-if="clinic.nameEdit" />
+        <div class="grow">
+          <div class="flex gap-2">
+            <h3 class="cursor-pointer" @click="canEdit(clinic) && (clinic.nameEdit = clinic.name)" v-if="!clinic.nameEdit">{{ clinic.name }}</h3>
+            <input v-model="clinic.nameEdit" type="text"
+              class="input input-bordered input-sm w-full max-w-xs"
+              @keypress.enter="() => [(clinic.nameEdit = null), $emit('update-clinic', { ...clinic, name: clinic.nameEdit })]"
+              v-else
+            >
+            <XCircleIcon class="w-4 cursor-pointer text-error" @click="clinic.nameEdit = null" v-if="clinic.nameEdit" />
+          </div>
+          <div class="w-full prose"><small>{{ clinicCreationData(clinic) }}</small></div>
         </div>
         <div class="">
           <UserAvatar v-for="(user, uix) in clinicUsers(clinic)" :key="uix"
@@ -20,7 +23,7 @@
         </div>
         <div class="flex gap-2 justify-end">
           <button class="btn btn-xs btn-outline btn-warning gap-2"
-            @click="$emit('join-clinic', clinic)">
+            @click.prevent.stop="$emit('join-clinic', clinic)">
             <TerminalIcon class="w-4" /> Join
           </button>
           <button class="btn btn-xs btn-outline btn-error gap-2"
@@ -43,6 +46,7 @@ import {
   XCircleIcon,
   SaveIcon
 } from "@heroicons/vue/outline"
+import moment from 'moment'
 import UserAvatar from '@/components/UserAvatar.vue'
 export default {
   components: {
@@ -64,6 +68,9 @@ export default {
     },
     me () {
       return this.$storex.user.user
+    },
+    orderedClinics () {
+      return this.clinics.sort((a, b) => a.createdAt > b.createdAt ? -1 : 0)
     }
   },
   methods: {
@@ -77,6 +84,9 @@ export default {
     },
     canEdit ({ user: id }) {
       return id === this.me.id
+    },
+    clinicCreationData (clinic) {
+      return moment(clinic.createdAt).fromNow()
     }
   }
 }

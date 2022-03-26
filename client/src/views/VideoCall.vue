@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col items-center relative">
-    <EyeOffIcon class="w-14 btn absolute bottom-4 right-2 z-10" @click="$emit('close')" v-if="false"/>
+    <EyeOffIcon class="w-6 absolute top-4 right-4 z-10 ring cursor-pointer" @click="$emit('close')" v-if="true"/>
     <video
       autoplay
       :muted="calleeVideo.type === 'local'"

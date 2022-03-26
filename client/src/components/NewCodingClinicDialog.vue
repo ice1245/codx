@@ -1,12 +1,15 @@
 <template>
   <Dialog :title="'New coding clininc'">
       <template v-slot:icon>
-        <AvatarSelect
-          class="w-32"
-          selectedSize="12"
-          :avatars="companies"
-          :selected="companySelected"
-          @change="ix => companySelected = ix"/>
+        <div class="flex flex-col">
+          <div class="prose text-center mb-2"><h2>Host</h2></div>
+          <AvatarSelect
+            class=""
+            selectedSize="12"
+            :avatars="companies"
+            :selected="companySelected"
+            @change="ix => companySelected = ix"/>
+        </div>
       </template>
       <template v-slot:actions>
         <button :class="['btn shadow-sm px-4 py-2',
@@ -37,7 +40,7 @@
             v-for="(card, ix) in templates" :key="ix"
             @click="template = ix"
           >
-            <div :class="['w-40 h-32 border-dashed border-2 rounded-lg relative m-auto',
+            <div :class="['w-1/3 border-dashed border-2 rounded-lg relative m-auto',
               template === ix ? 'border-sky-500' : 'border-gray-500 opacity-60']">
               <div class="indicator-item badge badge-primary absolute top-0 left-10" v-if="template === ix + 100">Selected</div> 
               <img :src="cardImage(card)" class="w-full h-full" />
@@ -48,7 +51,10 @@
         </div>
 
         <label class="label cursor-pointer" @click="powerSizeShown = !powerSizeShown">
-          <u>Power size...</u>
+          <u class="flex">Power size 
+            <ChevronDownIcon class="w-6" v-if="!powerSizeShown"/>
+            <ChevronUpIcon class="w-6" v-else/>
+          </u>
         </label>
         <div class="border rounded-md p-2 h-40 flex flex-col" v-if="powerSizeShown">
           <ul class="w-full steps">
@@ -60,7 +66,7 @@
             <div class="flex flex-row gap-2 justify-end">
               <div class="flex flex-row gap-2">
                 <CogIcon class="w-6" />
-                <small>{{ powerSizes[powerSize].type }}</small>
+                <small>{{ powerSizes[powerSize].type }} / {{ powerSizes[powerSize].provider }}</small>
               </div>
               <div class="flex flex-row gap-2">
                 <ClockIcon class="w-6" />
@@ -73,16 +79,24 @@
     </Dialog>
 </template>
 <script>
-import { PlusIcon, CogIcon, ClockIcon } from '@heroicons/vue/outline'
+import {
+  PlusIcon,
+  CogIcon,
+  ClockIcon,
+  ChevronDownIcon,
+  ChevronUpIcon
+} from '@heroicons/vue/outline'
 import Dialog from '@/components/Dialog.vue'
 import AvatarSelect from '@/components/AvatarSelect.vue'
 export default {
   components: {
     PlusIcon,
+    CogIcon,
+    ClockIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
     AvatarSelect,
     Dialog,
-    CogIcon,
-    ClockIcon
   },
   props: ['clinicTemplates'],
   data () {
@@ -123,6 +137,13 @@ export default {
           ]
         }
       }
+    }
+  },
+  created () {
+    if (this.clinicTemplates?.length === 1) {
+      const { name, description } = this.clinicTemplates[0]
+      this.name = name
+      this.description = description
     }
   },
   computed: {

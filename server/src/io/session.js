@@ -6,15 +6,20 @@ module.exports = strapi => {
       }
     },
     network (user) {
-      const { network: { friends }, chats } = user
+      const { network: { friends }, chats, currentClinicChatId } = user
       return {
         friends: friends.map(fid => {
           const friend = strapi.io.onlineUsers[fid]
-          return friend ? {
+          if (!friend) {
+            return null
+          }
+          const openedChat = chats.indexOf(friend.openedChat) !== -1 ? friend.openedChat : null
+          return {
             id: fid,  
             online: true,
-            openedChat: chats.indexOf(friend.openedChat) !== -1 ? friend.openedChat : null
-          } : null
+            openedChat,
+            currentClinicChatId: friend.currentClinicChatId === openedChat ? friend.currentClinicChatId: null
+          }
         }).filter(f => !!f)
       }
     }

@@ -27,11 +27,10 @@ export const mutations = mutationTree(state, {
   },
   updateFriendStatus (state, friendStatus = []) {
     const { friends } = state
-    friendStatus.forEach(({id, online, openedChat }) =>
-      friends[id] = {
-        ...friends[id],
-        online,
-        openedChat
+    friendStatus.forEach(friend =>
+      friends[friend.id] = {
+        ...friends[friend.id],
+        ...friend
       })
     state.friends = {
       ...friends

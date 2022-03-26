@@ -13,20 +13,24 @@
           </button>
         </div>
       </template>
-      <div class="h-96">
-        <div class="tabs ml-4">
+      <div class="h-1/4">
+        <div class="tabs ml-4 mb-4">
           <a :class="['tab tab-bordered', tabIndex === 0 ? 'tab-active': '']"
             @click="tabIndex = 0">Overview</a> 
           <a :class="['tab tab-bordered', tabIndex === 1 ? 'tab-active': '']"
             @click="tabIndex = 1" v-if="template.readme">README</a> 
         </div>
-        <div v-if="tabIndex == 0">
-          <div class="max-w-lg p-4 space-x-4 carousel carousel-center bg-neutral rounded-box h-1/3">
-            <div class="w-full carousel-item"
-              v-for="(mhtml, iix) in media" :key="iix"
-              >
-              <div v-html="mhtml" class="w-full"></div>
-            </div>
+        <div v-if="tabIndex == 0" class="h-full">
+          <h1 class="prose">{{ template.name }}</h1>
+          <div :class="['w-full h-80 rounded-lg', 'slide-' + slideId, iix === slideId ? '' : 'hidden']"
+            v-for="(mhtml, iix) in media" :key="iix"
+            v-html="mhtml">
+          </div>
+          <div class="flex justify-center w-full py-2 gap-2">
+            <a href="#" class="btn btn-xs"
+              v-for="(_, mix) in media.length" :key="mix"
+              @click="slideId = mix"
+            >{{ mix + 1 }}</a>
           </div>
           <div class="flex flex-row w-full">
             <div class="ml-4 flex flex-col w-full">
@@ -52,17 +56,17 @@
       </div>
       <template v-slot:actions>
         <div class="flex gap-2 justify-end py-4">
-          <button class="btn btn-accent shadow-sm px-4 py-2 gap-2"
-            @click="onClose(true)"
-          >
-            <TerminalIcon class="w-6" />
-              Run
-          </button> 
           <button class="btn btn-error shadow-sm px-4 py-2"
             @click="$emit('close')"
           >
               Close
-            </button>
+          </button>
+          <button class="btn btn-accent shadow-sm px-4 py-2 gap-2"
+            @click="$emit('run', template)"
+          >
+            <TerminalIcon class="w-6" />
+              Run...
+          </button> 
         </div>
       </template>
     </Dialog>
@@ -90,12 +94,16 @@ export default {
   data () {
     return {
       tabIndex: 0,
+      slideId: 0,
       templateInfo: `# Test`
     }
   },
   async created () {
-    const { data: md } = await axios.get(this.template.readme)
-    this.templateInfo = md
+    const { readme } = this.template
+    if (readme) {
+      const { data: md } = await axios.get(this.template.readme)
+      this.templateInfo = md
+    }
   }
 
 }

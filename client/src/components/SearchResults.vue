@@ -4,7 +4,7 @@
       <div class="px-2 mx-2 flex-1">
         <div><span class="text-lg font-bold">{{ search.topic }}</span></div>
       </div>
-      <div class="flex-none hidden px-2 mx-2 lg:flex" v-if="user">
+      <div class="flex-none hidden px-2 mx-2 lg:flex" v-if="false && user">
         <div class="flex items-stretch">
           <a class="btn btn-ghost btn-sm rounded-btn"
             @click="newBlankClinic">
@@ -31,6 +31,32 @@
           </a>
         </div>
       </div> 
+      <div class="p-2 flex gap-4">
+        <div class="flex flex-row text-primary drop-shadow-sm">
+          <FireIcon class="w-6 mr-2" />
+          <div class="prose">
+            <div>Sponsored</div>
+          </div>
+        </div>
+        <div class="flex flex-row text-secondary drop-shadow-sm">
+          <AcademicCapIcon class="w-6 mr-2" />
+          <div class="prose">
+            <div>Free</div>
+          </div>
+        </div>
+        <div class="flex flex-row text-info drop-shadow-sm">
+          <BeakerIcon class="w-6 mr-2" />
+          <div class="prose">
+            <div>Data</div>
+          </div>
+        </div>
+        <div class="flex flex-row text-warning drop-shadow-sm">
+          <CodeIcon class="w-6 mr-2" />
+          <div class="prose">
+            <div>Coding/Web</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="m-2 shadow-lg flex flex-col">
       <div class="p-2 flex" v-if="runningClinics">
@@ -45,32 +71,7 @@
       />
     </div>
 
-    <div class="p-2 flex gap-4">
-      <div class="flex flex-row text-primary drop-shadow-sm">
-        <FireIcon class="w-6 mr-2" />
-        <div class="prose">
-          <div>Sponsored</div>
-        </div>
-      </div>
-      <div class="flex flex-row text-secondary drop-shadow-sm">
-        <AcademicCapIcon class="w-6 mr-2" />
-        <div class="prose">
-          <div>Free</div>
-        </div>
-      </div>
-      <div class="flex flex-row text-info drop-shadow-sm">
-        <BeakerIcon class="w-6 mr-2" />
-        <div class="prose">
-          <div>Data</div>
-        </div>
-      </div>
-      <div class="flex flex-row text-warning drop-shadow-sm">
-        <CodeIcon class="w-6 mr-2" />
-        <div class="prose">
-          <div>Coding/Web</div>
-        </div>
-      </div>
-    </div>
+
     <div class="my-2" v-if="searchString"><i>results for: {{ searchString }}</i></div>
 
     <div class="p-2 grid grid-cols-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-100">
@@ -109,7 +110,7 @@
         </div>
       </div> 
     </div>
-    <CodingClinicDialog
+    <NewCodingClinicDialog
       v-if="newCodingClinic"
       :clinicTemplates="clinicTemplates"
       @ok="onNewCodingClinic"
@@ -117,7 +118,6 @@
     />
     <CodingClinicTemplate
       @close="resultDialog = null"
-      @ok="resultDialog = null"
       @run="runClinicTemplate(resultDialog)"
       v-if="resultDialog"
       :template="resultDialog"
@@ -145,7 +145,7 @@ import {
   CodeIcon
 } from '@heroicons/vue/outline'
 import Avatar from '@/components/Avatar.vue'
-import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
+import NewCodingClinicDialog from '@/components/NewCodingClinicDialog.vue'
 import CodingClinicTemplate from '@/components/CodingClinicTemplate.vue'
 import OpenClinics from '@/components/OpenClinics.vue'
 import DeleteClinicDialog from '@/components/DeleteClinicDialog.vue'
@@ -162,7 +162,7 @@ export default {
     AcademicCapIcon,
     BeakerIcon,
     CodeIcon,
-    CodingClinicDialog,
+    NewCodingClinicDialog,
     CodingClinicTemplate,
     OpenClinics,
     DeleteClinicDialog
@@ -230,6 +230,7 @@ export default {
     runClinicTemplate (result) {
       if (!this.$root.login()) return
       this.clinicTemplates = [result]
+      this.resultDialog = null
       this.newCodingClinic = true
     },
     carrouselMe(result) {

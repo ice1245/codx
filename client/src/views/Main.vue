@@ -8,11 +8,11 @@
     />
     <div :class="[
       'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md py-4',
-      'w-2/6 lg:px-4 relative ml-0',
+      'w-1/4 h-full px-2 relative ml-0',
       'flex flex-col justify-between',
       '']"
       v-if="explorerBarVisible">
-      <Explorer class="explorer w-full"
+      <Explorer class="explorer w-full text-sm"
         v-if="explorerVisible"
         @academy-courses="onAcademyCourses"
         @coding-clinics="onCodingClinics"
@@ -80,6 +80,7 @@
             :class="['flex-none rounded-md p-2', chatVisible ? 'w-1/3' : 'w-full']"
             :call="$storex.call.currentCall"
             v-if="videoCallVisible"
+            @close="toggleVideoHidden"
           />
         </div>
       </div>
@@ -93,9 +94,17 @@
         <ChatAltIcon class="" />
       </div>
     </div>
-    <CodingClinicDialog
+    <div class="avatar absolute bottom-20 right-4 cursor-pointer"
+      v-if="videoCall && videoHidden"
+      @click="toggleVideoHidden"
+    >
+      <div class="mb-8 rounded-full w-12 h-12 ring ring-primary ring-offset-base-100 ring-offset-2 p-2">
+        <VideoCameraIcon class="" />
+      </div>
+    </div>
+    <NewCodingClinicDialog
       v-if="showCodingClinicDialog"
-      @close="showCodingClinicDialog = false"
+      @cancel="showCodingClinicDialog = false"
       @ok="onNewCodingClinic"
       />
   </div>
@@ -109,18 +118,20 @@ import Explorer from "@/views/Explorer.vue"
 import VideoCall from "@/views/VideoCall.vue"
 import Header from "@/components/Header.vue"
 import SearchResults from "@/components/SearchResults.vue"
-import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
+import NewCodingClinicDialog from '@/components/NewCodingClinicDialog.vue'
 import NekoRoom from '@/components/NekoRoom.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
 import Channel from '@/components/channel/Channel.vue'
 import Sprint from '@/components/Sprint.vue'
-import { ChatAltIcon } from "@heroicons/vue/outline"
+import { ChatAltIcon, VideoCameraIcon } from "@heroicons/vue/outline"
 import TaskManager from '@/components/TaskManager.vue'
 import InviteBtn from '@/components/InviteBtn.vue'
 import CodxAcademyHero from '@/components/hero/CodxAcademyHero.vue'
 import UserCalendar from '@/components/UserCalendar.vue'
 export default {
   components: {
+    ChatAltIcon,
+    VideoCameraIcon,
     SideBar,
     ChatBox,
     ChatList,
@@ -129,12 +140,11 @@ export default {
     VideoCall,
     Header,
     SearchResults,
-    CodingClinicDialog,
+    NewCodingClinicDialog,
     NekoRoom,
     LoadingDialog,
     Channel,
     Sprint,
-    ChatAltIcon,
     TaskManager,
     InviteBtn,
     CodxAcademyHero,
@@ -149,6 +159,7 @@ export default {
       showCodingClinics: true,
       showCodingClinicDialog: false,
       chatHidden: false,
+      videoHidden: false,
       loading: false,
       taskManager: null,
       hero: 'welcome',
@@ -199,8 +210,11 @@ export default {
     splittedView () {
       return !this.showCodingClinics && !this.showChannel && (!this.taskManager || this.chatVisible) || this.hero
     },
+    videoCall () {
+      return this.$storex.call.currentCall
+    },
     videoCallVisible () {
-      return this.$storex.call.currentCall && this.$storex.call.currentCall.streams
+      return (this.videoCall && this.$storex.call.currentCall.streams) && !this.videoHidden
     },
     stackPanels () {
       return this.chatVisible && this.videoCallVisible && this.currentClinic
@@ -290,8 +304,12 @@ export default {
     },
     async joinClinic ({ id, chat = {} }, alreadyNotified) {
       await this.resetView({ keepChat: true })
+      const { openedChat = {} } = this.$storex.chat
       if (chat.id) {
         await this.onOpenChat(chat)
+        if (chat.id !== openedChat.id) {
+          this.chatHidden = true
+        }
       }
       this.$storex.clinic.setCurrentClinic(id)
       if (!alreadyNotified) {
@@ -312,10 +330,16 @@ export default {
     leaveClinic () {
       this.clinicList = false
       this.$storex.clinic.setCurrentClinic()
+      if (!this.chatVisible) {
+        this.chatHidden = false
+      }
     },
     toggleChatHidden () {
       this.chatHidden = !this.chatHidden
       this.$storex.chat.openedChat.visible = !this.chatHidden 
+    },
+    toggleVideoHidden () {
+      this.videoHidden = !this.videoHidden
     },
     onEventClick ({ event: eventSettings }) {
       const { event, clinic, type, roomId } = eventSettings

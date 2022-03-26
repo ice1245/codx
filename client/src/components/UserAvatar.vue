@@ -1,12 +1,15 @@
 <template>
   <div :class="['avatar indicator not-prose',
-      user.online ? 'online' : ''
+      user.online && !video ? 'online' : ''
     ]"
     :title="'@' + user.username">
-  <div :class="avatarClass">
-    <span :class="['indicator-item badge', muted ? 'badge-error text-black' : 'badge-secondary']" v-if="video">
-      <MicrophoneIcon :class="['w-4', muted ? '' : 'animate-pulse']" />
-    </span> 
+  <div class="absolute z-10">
+    <slot name="badges" />
+  </div>
+  <div :class="[avatarClass]">
+    <div :class="['indicator-item badge', muted ? 'badge-error text-black' : 'badge-secondary']" v-if="video">
+      <MicrophoneIcon :class="['w-2', muted ? '' : 'animate-pulse']" />
+    </div>
     <video
       autoplay
       :muted="video.type === 'local'"

@@ -56,7 +56,7 @@
         v-for="(channel, ix) in $storex.channel.channels" :key="ix"
         @click="$emit('open-channel', channel)"
       >
-        <h4># {{ channel.name }}</h4>
+        <h4>#{{ channel.name }}</h4>
       </div>
       <div class="text-base pl-3 cursor-pointer ml-3 mt-2"
         @click="onCreateNewChannel"
@@ -79,12 +79,12 @@
     >
       <div
         v-for="(chat, ix) in $storex.chat.userChats" :key="ix"
-        :class="['text-base pl-3 cursor-pointer ml-3 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
+        :class="['text-base cursor-pointer ml-6 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
         @click="$emit('open-chat', chat)"
       >
           <div class="grow flex">
             <h4 class="">
-              @ {{ chatName(chat)}}
+              @{{ chatName(chat)}}
             </h4>
             <div class="-space-x-1 ml-2">
               <UserAvatar v-for="(user, uix) in chat.users" :key="uix"

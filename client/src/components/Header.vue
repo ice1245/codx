@@ -18,10 +18,14 @@
           :title="`@${user.username}`"
           v-for="(user, ix) in chatUsers" :key="ix">
           <UserAvatar
-          :tabindex="ix"
-          :user="user"
-          class="mr-2 cursor-pointer"
-        />
+            :tabindex="ix"
+            :user="user"
+            class="mr-2 cursor-pointer"
+          >
+            <template v-slot:badges>
+              <TerminalIcon class="w-4 bg-neutral-focus text-neutral-content animate-pulse" v-if="user.currentClinicChatId && !liveClinic?.id" />
+            </template>
+          </UserAvatar>
           <ul :tabindex="ix" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
             <li><a @click="$emit('user-profile', user)" >{{ `@${user.username}` }} </a></li>
             <li v-if="user.id !== me.id" @click="$emit('remove-user', user)" ><a><BanIcon class="w-5 mr-2"/>Remove</a></li>
@@ -99,6 +103,7 @@ import {
   TrashIcon,
   StopIcon,
   BanIcon,
+  CursorClickIcon
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -115,6 +120,7 @@ export default {
     TrashIcon,
     StopIcon,
     BanIcon,
+    CursorClickIcon,
     UserAdd,
     UserAvatar
   },

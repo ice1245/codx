@@ -22,7 +22,7 @@
     <button class="flex-none btn btn-info w-full" @click="newCodingClinic = true">
       <PlusIcon class="w-12 mr-2" /> Create clinic
     </button> 
-    <CodingClinicDialog
+    <NewCodingClinicDialog
       v-if="newCodingClinic"
       @ok="onNewCodingClinic"
       @cancel="newCodingClinic = false"
@@ -47,7 +47,7 @@ import {
   XCircleIcon,
   TrashIcon
 } from '@heroicons/vue/outline'
-import CodingClinicDialog from '@/components/CodingClinicDialog.vue'
+import NewCodingClinicDialog from '@/components/NewCodingClinicDialog.vue'
 import Dialog from '@/components/Dialog.vue'
 export default {
   components: {
@@ -56,7 +56,7 @@ export default {
     PlusIcon,
     XCircleIcon,
     TrashIcon,
-    CodingClinicDialog,
+    NewCodingClinicDialog,
     Dialog
   },
   data () {

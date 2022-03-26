@@ -37,7 +37,7 @@ RUN ARCH="$(dpkg --print-architecture)" && \
     mkdir -p /etc/fixuid && \
     printf "user: codx\ngroup: codx\n" > /etc/fixuid/config.yml
 
-ARG CODE_SERVER_VER=4.1.0
+ARG CODE_SERVER_VER=4.2.0
 RUN ARCH="$(dpkg --print-architecture)" && \
     curl -fsSL "https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VER}/code-server_${CODE_SERVER_VER}_${ARCH}.deb" > /tmp/code-server.deb
 

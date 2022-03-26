@@ -48,9 +48,7 @@ services:
       - "traefik.http.services.codx-web-$CONTAINER_PREFIX.loadbalancer.server.port=8080"
 
   neko-rooms:
-    image: "codx/neko-rooms:latest"
-    build:
-      context: ../neko-rooms
+    image: "m1k1o/neko-rooms:latest"
     restart: "unless-stopped"
     environment:
       - "TZ"
