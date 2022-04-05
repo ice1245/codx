@@ -21,8 +21,10 @@ const storePattern = {
 const store = createStore(storePattern)
 
 export const $storex = useAccessor(store, storePattern)
-$storex.init = () => {
-  $storex.log.init()
+$storex.init = async () => {
+  await $storex.log.init()
+  await $storex.session.init()
+  await $storex.clinic.init()
 }
 window.$storex = $storex
 export default store

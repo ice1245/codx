@@ -11,6 +11,7 @@ export const state = () => ({
 })
 
 export const getters = getterTree(state, {
+  hostingClinic: ({ currentClinic }) => currentClinic?.neko?.remote.hosting ? currentClinic : null
 })
 
 export const mutations = mutationTree(state, {
@@ -29,6 +30,11 @@ export const actions = actionTree(
   { state, getters, mutations },
   {
     init () {
+      if ($storex.session.isOnline) {
+        $storex.session.addListener({ event: 'clinic-request-control', cb: $storex.clinic.onReleaseControl.bind($storex.clinic) })
+      } else {
+        setTimeout(() =>  $storex.clinic.init(), 1000)
+      }
     },
     async newCodingClinic({ state }, clinicSettings) {
       const { data: clinic } = await api.createClinic(clinicSettings)
@@ -56,6 +62,27 @@ export const actions = actionTree(
     notifyUserCursorPistion ({ state: { currentClinic }}, position) {
       const { id } = $storex.user.user
       console.log("clinic", { user: { id }, position })
+    },
+    requestControl({ state: { currentClinic }}) {
+      if (currentClinic.neko.remote.hosting) {
+        return
+      }
+      const { id } = $storex.user.user
+      $storex.session.emit({
+        event: 'clinic-request-control',
+        data: { id, clinicId: currentClinic.id },
+        cb: () => {
+          currentClinic.neko.remote.request()
+        }
+      })
+    },
+    onReleaseControl ({ state: { currentClinic } }, { clinicId }) {
+      if (currentClinic?.id === clinicId) {
+        currentClinic?.neko.remote.release()
+      }
+    },
+    releaseControl ({ state: { currentClinic } }) {
+      currentClinic?.neko.remote.release()
     }
   },
 )

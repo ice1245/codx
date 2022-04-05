@@ -17,11 +17,11 @@ function injectApi (params) {
     // console.log("strapiServices", strapiServices)
     const sid = strapiServices.filter(s => s.endsWith(id))[0]
     return {
-      findMany: (...params) => strapi.entityService.findMany(...[sid, ...params]),
-      findOne: (...params) => strapi.entityService.findOne(...[sid, ...params]),
-      create: (...params) => strapi.entityService.create(...[sid, ...params]),
-      update: (...params) => strapi.entityService.update(...[sid, ...params]),
-      delete: (...params) => strapi.entityService.delete(...[sid, ...params])
+      findMany: (...args) => strapi.entityService.findMany(...[sid, ...args]),
+      findOne: (...args) => strapi.entityService.findOne(...[sid, ...args]),
+      create: (...args) => strapi.entityService.create(...[sid, ...args]),
+      update: (...args) => strapi.entityService.update(...[sid, ...args]),
+      delete: (...args) => strapi.entityService.delete(...[sid, ...args])
     }
   }
   return params
@@ -41,5 +41,6 @@ function createCoreService (id, cfg) {
 
 module.exports = {
   createCoreController,
-  createCoreService
+  createCoreService,
+  injectApi
 }

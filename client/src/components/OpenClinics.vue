@@ -6,7 +6,11 @@
       >
         <div class="grow">
           <div class="flex gap-2">
-            <h3 class="cursor-pointer" @click="canEdit(clinic) && (clinic.nameEdit = clinic.name)" v-if="!clinic.nameEdit">{{ clinic.name }}</h3>
+            <h3 :class="[clinic.canEdit ? 'cursor-pointer': '']"
+              @click="clinic.canEdit && (clinic.nameEdit = clinic.name)"
+              v-if="!clinic.nameEdit">
+                {{ clinic.name }}
+            </h3>
             <input v-model="clinic.nameEdit" type="text"
               class="input input-bordered input-sm w-full max-w-xs"
               @keypress.enter="() => [(clinic.nameEdit = null), $emit('update-clinic', { ...clinic, name: clinic.nameEdit })]"
@@ -28,7 +32,7 @@
           </button>
           <button class="btn btn-xs btn-outline btn-error gap-2"
             @click="$emit('delete-clinic', clinic)"
-            v-if="clinic.user.id === me.id"
+            v-if="true || clinic.canDelete"
           >
             <TrashIcon class="w-4" />
           </button>
@@ -81,9 +85,6 @@ export default {
     clinicUsers (clinic) {
       const chat = this.clinicChat(clinic)
       return chat?.users
-    },
-    canEdit ({ user: id }) {
-      return id === this.me.id
     },
     clinicCreationData (clinic) {
       return moment(clinic.createdAt).fromNow()

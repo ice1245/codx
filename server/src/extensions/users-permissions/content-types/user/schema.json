@@ -89,6 +89,9 @@
     },
     "profiles": {
       "type": "json"
+    },
+    "credits": {
+      "type": "integer"
     }
   }
 }

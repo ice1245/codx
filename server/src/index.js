@@ -1,6 +1,7 @@
 'use strict';
 const session = require("koa-session2")
 const ioManager = require('./io')
+const { injectApi } = require('./api/strapix')
 
 module.exports = {
   /**
@@ -24,6 +25,7 @@ module.exports = {
    * run jobs, or perform some special logic.
    */
   bootstrap({ strapi }) {
+    injectApi({ strapi })
     // https://docs.strapi.io/developer-docs/latest/development/backend-customization/models.html#hook-event-object
     strapi.db.lifecycles.subscribe({
       models: ['plugin::users-permissions.user'],
@@ -33,6 +35,23 @@ module.exports = {
           data.avatar = `https://avatars.dicebear.com/api/adventurer/${data.username}.svg`
         }
       },
+      async afterCreate(event) {
+        const { result: { id } } = event
+        // User intialization
+        await strapi.$api('network').create({ data: {
+          user: [ id ]
+        }})
+      },
+      async beforeDelete (event) {
+        const id = event.params.where.id;
+        const [network] = await strapi.$api('network').findMany({ filters: {
+          user: id
+        }})
+        if (network) {
+          // User intialization
+          await strapi.$api('network').delete(network.id)
+        }
+      }
     });
   },
 };

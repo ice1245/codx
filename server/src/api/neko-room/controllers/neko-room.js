@@ -10,12 +10,18 @@ module.exports = createCoreController('api::neko-room.neko-room', ({ strapi }) =
   return {
     async create ({ request: { body, header: { authorization } }, state: { user } }) {
       let { chat, settings } = body
+      const currentCredits = user.credits || 0
+      if (!currentCredits || (settings.credits || 0) > currentCredits) {
+        throw new Error("Not enough credits to run clinic.")
+      }
+
       chat = chat?.id ? await strapi.$api('chat').findOne(chat.id) : null
       user.token = authorization.split(" ")[1]
       const {
         roomSettings: { provider }
       } = settings
       settings.cloudProvider = (await strapi.$query('cloud-provider').findMany({ filters: { name: provider }}))[0]
+
       const room = await codx.room.createRoom({ user, settings })
       const nekoRoom = await strapi.$api('neko-room').create({ data: {
         user,

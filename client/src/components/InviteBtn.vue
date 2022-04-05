@@ -1,19 +1,8 @@
 <template>
-  <div class="alert bg-accent shadow-lg" v-if="!copied">
-    <div class="flex-col">
-      <div class="flex flex-row">
-        <SpeakerphoneIcon class="w-6 mr-2" />
-        <div>
-          Invite a friend!
-          <i> And get extra minutes...</i>
-        </div>
-      </div>
-      <button class="btn btn-info drop-shadow text-accent-content mt-2" @click="copyLink">
-        <ClipboardCopyIcon class="w-6 mr-2" />
-        <strong>{{ shareLInk }}</strong>
-      </button>
-    </div>
-  </div>
+    <button class="btn btn-info drop-shadow text-accent-content mt-2" @click="copyLink" v-if="me">
+      <ClipboardCopyIcon class="w-6 mr-2" />
+      <strong>{{ shareLInk }}</strong>
+    </button>
 </template>
 <script>
 import {
@@ -31,8 +20,11 @@ export default {
     }
   },
   computed: {
+    me () {
+      return this.$storex.user.user
+    },
     shareLInk () {
-      return `${window.location.origin}/join/@gbrian`
+      return `${window.location.origin}/join/@${this.me?.username}`
     }
   },
   methods: {

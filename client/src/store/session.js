@@ -36,6 +36,7 @@ export const mutations = mutationTree(state, {
         const { user: { id, username, network: { friends } } } = $storex.user
         const { chats = {}, openedChat } = $storex.chat
         const { chat: currentClinicChat, cursorPosition } = $storex.clinic.currentClinic || {}
+        const { hostingClinic } = $storex.clinic
         socket.emit('heartbeat', {
           id,
           username,
@@ -43,7 +44,8 @@ export const mutations = mutationTree(state, {
           openedChat: openedChat?.id,
           clinic: {
             currentClinicChatId: currentClinicChat?.id,
-            cursorPosition
+            cursorPosition,
+            hosting: !!hostingClinic
           },
           network: {
             friends: friends?.map(f => f.id)
@@ -98,6 +100,14 @@ export const actions = actionTree(
         const { socket } =  $storex.session
         socket && socket.emit('log', { user: { id, username }, log })
       } catch {}
+    },
+    addListener (_, { event, cb}) {
+      const { socket } =  $storex.session
+      socket.on(event, cb)
+    },
+    emit (_, { event, data, cb }) {
+      const { socket } =  $storex.session
+      socket.emit(event, data, cb)
     }
   },
 )

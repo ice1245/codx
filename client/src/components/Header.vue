@@ -23,7 +23,8 @@
             class="mr-2 cursor-pointer"
           >
             <template v-slot:badges>
-              <TerminalIcon class="w-4 bg-neutral-focus text-neutral-content animate-pulse" v-if="userOnClinic(user)" />
+              <TerminalIcon class="w-4 bg-neutral-focus text-neutral-content" v-if="userOnClinic(user) && !userHostingClinic(user)" />
+              <CursorClickIcon class="w-4 bg-neutral-focus text-neutral-content" v-if="userHostingClinic(user)" />
             </template>
           </UserAvatar>
           <ul :tabindex="ix" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
@@ -35,58 +36,59 @@
       </div>
     </div>
     <div class="flex items-center space-x-6">
-      <div
-        :class="['avatar', micOn ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
-         @click="onMic"
-      >
-        <MicrophoneIcon class="hidden md:block cursor-pointer w-5 "/>
+      <div class="flex space-x-2 p-2 border rounded-md" v-if="liveClinic">
+        <div
+          :class="['avatar', chatVisible ? 'btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
+          @click="$emit('toggle-chat')"
+        >
+          <ChatAltIcon class="hidden md:block cursor-pointer w-5 "/>
+        </div>
       </div>
-      
-      <div
-        :class="['avatar', camOn ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
-         @click="onCam"
-      >
-        <VideoCameraIcon class="hidden md:block cursor-pointer w-5 "/>
-      </div>
-      <div
-        :class="['avatar bg-error text-error-content btn btn-sm rounded-md']"
-         @click="onEndCall"
-         v-if="call"
-      >
-        <PhoneMissedCallIcon class="hidden md:block cursor-pointer w-5 "/>
+      <div class="flex space-x-2 p-2 border rounded-md">
+        <div
+          :class="['avatar', videoVisible ? 'btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
+          @click="$emit('toggle-video')"
+          v-if="call"
+        >
+          <EyeIcon class="hidden md:block cursor-pointer w-5 "/>
+        </div>
+        <div
+          :class="['avatar', micOn ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
+          @click="onMic"
+        >
+          <MicrophoneIcon class="hidden md:block cursor-pointer w-5 "/>
+        </div>
+        <div
+          :class="['avatar', camOn ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
+          @click="onCam"
+        >
+          <VideoCameraIcon class="hidden md:block cursor-pointer w-5 "/>
+        </div>
+        <div
+          :class="['online btn btn-sm btn-error text-white rounded-md']"
+          @click="onEndCall"
+          v-if="call"
+        >
+          <PhoneMissedCallIcon class="hidden md:block cursor-pointer w-5 "/>
+        </div>
       </div>
 
-      
-
-      <div class="dropdown">
-        <label tabindex="0"
-          :class="['m-1 btn btn-sm',
-          liveClinic ? 'online  btn-accent rounded-md' : 'btn-ghost']"
-          @click="liveClinic && $emit('leave-clinic')"
+      <div class="flex space-x-2 p-2 border rounded-md">
+        <div
+          :class="['online btn btn-sm btn-accent rounded-md']"
+          @click="$storex.clinic.releaseControl()"
+          v-if="$storex.clinic.hostingClinic"
+        >
+          <CursorClickIcon class="hidden md:block cursor-pointer w-5 "/>
+        </div>
+        <div
+          :class="['avatar', liveClinic ? 'online btn btn-sm btn-accent rounded-md' : 'btn btn-sm btn-ghost']"
+          tabindex="0"
+          @click="toggleClinic"
         >
           <TerminalIcon class="w-6" />
-          <div class="mx-2" v-if="liveClinic">{{ liveClinic.name }}</div>
-           <StopIcon v-if="liveClinic" class="w-6" />
-        </label>
-        <ul tabindex="0" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52" v-if="!liveClinic">
-          <li class="group relative" v-for="(clinic, ix) in clinics" :key="ix"
-            @click="$emit('join-clinic', clinic)"
-          >
-            <a>{{ clinic.name }}</a>
-            <div class="group-hover:visible invisible ml-4 pt-1 absolute right-2 top-1 cursor-pointer">
-              <TrashIcon class="w-5" @click.stop="$emit('delete-clinic', clinic)" />
-            </div>
-          </li>
-          <li @click="$emit('new-clinic')"><a>New...</a></li>
-        </ul>
-      </div>
-
-      <div class="form-control">
-        <div class="relative">
-          <input type="text" placeholder="Search" class="w-full pr-16 input input-sm input-primary input-bordered"> 
-          <SearchIcon class="absolute top-1 right-2 cursor-pointer w-5 " />
         </div>
-      </div> 
+      </div>
     </div>
   </div>
 </template>
@@ -103,7 +105,8 @@ import {
   TrashIcon,
   StopIcon,
   BanIcon,
-  CursorClickIcon
+  CursorClickIcon,
+  EyeIcon
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
@@ -120,11 +123,12 @@ export default {
     TrashIcon,
     StopIcon,
     BanIcon,
+    EyeIcon,
     CursorClickIcon,
     UserAdd,
     UserAvatar
   },
-  props: ['chat', 'explorerVisible', 'chatVisible'],
+  props: ['chat', 'explorerVisible', 'chatVisible', 'videoVisible'],
   data () {
     return {
       newCodingClinic: false
@@ -208,6 +212,18 @@ export default {
     },
     userOnClinic ({ clinic }) {
       return !!clinic
+    },
+    userHostingClinic ({ clinic }) {
+      return clinic && clinic.hosting
+    },
+    toggleClinic () {
+      if (this.liveClinic)  {
+        return this.$emit('leave-clinic')
+      }
+      if (this.clinics?.length) {
+        return this.$emit('join-clinic', this.clinics[0])
+      }
+      return this.$emit('new-clinic')
     }
   },
   beforeUnmount () {

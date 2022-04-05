@@ -19,7 +19,7 @@
       <div>codx academy</div>
       <div class="flex grow ml-2 mr-4">
         <progress class="progress progress-secondary mt-3 mx-2" value="20" max="100"></progress>
-        <small>200,5</small>
+        <small>{{ me.credits }}</small>
         <CreditCardIcon class="h-6 ml-1" />
       </div>
     </div>

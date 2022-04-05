@@ -85,7 +85,8 @@ module.exports = strapi => {
         chats,
         channels,
         clinics,
-        companies
+        companies,
+        credits: sme.credits
       }
     }
   }

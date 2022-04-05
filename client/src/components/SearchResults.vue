@@ -99,6 +99,10 @@
                     <ThumbUpIcon class="w-4" /> {{ result.likeCount }}
                     <ThumbDownIcon class="ml-2 w-4" /> {{ result.dislikeCount }}
                   </div>
+                  <div class="flex -space-x-1" title="20 cred/h">
+                    <CurrencyDollarIcon class="w-4 float-left" />
+                    <CurrencyDollarIcon class="w-4 float-left" />
+                  </div>
                 </div>
                 <small>Category 4*</small>
               </div>
@@ -142,7 +146,8 @@ import {
   TerminalIcon,
   AcademicCapIcon,
   BeakerIcon,
-  CodeIcon
+  CodeIcon,
+  CurrencyDollarIcon
 } from '@heroicons/vue/outline'
 import Avatar from '@/components/Avatar.vue'
 import NewCodingClinicDialog from '@/components/NewCodingClinicDialog.vue'
@@ -151,7 +156,6 @@ import OpenClinics from '@/components/OpenClinics.vue'
 import DeleteClinicDialog from '@/components/DeleteClinicDialog.vue'
 export default {
   components: {
-    Avatar,
     ThumbUpIcon,
     ThumbDownIcon,
     PlayIcon,
@@ -162,6 +166,8 @@ export default {
     AcademicCapIcon,
     BeakerIcon,
     CodeIcon,
+    CurrencyDollarIcon,
+    Avatar,
     NewCodingClinicDialog,
     CodingClinicTemplate,
     OpenClinics,

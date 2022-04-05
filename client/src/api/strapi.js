@@ -50,7 +50,9 @@ class Strapi {
 
   async sendMessage(chatMessage) {
     const { headers } = this
-    return useFetch.post("api/chat-messages", chatMessage, { headers })
+    const { chat, from } = chatMessage
+    const data = { ...chatMessage, chat: { id: chat.id }, from: { id: from.id } }
+    return useFetch.post("api/chat-messages", data, { headers })
   }
 
   async chatAddUser({ chat, user }) {

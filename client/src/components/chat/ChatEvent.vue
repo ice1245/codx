@@ -1,5 +1,5 @@
 <template>
-  <div class="alert w-1/3 flex flex-row justify-between mx-auto">
+  <div class="alert alert-warning flex flex-row justify-between mx-auto">
     <Avatar :url="message.from.avatar" />
     <div class="mx-3 grow">
       <label>{{ content }}</label>

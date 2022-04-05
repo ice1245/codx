@@ -49,6 +49,7 @@
           :chat="$storex.chat.openedChat"
           :explorerVisible="explorerVisible"
           :chatVisible="chatVisible"
+          :videoVisible="videoCall && !videoHidden"
           @leave-clinic="leaveClinic"
           @delete-clinic="deleteClinic"
           @join-clinic="joinClinic"
@@ -58,6 +59,7 @@
           @toggle-chat="toggleChatHidden"
           @remove-user="removeUser"
           @user-profile="showUserProfile"
+          @toggle-video="toggleVideoHidden"
           v-if="showHeader"
         />
       <div class="lg:flex flex-row hidden h-full w-full">
@@ -72,7 +74,6 @@
         >
           <ChatBox class="w-full chat-box grow border-l border-slate-500 bg-neutral-focus text-neutral-content"
             :chat="$storex.chat.openedChat" v-if="chatVisible"
-            :closeMe="!!currentClinic"
             @on-event-click="onEventClick"
             @hide-chat="toggleChatHidden"
           />
@@ -86,22 +87,6 @@
       </div>
     </div>
     <LoadingDialog v-if="loading" />
-    <div class="avatar absolute bottom-2 right-4 cursor-pointer"
-      v-if="chatHidden"
-      @click="toggleChatHidden"
-    >
-      <div class="mb-8 rounded-full w-12 h-12 ring ring-primary ring-offset-base-100 ring-offset-2 p-2">
-        <ChatAltIcon class="" />
-      </div>
-    </div>
-    <div class="avatar absolute bottom-20 right-4 cursor-pointer"
-      v-if="videoCall && videoHidden"
-      @click="toggleVideoHidden"
-    >
-      <div class="mb-8 rounded-full w-12 h-12 ring ring-primary ring-offset-base-100 ring-offset-2 p-2">
-        <VideoCameraIcon class="" />
-      </div>
-    </div>
     <NewCodingClinicDialog
       v-if="showCodingClinicDialog"
       @cancel="showCodingClinicDialog = false"
@@ -123,15 +108,12 @@ import NekoRoom from '@/components/NekoRoom.vue'
 import LoadingDialog from '@/components/LoadingDialog.vue'
 import Channel from '@/components/channel/Channel.vue'
 import Sprint from '@/components/Sprint.vue'
-import { ChatAltIcon, VideoCameraIcon } from "@heroicons/vue/outline"
 import TaskManager from '@/components/TaskManager.vue'
 import InviteBtn from '@/components/InviteBtn.vue'
 import CodxAcademyHero from '@/components/hero/CodxAcademyHero.vue'
 import UserCalendar from '@/components/UserCalendar.vue'
 export default {
   components: {
-    ChatAltIcon,
-    VideoCameraIcon,
     SideBar,
     ChatBox,
     ChatList,

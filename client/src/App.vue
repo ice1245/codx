@@ -27,7 +27,7 @@ export default {
       return authenticated
     },
     isDarkMode () {
-      const darkThemes = ['dark', 'halloween', 'black', 'luxury', 'dracula']
+      const darkThemes = ['dark', 'halloween', 'black', 'luxury', 'dracula', 'forest']
       return darkThemes.indexOf(this.currentTheme) !== -1
     },
     setTheme (theme) {

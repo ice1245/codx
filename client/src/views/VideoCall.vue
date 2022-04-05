@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-col items-center relative">
-    <EyeOffIcon class="w-6 absolute top-4 right-4 z-10 ring cursor-pointer" @click="$emit('close')" v-if="true"/>
     <video
       autoplay
       :muted="calleeVideo.type === 'local'"
@@ -30,11 +29,9 @@
   </div>
 </template>
 <script>
-import { EyeOffIcon } from '@heroicons/vue/solid'
 import Avatar from '@/components/Avatar.vue'
 export default {
   components: {
-    EyeOffIcon,
     Avatar
   },
   props: ["call"],

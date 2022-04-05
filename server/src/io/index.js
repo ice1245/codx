@@ -54,13 +54,41 @@ class ioManager {
   onConnection(socket) {
     // Say hi
     try {
-      socket.emit("welcome", {})
+      socket.emit("welcome", null, user => session.newUser({ ...user, socket }))
       socket.on('heartbeat', user => this.onHeartBeat({ ...user, socket }))
       socket.on('log', event => this.onLog(event))
+      this.onNewConnectionClinicEvents(socket)
       console.log("new socket", socket.handshake)
     } catch (ex) {
       console.error("io", "new socket connection error", { ex })
     }
+  }
+
+  onNewConnectionClinicEvents (socket) {
+    socket.on('clinic-request-control', ({ id, clinicId }, cb) => {
+      try {
+        const user = this.users[id]
+        const { network: { friends = [] } } = user
+        console.log("clinic-request-control", id, friends)
+        Promise.all(friends.filter(fid => !!this.users[fid]?.socket)
+            .map(fid => new Promise(ok => {
+            try {
+              this.users[fid].socket.timeout(2000).emit('clinic-request-control', { user: id, clinicId }, err => { 
+                ok(err + "")
+              })
+            } catch (err) {
+              ok(err + "")
+            }
+        }))
+        )
+        .then(responses => {
+          console.log("clinic-request-control", "callback done", responses)
+          cb()
+        })
+      } catch (ex) {
+        console.error(ex)
+      }
+    })
   }
 
   onHeartBeat (user) {

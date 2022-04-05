@@ -55,6 +55,9 @@
     },
     "name": {
       "type": "string"
+    },
+    "creditsHour": {
+      "type": "integer"
     }
   }
 }

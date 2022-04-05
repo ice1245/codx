@@ -42,8 +42,8 @@
 
 <script>
 import moment from 'moment'
-import ChatEntry from '../chat/ChatEntry.vue'
-import ChatEvent from '../ChatEvent.vue'
+import ChatEntry from './ChatEntry.vue'
+import ChatEvent from './ChatEvent.vue'
 import ChatInputArea from './ChatInputArea.vue'
 export default {
   components: {
@@ -117,7 +117,7 @@ export default {
           const { event } = extra
           const createdAt = moment(ts)
           if (!event && acc.length) {
-            const { id: mid } = from
+            const { id: mid } = from || {}
             const { from: { id: lid }, entries, createdAtFormat: lcatf } = acc[acc.length-1]
             if (lid === mid) {
               const nots = createdAt.diff(lcatf, 'minutes') < 2

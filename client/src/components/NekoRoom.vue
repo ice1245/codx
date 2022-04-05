@@ -93,7 +93,8 @@ export default {
           .header-container,
           .video-menu.bottom,
           .video-menu.top .fa-expand,
-          .neko-menu
+          .neko-menu,
+          .request-control
           {
             display: none !important;
           }
@@ -118,7 +119,7 @@ export default {
         </style>`
       this.document.head.insertAdjacentHTML("beforeend", style)
       this.overlay.addEventListener('click', ev => {
-        this.neko.remote.request()
+        this.$storex.clinic.requestControl()
       })
       this.overlay.addEventListener('mousemove', this.setUserCursor.bind(this))
       this.overlay.addEventListener('mouseleave', this.removeUserCursor.bind(this))
