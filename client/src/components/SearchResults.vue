@@ -31,34 +31,34 @@
           </a>
         </div>
       </div> 
-      <div class="p-2 flex gap-4">
-        <div class="flex flex-row text-primary drop-shadow-sm">
-          <FireIcon class="w-6 mr-2" />
-          <div class="prose">
-            <div>Sponsored</div>
-          </div>
+    </div>
+    <div class="p-2 flex gap-4">
+      <div class="flex flex-row text-primary drop-shadow-sm">
+        <FireIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Sponsored</div>
         </div>
-        <div class="flex flex-row text-secondary drop-shadow-sm">
-          <AcademicCapIcon class="w-6 mr-2" />
-          <div class="prose">
-            <div>Free</div>
-          </div>
+      </div>
+      <div class="flex flex-row text-secondary drop-shadow-sm">
+        <AcademicCapIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Free</div>
         </div>
-        <div class="flex flex-row text-info drop-shadow-sm">
-          <BeakerIcon class="w-6 mr-2" />
-          <div class="prose">
-            <div>Data</div>
-          </div>
+      </div>
+      <div class="flex flex-row text-info drop-shadow-sm">
+        <BeakerIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Data</div>
         </div>
-        <div class="flex flex-row text-warning drop-shadow-sm">
-          <CodeIcon class="w-6 mr-2" />
-          <div class="prose">
-            <div>Coding/Web</div>
-          </div>
+      </div>
+      <div class="flex flex-row text-warning drop-shadow-sm">
+        <CodeIcon class="w-6 mr-2" />
+        <div class="prose">
+          <div>Coding/Web</div>
         </div>
       </div>
     </div>
-    <div class="m-2 shadow-lg flex flex-col">
+    <div class="m-2 shadow-lg flex flex-col" v-if="false">
       <div class="p-2 flex" v-if="runningClinics">
         <TerminalIcon class="w-8 mr-2" />
         <div class="prose">

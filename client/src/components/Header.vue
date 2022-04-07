@@ -1,8 +1,8 @@
 <template>
   <div
-      class="text-primary pt-3 pb-2 px-4 flex flex-row space-x-5 border-b border-slate-600/50 w-full"
+      class="text-primary pt-3 pb-2 px-4 flex flex-row justify-between space-x-5 border-b border-slate-600/50 w-full"
     >
-    <div class="flex flex-row grow">
+    <div class="flex flex-row">
       <MenuIcon 
         :class="['cursor-pointer w-7 ml-2 mr-5', liveClinic ? 'lg:hidde' : '']"
         v-if="!explorerVisible && liveClinic"
@@ -34,6 +34,9 @@
         </div>
         <UserAdd class="ml-2 w-18 h18" :ignoreUsers="chatUsers" @user="user => addUser(user)" />
       </div>
+    </div>
+    <div class="flex items-center space-x-6 prose">
+      <h3>{{ headerTitle }}</h3>
     </div>
     <div class="flex items-center space-x-6">
       <div class="flex space-x-2 p-2 border rounded-md" v-if="liveClinic">
@@ -87,6 +90,7 @@
           @click="toggleClinic"
         >
           <TerminalIcon class="w-6" />
+          <div class="ml-2" v-if="chat?.clinic">{{ chat?.clinic?.name }}</div>
         </div>
       </div>
     </div>
@@ -169,6 +173,12 @@ export default {
     },
     me () {
       return this.$storex.user.user
+    },
+    headerTitle () {
+      if (this.chat) {
+        return this.chat.name || this.chat.users.map(u => u.username).join("-")
+      }
+      return null
     }
   },
   watch: {

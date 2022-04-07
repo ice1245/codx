@@ -64,3 +64,4 @@ docker/.env
 
 # traefic certs
 acme.json
+data

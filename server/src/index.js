@@ -44,7 +44,7 @@ module.exports = {
       },
       async beforeDelete (event) {
         const id = event.params.where.id;
-        const [network] = await strapi.$api('network').findMany({ filters: {
+        const [network] = await strapi.$query('network').findMany({ filters: {
           user: id
         }})
         if (network) {

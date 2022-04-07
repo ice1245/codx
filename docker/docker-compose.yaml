@@ -94,6 +94,26 @@ services:
       - "traefik.http.routers.codx-images.service=codx-images"
       - "traefik.http.services.codx-images.loadbalancer.server.port=5000"
 
+  wodxdb:
+    image: postgres
+    environment:
+      - POSTGRES_DB=$POSTGRES_DB
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+      - POSTGRES_USER=$POSTGRES_USER
+    volumes:
+      - $CODX_PATH/data:/var/lib/postgresql/data
+  wodx:
+    image: odoo
+    depends_on:
+      - wodxdb
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.codx-images.rule=Host(`$CMS_DOMAIN`)"
+        - "traefik.http.routers.codx-images.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+        - "traefik.http.routers.codx-images.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
+        - "traefik.http.routers.codx-images.service=codx-images"
+        - "traefik.http.services.codx-images.loadbalancer.server.port=8069"
+
   traefik:
     image: "traefik:latest"
     container_name: "traefik"

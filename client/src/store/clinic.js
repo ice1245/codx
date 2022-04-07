@@ -22,7 +22,7 @@ export const mutations = mutationTree(state, {
     state.clinics = [...state.clinics.filter(c => c.id !== clinic.id), clinic]
   },
   setCurrentClinic (state, id) {
-    state.currentClinic = state.clinics.filter(c => c.id === id)[0]
+    state.currentClinic = state.clinics?.filter(c => c.id === id)[0]
   }
 })
 

@@ -11,7 +11,8 @@ export const state = () => ({
 export const getters = getterTree(state, {
   userChats: ({ chats }) => Object.keys(chats)
                             .map(k => chats[k])
-                            .reduce((acc, c) => [acc, !c.isChannel && (acc[c.id] = c)][0], {})
+                            .filter(({ isChannel }) => !isChannel)
+                            .sort(a => a.clinic ? -1 : 1)
 })
 
 function prepareChat (chat, { visible }) {
@@ -27,6 +28,7 @@ function prepareChat (chat, { visible }) {
     guests,
     visible,
     messages,
+    clinic: $storex.clinic.clinics.filter(({ chat: { id } }) => id === chat.id)[0],
     get users () {
       return this.admins.concat(this.guests)
         .map(u => ($storex.network.allUsers||[])[u.id] || u)

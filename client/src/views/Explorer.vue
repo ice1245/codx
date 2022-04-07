@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="h-full">
     <div class="mt-2 mb-6 w-full">
       <label class="input-group input-group-sm w-full">
         <input type="text"
@@ -19,7 +19,7 @@
       <div>codx academy</div>
       <div class="flex grow ml-2 mr-4">
         <progress class="progress progress-secondary mt-3 mx-2" value="20" max="100"></progress>
-        <small>{{ me.credits }}</small>
+        <small>{{ me?.credits }}</small>
         <CreditCardIcon class="h-6 ml-1" />
       </div>
     </div>
@@ -38,12 +38,15 @@
     <div class="text-base pl-3 cursor-pointer mb-2"><StarIcon class="h-5 w-5 float-left mr-2" />Starred messages</div>
     <div class="text-base pl-3 cursor-pointer mb-2" @click="$emit('calendar')"><CalendarIcon class="h-5 w-5 float-left mr-2" />Next events</div>
 
-    <div class="text-base pl-3 mt-3 cursor-pointer"
+    <div class="flex justify-between text-base pl-3 mt-3 cursor-pointer border-b border-slate-800"
       @click="channelsOpen = !channelsOpen"
     >
-      <ChevronDownIcon class="h-5 w-5 float-left mr-2" v-if="channelsOpen" />
-      <ChevronUpIcon class="h-5 w-5 float-left mr-2" v-else />
-      Channels
+      <div>
+        <ChevronDownIcon class="h-5 w-5 float-left mr-2" v-if="channelsOpen" />
+        <ChevronUpIcon class="h-5 w-5 float-left mr-2" v-else />
+        Channels
+      </div>
+      <PlusIcon class="h-5 w-5 float-left mr-2 cursor-pointer" @click="onCreateNewChannel"/>
     </div>
     <div class="text-base pl-3"></div>
 
@@ -52,25 +55,23 @@
       style="max-height: calc(100vh - 280px)"
       v-if="channelsOpen"
     >
-      <div class="text-base pl-3 cursor-pointer ml-3 mt-2 prose"
+      <div class="text-base pl-3 cursor-pointer mt-2 prose"
         v-for="(channel, ix) in $storex.channel.channels" :key="ix"
         @click="$emit('open-channel', channel)"
       >
         <h4>#{{ channel.name }}</h4>
       </div>
-      <div class="text-base pl-3 cursor-pointer ml-3 mt-2"
-        @click="onCreateNewChannel"
-      >
-        <PlusIcon class="h-5 w-5 float-left mr-2" /> New channel
-      </div>
     </div>
 
-    <div class="text-base pl-3 mt-3 cursor-pointer"
+    <div class="flex justify-between text-base pl-3 mt-3 cursor-pointer border-b border-slate-800"
       @click="directMessagesOpen = !directMessagesOpen"
     >
-      <ChevronDownIcon class="h-5 w-5 float-left mr-2" v-if="directMessagesOpen" />
-      <ChevronUpIcon class="h-5 w-5 float-left mr-2" v-else />
-      Direct messages
+      <div>
+        <ChevronDownIcon class="h-5 w-5 float-left mr-2" v-if="channelsOpen" />
+        <ChevronUpIcon class="h-5 w-5 float-left mr-2" v-else />
+        Chats
+      </div>
+      <PlusIcon class="h-5 w-5 float-left mr-2 cursor-pointer" @click="$emit('new-chat')"/>
     </div>
     <div
       class="space-y-1.5 overflow-y-auto pb-12 lg:pb-0"
@@ -79,10 +80,11 @@
     >
       <div
         v-for="(chat, ix) in $storex.chat.userChats" :key="ix"
-        :class="['text-base cursor-pointer ml-6 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
+        :class="['text-base cursor-pointer ml-3 mt-2 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
         @click="$emit('open-chat', chat)"
       >
           <div class="grow flex">
+            <TerminalIcon class="w-4 mr-2" v-if="chat.clinic" />
             <h4 class="">
               @{{ chatName(chat)}}
             </h4>
@@ -101,9 +103,6 @@
           <div class="group-hover:visible invisible ml-4 pt-1">
             <TrashIcon class="w-5" @click.stop="confirmDeleteChat = chat" />
           </div>
-      </div>
-      <div class="text-base pl-3 cursor-pointer ml-3 mt-2" @click="$emit('new-chat')">
-        <PlusIcon class="h-5 w-5 float-left mr-2" /> New chat
       </div>
     </div>
     <Dialog
