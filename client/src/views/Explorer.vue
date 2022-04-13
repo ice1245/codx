@@ -46,7 +46,7 @@
         <ChevronUpIcon class="h-5 w-5 float-left mr-2" v-else />
         Channels
       </div>
-      <PlusIcon class="h-5 w-5 float-left mr-2 cursor-pointer" @click="onCreateNewChannel"/>
+      <PlusIcon class="h-5 w-5 float-left mr-2 cursor-pointer" @click.prevent.stop="onCreateNewChannel"/>
     </div>
     <div class="text-base pl-3"></div>
 
@@ -71,7 +71,7 @@
         <ChevronUpIcon class="h-5 w-5 float-left mr-2" v-else />
         Chats
       </div>
-      <PlusIcon class="h-5 w-5 float-left mr-2 cursor-pointer" @click="$emit('new-chat')"/>
+      <PlusIcon class="h-5 w-5 float-left mr-2 cursor-pointer" @click.prevent.stop="$emit('new-chat')"/>
     </div>
     <div
       class="space-y-1.5 overflow-y-auto pb-12 lg:pb-0"
@@ -80,7 +80,7 @@
     >
       <div
         v-for="(chat, ix) in $storex.chat.userChats" :key="ix"
-        :class="['text-base cursor-pointer ml-3 mt-2 flex felx-row group justify-between', chat.id === session.lastOpenChat ? 'font-bold' : '']"
+        :class="['text-base cursor-pointer ml-3 mt-2 flex felx-row group justify-between', chat.id === openedChat?.id ? 'font-bold' : '']"
         @click="$emit('open-chat', chat)"
       >
           <div class="grow flex">
@@ -192,6 +192,9 @@ export default {
     },
     me () {
       return this.$storex.user.user
+    },
+    openedChat () {
+      return this.$storex.chat.openedChat
     }
   },
   methods: {

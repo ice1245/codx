@@ -20,6 +20,11 @@ export default {
   mounted () {
     themeChange(false)
   },
+  computed: {
+    isMobile () {
+      return this.$isMobile()
+    }
+  },
   methods: {
     login () {
       const { authenticated } = this.$storex.user

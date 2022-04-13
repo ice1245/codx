@@ -33,7 +33,8 @@ export default {
   created () {
     this.checkPage()
   },
-  beforeDestroy () {
+  destroyed () {
+    console.log("NekoRoom", "destroyed")
     clearInterval(this.checkTout)
     if (this.userLayer) {
       this.userLayer.destroy()

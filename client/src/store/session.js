@@ -73,6 +73,7 @@ export const mutations = mutationTree(state, {
       socket.on('welcome', () => {
         $storex.user.fetchAccessToken()
       })
+      socket.on('chat-delete', ev => $storex.chat.removeChat(ev))
     }
   }
 })

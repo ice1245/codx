@@ -28,6 +28,9 @@
     },
     "data": {
       "type": "json"
+    },
+    "free": {
+      "type": "boolean"
     }
   }
 }

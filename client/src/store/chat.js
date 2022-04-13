@@ -1,5 +1,6 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex'
 import api from '@/api'
+import { $storex } from '.'
 
 export const namespaced = true
 
@@ -16,12 +17,13 @@ export const getters = getterTree(state, {
 })
 
 function prepareChat (chat, { visible }) {
-  const { id, admins = [], guests = [], messages = [], lastView = new Date() } = chat
+  const { id, admins = [], guests = [], messages = [] } = chat
   messages.forEach(m => {
     m.from = $storex.network.allUsers[m.from.id]
     m.createdAt = Date.parse(m.createdAt)
   })
-  const mention = `@${$storex.user.user.username}`
+  const me = $storex.user.user
+  const mention = `@${me.username}`
   return {
     ...chat,
     admins,
@@ -40,7 +42,12 @@ function prepareChat (chat, { visible }) {
     get missingMention () {
       return !!(this.unreadMessages||[]).filter(({ content }) => content.indexOf(mention) !== -1).length
     },
-    lastView
+    get lastView () {
+      return (this.readReceipt||{})[me.id] || this.createdAt
+    },
+    get isAdmin () {
+      return this.admins.filter(a => a.id === me.id).length !== 0
+    }
   }
 }
 
@@ -62,14 +69,11 @@ export const mutations = mutationTree(state, {
     }
     if (state.chats) {
       state.openedChat = state.chats[id]
-      if (state.openedChat) {
-        state.openedChat.lastView = new Date()
-      }
     }
   },
   async addMessage (state, { id, chat: { id: chatId }, from, content, createdAt, extra, edited }) {
     if (!state.chats[chatId]) {
-      await $storex.chat.refreshChat({ chatId })
+      await $storex.chat.refreshChat({ id: chatId })
     }
     const { messages = [] } = state.chats[chatId]
     const messageIx = messages.findIndex(m => m.id === id)
@@ -97,10 +101,16 @@ export const mutations = mutationTree(state, {
   },
   async deleteChat (state, chat) {
     await api.deleteChat(chat)
+    $storex.chat.removeChat(chat)
+  },
+  removeChat (state, { id }) {
     const { chats } = state
-    delete chats[chat.id]
+    delete chats[id]
     state.chats = {
       ...chats,
+    }
+    if (state.openedChat?.id === parseInt(id)) {
+      $storex.chat.setOpenedChat()
     }
   }
 })

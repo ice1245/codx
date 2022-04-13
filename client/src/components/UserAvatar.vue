@@ -18,7 +18,7 @@
       v-if="video"
       class="rounded-md object-fill z-0"
     ></video>
-    <img :src="user.avatar" :width="size || 12" :height="size || 12" :class="user.online ? '' : 'grayscale'" v-else>
+    <img :src="user.avatar" :width="size || 10" :height="size || 10" :class="user.online ? '' : 'grayscale'" v-else>
   </div>
 </div> 
 </template>
@@ -47,7 +47,7 @@ export default {
     avatarClass () {
       const { user, video, size, ring } = this
       return video ? 'rounded-btn w-24 h-12' :
-        [`bg-neutral-focus rounded-full w-${size || 12} h-${size || 12}`, (ring ? `ring ring-primary ring-offset-base-${ring} ring-offset-2` : '')]
+        [`bg-neutral-focus rounded-full w-${size || 10} h-${size || 10}`, (ring ? `ring ring-primary ring-offset-base-${ring} ring-offset-2` : '')]
     }
   }
 }

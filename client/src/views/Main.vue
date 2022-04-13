@@ -7,12 +7,12 @@
       @switch-company="onSwitchCompany"
     />
     <div :class="[
-      'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md py-4',
-      'w-1/4 h-full px-2 relative ml-0',
+      'detail-bar bg-neutral-focus text-neutral-content drop-shadow-md',
+      'grow h-full py-2 relative',
       'flex flex-col justify-between',
       '']"
       v-if="explorerBarVisible">
-      <Explorer class="explorer w-full text-sm"
+      <Explorer class="explorer w-full text-sm pl-2 pr-4"
         v-if="explorerVisible"
         @academy-courses="onAcademyCourses"
         @coding-clinics="onCodingClinics"
@@ -202,6 +202,9 @@ export default {
       return this.chatVisible && this.videoCallVisible && this.currentClinic
     },
     explorerBarVisible () {
+      if (this.$root.isMobile && (this.chatVisible || this.videoCallVisible || this.currentClinic)) {
+        return false
+      }
       return this.explorerVisible || this.profileVisible || this.calendarVisible
     }
   },
@@ -351,6 +354,8 @@ export default {
     removeUser (user) {
       const chat = this.$storex.chat.openedChat
       this.$storex.chat.removeUser({ user, chat })
+    },
+    showUserProfile (user){
     }
   }
 };

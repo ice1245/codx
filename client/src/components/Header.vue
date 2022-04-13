@@ -1,6 +1,6 @@
 <template>
   <div
-      class="text-primary pt-3 pb-2 px-4 flex flex-row justify-between space-x-5 border-b border-slate-600/50 w-full"
+      class="text-primary py-2 px-4 flex flex-row justify-between space-x-5 border-b border-slate-600/50 w-full"
     >
     <div class="flex flex-row">
       <MenuIcon 
@@ -13,30 +13,32 @@
         v-if="explorerVisible && liveClinic"
         @click="$emit('close-explorer')"
       />
-      <div class="flex flex-row">
-        <div class="dropdown"
-          :title="`@${user.username}`"
-          v-for="(user, ix) in chatUsers" :key="ix">
-          <UserAvatar
-            :tabindex="ix"
-            :user="user"
-            class="mr-2 cursor-pointer"
-          >
-            <template v-slot:badges>
-              <TerminalIcon class="w-4 bg-neutral-focus text-neutral-content" v-if="userOnClinic(user) && !userHostingClinic(user)" />
-              <CursorClickIcon class="w-4 bg-neutral-focus text-neutral-content" v-if="userHostingClinic(user)" />
-            </template>
-          </UserAvatar>
-          <ul :tabindex="ix" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
-            <li><a @click="$emit('user-profile', user)" >{{ `@${user.username}` }} </a></li>
-            <li v-if="user.id !== me.id" @click="$emit('remove-user', user)" ><a><BanIcon class="w-5 mr-2"/>Remove</a></li>
-          </ul>
+      <div class="flex flex-col">
+        <div class="flex flex-row">
+          <div class="dropdown"
+            :title="`@${user.username}`"
+            v-for="(user, ix) in chatUsers" :key="ix">
+            <UserAvatar
+              :tabindex="ix"
+              :user="user"
+              class="mr-1 cursor-pointer"
+            >
+              <template v-slot:badges>
+                <TerminalIcon class="w-4 bg-neutral-focus text-neutral-content" v-if="userOnClinic(user) && !userHostingClinic(user)" />
+                <CursorClickIcon class="w-4 bg-neutral-focus text-neutral-content" v-if="userHostingClinic(user)" />
+              </template>
+            </UserAvatar>
+            <ul :tabindex="ix" class="p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">
+              <li><a @click="$emit('user-profile', user)" >{{ `@${user.username}` }} </a></li>
+              <li v-if="user.id !== me.id" @click="$emit('remove-user', user)" ><a><BanIcon class="w-5 mr-2"/>Remove</a></li>
+            </ul>
+          </div>
+          <UserAdd class="" :ignoreUsers="chatUsers" @user="user => addUser(user)" />
         </div>
-        <UserAdd class="ml-2 w-18 h18" :ignoreUsers="chatUsers" @user="user => addUser(user)" />
+        <div class="flex items-center space-x-6 prose">
+          <small><strong><i><Label :label="headerTitle" /></i></strong></small>
+        </div>
       </div>
-    </div>
-    <div class="flex items-center space-x-6 prose">
-      <h3>{{ headerTitle }}</h3>
     </div>
     <div class="flex items-center space-x-6">
       <div class="flex space-x-2 p-2 border rounded-md" v-if="liveClinic">
@@ -114,6 +116,7 @@ import {
 } from "@heroicons/vue/outline"
 import UserAdd from '@/components/UserAdd.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import Label from '@/components/edit/Label.vue'
 export default {
   components: {
     SearchIcon,
@@ -130,7 +133,8 @@ export default {
     EyeIcon,
     CursorClickIcon,
     UserAdd,
-    UserAvatar
+    UserAvatar,
+    Label
   },
   props: ['chat', 'explorerVisible', 'chatVisible', 'videoVisible'],
   data () {
@@ -176,7 +180,8 @@ export default {
     },
     headerTitle () {
       if (this.chat) {
-        return this.chat.name || this.chat.users.map(u => u.username).join("-")
+        const chatUsers = this.chat.users.filter(u => u.id !== this.me.id)
+        return this.chat.name || `you  & ${chatUsers.map(u => '@' + u.username).join(", ")}`
       }
       return null
     }

@@ -66,7 +66,7 @@
             <div class="flex flex-row gap-2 justify-end">
               <div class="flex flex-row gap-2">
                 <CogIcon class="w-6" />
-                <small>{{ powerSizes[powerSize].type }} / {{ powerSizes[powerSize].provider }}</small>
+                <small>{{ powerSizes[powerSize].image }} / {{ powerSizes[powerSize].provider }}</small>
               </div>
               <div class="flex flex-row gap-2">
                 <ClockIcon class="w-6" />

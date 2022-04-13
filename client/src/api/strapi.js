@@ -45,7 +45,7 @@ class Strapi {
 
   async loadChat (id) {
     const { headers } = this
-    return useFetch.get(`api/chats/${id}?populate=admins,guests`, { headers })
+    return useFetch.get(`api/chats/${id}?populate=admins,guests&updateReadRecipe=1`, { headers })
   }
 
   async sendMessage(chatMessage) {

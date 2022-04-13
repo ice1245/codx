@@ -29,10 +29,11 @@ module.exports = strapi => {
         filters: { free: true }
       })
       return [
-        freeSubs.map(({ settings: { rooms: subscription } }) => ({
+        {
           personal: true,
-          subscription
-        }))[0],
+          subscription: freeSubs.map(({ settings: { rooms: subscription } }) => subscription)
+            .reduce((a,b ) => a.concat(b), [])
+        },
         ...paidSubs
       ]
     },

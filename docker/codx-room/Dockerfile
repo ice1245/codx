@@ -49,10 +49,12 @@ COPY --chown=codx code-server/settings.json /home/codx/.local/share/code-server/
 
 ## APPS
 COPY --chown=codx apps /home/codx/apps
+ENV CODX_APPS=/home/codx/apps
 ##
 
 ## github
 RUN mkdir /home/codx/codx
+RUN chown codx /home/codx/codx
 ##
 
 ENV PATH=$PATH:/usr/share/code

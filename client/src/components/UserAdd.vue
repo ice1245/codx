@@ -1,8 +1,8 @@
 <template>
   <div class="dropdown dropdown-right">
-    <div class="avatar ring rounded-full p-2" tabindex="0">
-      <div class="w-8 h-8 rounded-full">
-        <UserAddIcon :class="`hidden md:block cursor-pointer w-${size || 8}`" />
+    <div class="avatar rounded-full p-2" tabindex="0">
+      <div class="w-6 h-6 rounded-full">
+        <UserAddIcon :class="`hidden md:block cursor-pointer w-${size || 6}`" />
       </div>
     </div>
     <ul tabindex="0" class="ml-4 p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52">

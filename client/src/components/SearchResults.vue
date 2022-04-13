@@ -58,7 +58,7 @@
         </div>
       </div>
     </div>
-    <div class="m-2 shadow-lg flex flex-col" v-if="false">
+    <div class="m-2 shadow-lg flex flex-col" v-if="true">
       <div class="p-2 flex" v-if="runningClinics">
         <TerminalIcon class="w-8 mr-2" />
         <div class="prose">
