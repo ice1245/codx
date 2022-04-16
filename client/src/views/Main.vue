@@ -255,9 +255,9 @@ export default {
       this.resetView()
       this.showCodingClinics = await this.$storex.search.codingClinics()
     },
-    async onNewChat () {
+    async onNewChat (chatSettings) {
       if (!this.$root.login()) return
-      const chat = await this.$storex.chat.newChat()
+      const chat = await this.$storex.chat.newChat(chatSettings)
       this.onOpenChat(chat)
     },
     async onResultsNewCodingClinic (settings) {
@@ -292,8 +292,8 @@ export default {
       const { openedChat = {} } = this.$storex.chat
       if (chat.id) {
         await this.onOpenChat(chat)
-        if (chat.id !== openedChat.id) {
-          this.chatHidden = true
+        if (!this.chatHidden) {
+          this.toggleChatHidden()
         }
       }
       this.$storex.clinic.setCurrentClinic(id)
@@ -319,7 +319,14 @@ export default {
         this.chatHidden = false
       }
     },
-    toggleChatHidden () {
+    async toggleChatHidden () {
+      if (!this.$storex.chat.openedChat) {
+        const { currentClinic } = this.$storex.clinic
+        if (currentClinic) {
+          const chat = await this.$storex.chat.newChat({ clinicId: currentClinic.id })
+          this.$storex.chat.setOpenedChat({ ...chat, visible: true })
+        }
+      }
       this.chatHidden = !this.chatHidden
       this.$storex.chat.openedChat.visible = !this.chatHidden 
     },

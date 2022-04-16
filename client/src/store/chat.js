@@ -120,8 +120,8 @@ export const actions = actionTree(
   {
     init () {
     },
-    async newChat () {
-      const { data: chat } = await api.createChat({})
+    async newChat (ctx, chatSettings) {
+      const { data: chat } = await api.createChat(chatSettings)
       $storex.chat.addChat(chat)
       return chat
     },

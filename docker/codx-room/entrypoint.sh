@@ -1,5 +1,4 @@
 #!/bin/bash
-bash $CODX_APPS/clone-clinic.sh
-
+codx clone-clinic
 # Run supervisor
 /usr/bin/supervisord -c /etc/neko/supervisord.conf

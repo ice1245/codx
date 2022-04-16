@@ -8,13 +8,17 @@
 
 module.exports = createCoreController('api::chat.chat', ({ strapi }) => ({
   async create (ctx) {
-    const { name } = ctx.params
+    const { params: { name }, request: { body } } = ctx
     const data = {
+      ...body,
       admins: [ctx.state.user],
       name,
       roomId: `${uuid()}`
     }
     const { id } = await strapi.$api('chat').create({ data })
+    if (body.clinicId) {
+      await strapi.$api("neko-room").update(body.clinicId, { data: { chat: id }})
+    }
     return this.findOne({ ...ctx, params: { id }})
   },
   async findOne ({ state: { user }, params: { id } }) {
@@ -54,7 +58,7 @@ module.exports = createCoreController('api::chat.chat', ({ strapi }) => ({
   async delete (ctx) {
     const { state: { user }, params: { id }, request: { query } } = ctx
     const { guests = [], admins } = await strapi.$api('chat').findOne(id, { populate: { admins: true, guests: true } })
-    const isAdmin = guests.filter(a => a.id === user.id)[0]
+    const isAdmin = admins.filter(a => a.id === user.id)[0]
     const removeUser = isAdmin ? query.removeUser : guests.filter(a => a.id === user.id)[0]?.id
     if (removeUser) {
       const uid = parseInt(removeUser)

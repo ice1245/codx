@@ -209,8 +209,8 @@ export default {
     },
     chatName (chat) {
       const { id: myId } = this.me
-      const { users } = chat
-      return (users.length > 1 ? chat.users.filter(({ id }) => id !== myId) : users)
+      const { users, name } = chat
+      return name || (users.length > 1 ? chat.users.filter(({ id }) => id !== myId) : users)
         .map(u => u.username).join("-") 
     },
     onCreateNewChannel () {

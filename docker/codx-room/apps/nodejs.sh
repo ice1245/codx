@@ -1,7 +1,8 @@
-# Using Ubuntu
-curl -fsSL https://deb.nodesource.com/setup_17.x | sudo -E bash -
-sudo apt-get install -y nodejs
+# https://github.com/nvm-sh/nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 
-# Using Debian, as root
-curl -fsSL https://deb.nodesource.com/setup_17.x | bash -
-sudo apt-get install -y nodejs
+# reload profile after installing
+source ~/.profile
+nvm install node
+
+npm install -g yarn

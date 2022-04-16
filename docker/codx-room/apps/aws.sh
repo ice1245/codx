@@ -14,7 +14,7 @@ if [ -z "$AWS_CLIENT_SECRET" ]; then
 fi
 
 # aws
-apt install -y unzip
+sudo apt install -y unzip
 curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip
 rm awscliv2.zip
 ./aws/install && aws --version

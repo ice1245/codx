@@ -43,18 +43,17 @@ RUN ARCH="$(dpkg --print-architecture)" && \
 
 RUN dpkg -i /tmp/code-server.deb && rm /tmp/code-server*.deb
 
-COPY --chown=codx code-server/.config.yaml /home/codx/.config/code-server/config.yaml
-COPY --chown=codx code-server/settings.json /home/codx/.local/share/code-server/User/settings.json
+ENV CODX_HOME=/home/codx
+
+COPY --chown=codx code-server/.config.yaml ${CODX_HOME}/.config/code-server/config.yaml
+COPY --chown=codx code-server/settings.json ${CODX_HOME}/.local/share/code-server/User/settings.json
 ## CODE-SERVER
 
 ## APPS
-COPY --chown=codx apps /home/codx/apps
-ENV CODX_APPS=/home/codx/apps
-##
-
-## github
-RUN mkdir /home/codx/codx
-RUN chown codx /home/codx/codx
+COPY --chown=codx apps ${CODX_HOME}/apps
+ENV CODX_APPS=${CODX_HOME}/apps
+RUN chmod +x $CODX_APPS/codx.sh
+RUN cp $CODX_APPS/codx.sh /bin/codx
 ##
 
 ENV PATH=$PATH:/usr/share/code
@@ -64,5 +63,8 @@ COPY --chown=codx firefox/neko.js /usr/lib/firefox/mozilla.cfg
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+# Python
+RUN apt update && apt install -y python python3-pip 
 
 ENTRYPOINT [ "/entrypoint.sh" ]
