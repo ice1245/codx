@@ -39,6 +39,7 @@ services:
       - "BASE_URL=$WEB_BASE_URL"
       - "VUE_APP_API=$API_BASE_URL"
       - "CODX_WEB_PORT"
+      - "CMS_DOMAIN"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.codx-web-$CONTAINER_PREFIX.rule=Host(`$WEB_DOMAIN`)"
@@ -95,24 +96,28 @@ services:
       - "traefik.http.services.codx-images.loadbalancer.server.port=5000"
 
   wodxdb:
-    image: postgres
+    image: postgres:13
     environment:
-      - POSTGRES_DB=$POSTGRES_DB
-      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
-      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_DB=postgres
     volumes:
-      - $CODX_PATH/data:/var/lib/postgresql/data
+      - $CODX_PATH/data/odoo_db:/var/lib/postgresql/data
   wodx:
-    image: odoo
+    image: odoo:latest
     depends_on:
       - wodxdb
+    environment:
+      - HOST=wodxdb
+    volumes:
+      - $CODX_PATH/data/odoo:/var/lib/odoo
     labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.codx-images.rule=Host(`$CMS_DOMAIN`)"
-        - "traefik.http.routers.codx-images.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
-        - "traefik.http.routers.codx-images.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
-        - "traefik.http.routers.codx-images.service=codx-images"
-        - "traefik.http.services.codx-images.loadbalancer.server.port=8069"
+        - "traefik.http.routers.wodx.rule=Host(`$CMS_DOMAIN`)"
+        - "traefik.http.routers.wodx.entrypoints=${NEKO_ROOMS_TRAEFIK_ENTRYPOINT}"
+        - "traefik.http.routers.wodx.tls.certresolver=${NEKO_ROOMS_TRAEFIK_CERTRESOLVER}"
+        - "traefik.http.routers.wodx.service=wodx"
+        - "traefik.http.services.wodx.loadbalancer.server.port=8069"
 
   traefik:
     image: "traefik:latest"
