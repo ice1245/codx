@@ -7,10 +7,7 @@ export default defineConfig({
   base: process.env.VUE_APP_PUBLIC_PATH,
   server: {
     host: true,
-    port: 8080,
-    hmr: {
-      port: process.env.CODX_WEB_PORT || 443,
-    }
+    port: 8080
   },
   plugins: [vue()],
   resolve: {
