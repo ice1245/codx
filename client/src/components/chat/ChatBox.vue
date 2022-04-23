@@ -65,6 +65,7 @@ export default {
     },
     dayMessages () {
       !this.hasScrolled && requestAnimationFrame(this.scrollToBottom.bind(this))
+  
       return this.chat.messages
         .filter(m => m.content)
         .reduce((acc, m) => {
@@ -101,12 +102,25 @@ export default {
   },
   methods: {
     async sendMessage (message) {
+      if (!message){
+        return 
+      }
+      const chat = JSON.parse(JSON.stringify(this.chat))
+      const editing = JSON.parse(JSON.stringify(this.editing))
+     
+      
+      this.abortEditing()
       await this.$storex.chat.sendMessage({
-        chat: this.chat,
-        ...this.editing,
+        chat: chat,
+        ...editing,
         content: message
       })
-      this.abortEditing()
+      // await this.$storex.chat.sendMessage({
+      //   chat: this.chat,
+      //   ...this.editing,
+      //   content: message
+      // })
+      // this.abortEditing()
     },
     groupedMessages (messages) {
       const { users } = this

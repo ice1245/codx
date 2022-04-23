@@ -7,8 +7,8 @@
       <input type="text" :placeholder="placeholder || 'Type messages'"
         :class="['input block w-full md:px-4 px-3 md:py-3 py-2 focus:outline-none sm:text-base text-sm border-gray-300 rounded',
           editing ? 'border-error' : '']"
-        v-model="message"
-        @keydown.enter="$emit('send-message', message)"
+        v-model="localMessage"
+        @keydown.enter="sendMessage"
         @keydown.esc="$emit('abort-editing')"
       >
     </div>
@@ -18,7 +18,7 @@
       <button
         class="bg-accent text-accent-content md:w-14 w-10 md:h-12 h-10 flex items-center justify-center rounded-lg"
       >
-        <ChatAltIcon class="cursor-pointer md:w-6 w-5 t" @click="$emit('send-message', message)" />
+        <ChatAltIcon class="cursor-pointer md:w-6 w-5 t" @click="sendMessage" />
       </button>
     </div>
     <EyeOffIcon class="cursor-pointer md:w-14 text-error btn btn-outline"
@@ -44,8 +44,15 @@ export default {
   props: ['show', 'chat', 'closeMe', 'editing', 'message', 'placeholder'],
   data() {
     return {
+      localMessage : this.$props.message,
       editMessage: this.$props.message
     }
   },
+  methods:{
+    sendMessage(){
+      this.$emit('send-message', this.localMessage)   
+      this.localMessage = ""
+    }
+  }
 }
 </script>
